@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router";
 import { LandingPage } from "./pages/LandingPage/LandingPage";
+import { AuthPage } from "./pages/AuthPage/AuthPage";
 
 
 export function App() {
@@ -11,6 +12,8 @@ export function App() {
 
                 {/* Public Routes */}
                 <Route path="/" element={<LandingPage />} />
+                <Route path="/auth" element={<AuthPage />} />
+                
             </Routes>
         </BrowserRouter>
     )
