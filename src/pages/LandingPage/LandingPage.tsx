@@ -2,6 +2,11 @@ import styles from './LandingPage.module.css'
 
 export function LandingPage () {
     return (
-        <>Landing Page</>
+        <div className={styles.landingPageContainer}>
+            <div className={styles.tempLandingPageWelcomeContainer}>
+                <p>Welcome to Gift Keeper.</p>
+                <p>This page is under construction.  Please check back later.</p>
+            </div>
+        </div>
     )
 }

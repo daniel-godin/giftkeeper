@@ -1,0 +1,22 @@
+.landingPageContainer {
+    margin: 0;
+    padding: 0;
+
+    height: 100%;
+    width: 100%;
+
+    display: grid;
+    place-content: center;
+    place-items: center;
+}
+
+.tempLandingPageWelcomeContainer {
+    margin: 0;
+    padding: 1rem;
+
+    border: 1px solid black;
+    border-radius: .5rem;
+
+    display: flex;
+    flex-direction: column;
+}
