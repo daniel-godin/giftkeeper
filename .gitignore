@@ -27,3 +27,4 @@ dist-ssr
 public
 dist
 /src/firebase/firebaseConfig.ts
+.firebase
