@@ -11,7 +11,7 @@ export function AuthPage () {
     return (
         <div className={styles.authPageContainer}>
             <div className={styles.authBoxContainer}>
-                <div className={styles.tabs}>
+                <div className={styles.tabsContainer}>
                     {/* Sign In Button */}
                     <button
                         className={`${styles.tab} ${authMode === 'signin' ? styles.activeTab : ''}`}

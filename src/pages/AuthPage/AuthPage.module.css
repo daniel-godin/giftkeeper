@@ -1,0 +1,38 @@
+.authPageContainer {
+    margin: 0;
+    padding: 0;
+
+    height: 100%;
+    width: 100%;
+
+    display: grid;
+    place-content: center;
+    place-items: center;
+}
+
+.authBoxContainer {
+    margin: 0;
+    padding: 1rem;
+
+    height: 40dvh;
+    width: 50dvh;
+
+    border: 1px solid black;
+    border-radius: 0.5rem;
+
+    display: grid;
+    grid-template-rows: auto 1fr;
+    gap: 0.5rem;
+}
+
+.tabsContainer {
+    margin: 0;
+    padding: 0;
+
+    height: 100%;
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
