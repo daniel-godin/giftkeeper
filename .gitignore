@@ -26,3 +26,4 @@ dist-ssr
 # My Custom Ignores
 public
 dist
+/src/firebase/firebaseConfig.ts
