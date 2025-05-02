@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import styles from './SignInForm.module.css'
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../../firebase/firebase';
