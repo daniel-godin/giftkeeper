@@ -1,5 +1,8 @@
 import { FormEvent, useEffect, useState } from 'react'
 import styles from './SignInForm.module.css'
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../../../firebase/firebase';
+import { useNavigate } from 'react-router';
 
 interface SignInFormData {
     email: string;
@@ -7,6 +10,9 @@ interface SignInFormData {
 }
 
 export function SignInForm () {
+    const navigate = useNavigate();
+
+    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<SignInFormData>({email: '', password: ''});
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -18,13 +24,19 @@ export function SignInForm () {
         })
     }
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
+        setStatus('Signing in...');
         try {
-
+            await signInWithEmailAndPassword(auth, formData.email, formData.password);
+            setStatus('Successfully Signed In. Redirecting You...');
+            setTimeout(() => {
+                navigate('/dashboard');
+            }, 1500)
         } catch (error) {
             console.error('Error Signing In. Error:', error);
+            setStatus('Error Signing In');
         }
     }
 
@@ -53,6 +65,8 @@ export function SignInForm () {
             </label>
 
             <button className={styles.button}>Sign In</button>
+
+            {status && (<p>{status}</p>)}
         </form>
     )
 }
