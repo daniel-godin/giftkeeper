@@ -3,6 +3,7 @@ import { LandingPage } from "./pages/LandingPage/LandingPage";
 import { AuthPage } from "./pages/AuthPage/AuthPage";
 import { Dashboard } from "./pages/Dashboard/Dashboard";
 import { useAuth } from "./contexts/AuthContext";
+import { Layout } from "./layouts/Layout";
 
 
 export function App() {
@@ -17,7 +18,10 @@ export function App() {
                 <Route path="/auth" element={<AuthPage />} />
 
                 {/* Protected Routes */}
-                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/" element={<ProtectedRoute />}>
+                    <Route path="dashboard" element={<Dashboard />} />
+
+                </Route>
                 
             </Routes>
         </BrowserRouter>
@@ -25,12 +29,13 @@ export function App() {
 }
 
 // Protected Route Provides Loading & Route Protecting/Redirection (If No User Signed In)
-function ProtectedRoute ({ children } : { children: React.ReactNode }) {
+function ProtectedRoute () {
+
     const { authState } = useAuth();
 
     if (authState.loading) { return <div>Loading...</div> };
 
     if (!authState.user) { return <Navigate to='/auth' replace /> };
 
-    return <>{children}</>
+    return <Layout />
 }

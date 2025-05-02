@@ -1,0 +1,36 @@
+:root {
+    --border-color: #e9eaf3;
+}
+
+.layout {
+    margin: 0;
+    padding: 0;
+
+    /* height: 100%;
+    width: 100%; */
+
+    height: 100dvh;
+    width: 100dvw;
+
+    display: grid;
+    grid-template-columns: 270px 1fr;
+    grid-template-rows: 75px 1fr;
+    grid-template-areas:
+        "nav header"
+        "nav main"
+    ;
+}
+
+.navContainer {
+    grid-area: nav;
+    border-right: 1px solid var(--border-color);
+}
+
+.topHeaderContainer {
+    grid-area: header;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mainContentContainer {
+    background-color: #f8f9fc;
+}
