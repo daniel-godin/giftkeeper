@@ -13,3 +13,31 @@
     justify-items: center;
     gap: 0.5rem;
 }
+
+/* .topNav {
+    margin: 0;
+    padding: 0;
+
+    height: 100%;
+    width: 100%;
+
+    border-top: 1px solid black;
+
+    display: grid;
+    align-items: center;
+    justify-items: center;
+} */
+
+.navList {
+    margin: 0;
+    padding: 0;
+
+    height: 100%;
+    width: 100%;
+
+    list-style-type: none;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    place-items: center
+} 
