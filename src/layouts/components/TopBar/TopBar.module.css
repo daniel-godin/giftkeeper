@@ -1,0 +1,15 @@
+.topBar {
+    margin: 0;
+    padding: 1rem;
+
+    height: 100%;
+    width: 100%;
+
+    border-bottom: 1px solid black;
+
+    display: grid;
+    grid-template-columns: 75px 1fr 75px;
+    align-items: center;
+    justify-items: center;
+    gap: 0.5rem;
+}
