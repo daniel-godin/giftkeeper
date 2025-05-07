@@ -1,4 +1,6 @@
+import { Link } from 'react-router';
 import styles from './TopBar.module.css'
+import { Circle } from 'lucide-react';
 
 interface TopBarProps {
     deviceType: 'mobile' | 'desktop';
@@ -9,7 +11,9 @@ export function TopBar({ deviceType }: TopBarProps) {
     return (
         <header className={styles.topBar}>
             <div className={styles.logo}>
-                GiftKeeper
+                <Link to="/dashboard">
+                    GiftKeeper
+                </Link>
             </div>
 
             <div className={styles.middleContainer}>
@@ -25,7 +29,9 @@ export function TopBar({ deviceType }: TopBarProps) {
             </div>
 
             <div className={styles.profileIcon}>
-                P
+                <Link to="/profile">
+                    <Circle />
+                </Link>
             </div>
         </header>
     )
