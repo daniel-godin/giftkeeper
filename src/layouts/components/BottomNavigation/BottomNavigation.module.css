@@ -25,3 +25,17 @@
     grid-template-columns: 1fr 1fr 1fr 1fr;
     place-items: center
 }
+
+.navLink {
+    text-decoration: none;
+    color: black;
+    transition: all 0.2s ease-in-out;
+
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.navLink:hover {
+    transform: translateY(-2px);
+}
