@@ -13,9 +13,9 @@
     grid-template-rows: 75px 1fr 75px;
 }
 
-.mainContentContainer {
+.mainContent {
     margin: 0;
-    padding: 0; /* Possibly add a default here */
+    padding: 1rem; /* Possibly a smaller REM for mobile screens */
 
     height: 100%;
     width: 100%;
