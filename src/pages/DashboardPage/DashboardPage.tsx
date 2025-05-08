@@ -1,6 +1,6 @@
 import styles from './DashboardPage.module.css'
 
-export function Dashboard () {
+export function DashboardPage () {
     return (
         <>Dashboard</>
     )

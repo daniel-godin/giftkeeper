@@ -1,7 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { LandingPage } from "./pages/LandingPage/LandingPage";
 import { AuthPage } from "./pages/AuthPage/AuthPage";
-import { Dashboard } from "./pages/Dashboard/Dashboard";
+import { DashboardPage } from "./pages/DashboardPage/DashboardPage";
 import { useAuth } from "./contexts/AuthContext";
 import { Layout } from "./layouts/Layout";
 
@@ -19,7 +19,7 @@ export function App() {
 
                 {/* Protected Routes */}
                 <Route path="/" element={<ProtectedRoute />}>
-                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="dashboard" element={<DashboardPage />} />
 
                 </Route>
                 
