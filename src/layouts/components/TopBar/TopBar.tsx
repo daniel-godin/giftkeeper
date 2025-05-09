@@ -55,7 +55,7 @@ export function TopBar({ deviceType }: TopBarProps) {
 
             <div className={styles.profileIcon}>
                 <Link to="/profile">
-                    <Circle />
+                    <Circle size={35}/>
                 </Link>
             </div>
         </header>
