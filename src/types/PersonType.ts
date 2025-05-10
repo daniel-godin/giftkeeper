@@ -1,8 +1,8 @@
-import { Timestamp } from "firebase/firestore";
+import { FieldValue, Timestamp } from "firebase/firestore";
 import { CalendarDate } from "./CommonTypes";
 
 
-interface Person {
+export interface Person {
     id: string;
     name: string;
     relationship?: string;
@@ -27,6 +27,6 @@ interface Person {
     }
 
     // Metadata
-    createdAt: Timestamp;
-    updatedAt: Timestamp;
+    createdAt: Timestamp | FieldValue;
+    updatedAt: Timestamp | FieldValue;
 }
