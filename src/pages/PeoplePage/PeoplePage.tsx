@@ -1,6 +1,6 @@
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import styles from './PeoplePage.module.css'
-import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Person } from '../../types/PersonType';
@@ -8,8 +8,44 @@ import { Person } from '../../types/PersonType';
 export function PeoplePage () {
     const { authState } = useAuth();
 
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [people, setPeople] = useState<Person[]>([]);
+
     const [newPerson, setNewPerson] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Guard Clause
+        if (!authState.user) {
+            setPeople([]);
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+
+        // Firestore Queries
+        const peopleRef = collection(db, 'users', authState.user.uid, 'people');
+        const peopleQuery = query(peopleRef, orderBy('name')); // Sorts by name
+
+        const unsubscribe = onSnapshot(peopleQuery, (snapshot) => {
+            const peopleList: Person[] = [];
+            snapshot.forEach((doc) => {
+                peopleList.push(doc.data() as Person);
+            })
+            setPeople(peopleList);
+            setIsLoading(false);
+        }, (error) => {
+            console.error('Error fetching people:', error);
+            setIsLoading(false);
+        })
+
+        return () => unsubscribe();
+    }, [])
+
+    useEffect(() => {
+        console.log(people);
+    }, [people])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewPerson(e.target.value);
