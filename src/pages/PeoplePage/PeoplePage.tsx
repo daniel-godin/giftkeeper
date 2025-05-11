@@ -96,6 +96,24 @@ export function PeoplePage () {
                 <button className={styles.submitButton}>{isSubmitting ? (<>Creating New Person...</>) : (<>Create New Person</>)}</button>
             </form>
 
+            <div className={styles.peopleContainer}>
+                {isLoading ? (
+                    <div className={styles.loadingMessage}>Loading people...</div>
+                ) : (
+                    <div className={styles.peopleGrid}>
+                        {people.length === 0 ? (
+                            <div>No people added yet.  Add someone to get get started!</div>
+                        ) : (
+                            people.map((person) => (
+                                <div key={person.id} className={styles.personCard}>
+                                    {person.name}
+                                </div>
+                            ))
+                        )}
+                    </div>  
+                )}
+            </div>
+
         </section>
     )
 }
