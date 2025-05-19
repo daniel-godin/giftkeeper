@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './EventsPage.module.css'
-import { CalendarDate } from '../../types/CommonTypes';
-import { Event, TempEvent } from '../../types/EventType';
-import { collection, doc, FieldValue, onSnapshot, orderBy, query, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
+import { TempEvent } from '../../types/EventType';
+import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 
 export function EventsPage () {
