@@ -1,8 +1,89 @@
+import { useState } from 'react';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './EventsPage.module.css'
+import { CalendarDate } from '../../types/CommonTypes';
+import { Event, TempEvent } from '../../types/EventType';
+import { collection, doc, FieldValue, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
+import { db } from '../../firebase/firebase';
 
 export function EventsPage () {
+    const { authState } = useAuth();
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    // const [events, setEvents] = useState<Event[]>([]);
+
+    const [newEvent, setNewEvent] = useState({title: '', date: '' })
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        
+        setNewEvent({
+            ...newEvent,
+            [name]: value
+        })
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Guard Clauses:
+        if (!newEvent || !newEvent.title || !newEvent.date) { console.warn('Must include both title & date'); return; };
+        if (!authState.user) { return; };
+
+        setIsSubmitting(true);
+        try {
+            const newDocRef = doc(collection(db, 'users', authState.user.uid, 'events'))
+            const newEventObject: TempEvent = {
+                id: newDocRef.id,
+                title: newEvent.title,
+                date: newEvent.date, // I need to use either a basic ISO string, or use my custom CalendarDate object.
+
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            }
+
+            await setDoc(newDocRef, newEventObject);
+
+            console.log(`New Event (${newEvent.title}) created on ${newEvent.date}.`)
+            setNewEvent({ title: '', date: '' });
+
+        } catch (error) {
+            console.error('Error submitting new event. Error:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
+    }
+
 
     return (
-        <>EventsPage</>
+        <section className={styles.eventsPage}>
+            <h1>Events</h1>
+
+            <form className={styles.formCreateEvent} onSubmit={handleSubmit} autoComplete='off'>
+                <label className={styles.label}>Event Title:
+                    <input
+                        type='text'
+                        name='title'
+                        required={true}
+                        value={newEvent.title}
+                        onChange={handleInputChange}
+                    />
+                </label>
+
+                <label className={styles.label}>Date:
+                    <input
+                        type='date'
+                        name='date'
+                        required={true}
+                        value={newEvent.date}
+                        onChange={handleInputChange}
+                    />
+                </label>
+
+                <button className={styles.button}>{isSubmitting ? (<>Creating New Event...</>) : (<>Create New Event</>)}</button>
+            </form>
+        </section>
     )
 }

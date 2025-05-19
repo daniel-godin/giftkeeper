@@ -15,3 +15,13 @@ export interface Event {
     createdAt: Timestamp | FieldValue;
     updatedAt: Timestamp | FieldValue;
 }
+
+export interface TempEvent {
+    id: string;
+    title: string;
+    date: string;
+
+    // Metadata
+    createdAt: Timestamp | FieldValue;
+    updatedAt: Timestamp | FieldValue;
+}
