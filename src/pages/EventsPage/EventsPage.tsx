@@ -1,19 +1,48 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './EventsPage.module.css'
 import { CalendarDate } from '../../types/CommonTypes';
 import { Event, TempEvent } from '../../types/EventType';
-import { collection, doc, FieldValue, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
+import { collection, doc, FieldValue, onSnapshot, orderBy, query, serverTimestamp, setDoc, Timestamp } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 
 export function EventsPage () {
     const { authState } = useAuth();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    // const [events, setEvents] = useState<Event[]>([]);
+    const [events, setEvents] = useState<TempEvent[]>([]);
 
     const [newEvent, setNewEvent] = useState({title: '', date: '' })
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Guard Clause
+        if (!authState.user) {
+            setEvents([]);
+            setIsLoading(false);
+            return;
+        }
+
+        setIsLoading(true);
+
+        // Firestore Queries
+        const eventsRef = collection(db, 'users', authState.user.uid, 'events');
+        const peopleQuery = query(eventsRef, orderBy('date')); // Sorts by date
+
+        const unsubscribe = onSnapshot(peopleQuery, (snapshot) => {
+            const eventsList: TempEvent[] = [];
+            snapshot.forEach((doc) => {
+                eventsList.push(doc.data() as TempEvent);
+            })
+            setEvents(eventsList);
+            setIsLoading(false);
+        }, (error) => {
+            console.error('Error fetching people:', error);
+            setIsLoading(false);
+        })
+
+        return () => unsubscribe();
+    }, [])
 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,6 +113,24 @@ export function EventsPage () {
 
                 <button className={styles.button}>{isSubmitting ? (<>Creating New Event...</>) : (<>Create New Event</>)}</button>
             </form>
+
+            <div className={styles.eventsContainer}>
+                {isLoading ? (
+                    <div className={styles.loadingMessage}>Loading events...</div>
+                ) : (
+                    <div className={styles.eventsGrid}>
+                        {events.length === 0 ? (
+                            <div>No events added yet.  Create an Event to get started!</div>
+                        ) : (
+                            events.map((event) => (
+                                <div key={event.id} className={styles.eventCard}>
+                                    {event.title} ({event.date})
+                                </div>
+                            ))
+                        )}
+                    </div>  
+                )}
+            </div>
         </section>
     )
 }
