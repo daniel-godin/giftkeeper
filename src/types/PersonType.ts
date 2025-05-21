@@ -6,7 +6,7 @@ export interface Person {
     id?: string;
     name: string;
     relationship?: string;
-    birthday?: CalendarDate;
+    birthday?: string;
     avatar?: string; // URL to profile image
     notes?: string;
 
