@@ -3,7 +3,7 @@ import { CalendarDate } from "./CommonTypes";
 
 
 export interface Person {
-    id: string;
+    id?: string;
     name: string;
     relationship?: string;
     birthday?: CalendarDate;
@@ -27,6 +27,6 @@ export interface Person {
     }
 
     // Metadata
-    createdAt: Timestamp | FieldValue;
-    updatedAt: Timestamp | FieldValue;
+    createdAt?: Timestamp | FieldValue;
+    updatedAt?: Timestamp | FieldValue;
 }
