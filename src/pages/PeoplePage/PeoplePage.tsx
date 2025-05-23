@@ -4,12 +4,15 @@ import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } 
 import { db } from '../../firebase/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Person } from '../../types/PersonType';
+import { AddPersonModal } from '../../components/modals/AddPersonModal/AddPersonModal';
 
 export function PeoplePage () {
     const { authState } = useAuth();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [people, setPeople] = useState<Person[]>([]);
+
+    const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
 
     const [newPerson, setNewPerson] = useState<string>('');
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -84,6 +87,8 @@ export function PeoplePage () {
         <section className={styles.peoplePage}>
             <h1>People</h1>
 
+            <button onClick={() => setIsAddPersonModalOpen(true)}>Add Person</button>
+
             <form className={styles.formCreatePerson} onSubmit={handleNewPersonForm}>
                 <input
                     type='text'
@@ -113,6 +118,11 @@ export function PeoplePage () {
                     </div>  
                 )}
             </div>
+
+            <AddPersonModal
+                isOpen={isAddPersonModalOpen}
+                onClose={() => setIsAddPersonModalOpen(false)}
+            />
 
         </section>
     )
