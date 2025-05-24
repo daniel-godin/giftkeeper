@@ -26,7 +26,10 @@ export function App() {
                 <Route path="/" element={<ProtectedRoute />}>
                     <Route path="dashboard" element={<DashboardPage />} />
                     <Route path="profile" element={<ProfilePage />} />
+
                     <Route path="people" element={<PeoplePage />} />
+                    <Route path="people/:personId" element={<></>} />
+                    
                     <Route path="events" element={<EventsPage />} />
                     <Route path="gift-lists" element={<GiftListsPage />} />
                     <Route path="wish-lists" element={<WishListsPage />} />
