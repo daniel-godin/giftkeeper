@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './EventsPage.module.css'
-import { TempEvent } from '../../types/EventType';
 import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
+import { Link } from 'react-router';
+import { Event } from '../../types/EventType';
+import { AddEventModal } from '../../components/modals/AddEventModal/AddEventModal';
 
 export function EventsPage () {
     const { authState } = useAuth();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [events, setEvents] = useState<TempEvent[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
 
-    const [newEvent, setNewEvent] = useState({title: '', date: '' })
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isAddNewEventModalOpen, setIsAddNewEventModalOpen] = useState<boolean>(false);
 
+    // Firestore onSnapshot Listener for collection(db, 'users', {userId}, 'events')
     useEffect(() => {
         // Guard Clause
         if (!authState.user) {
@@ -26,92 +28,28 @@ export function EventsPage () {
 
         // Firestore Queries
         const eventsRef = collection(db, 'users', authState.user.uid, 'events');
-        const peopleQuery = query(eventsRef, orderBy('date')); // Sorts by date
+        const eventsQuery = query(eventsRef, orderBy('title'));
 
-        const unsubscribe = onSnapshot(peopleQuery, (snapshot) => {
-            const eventsList: TempEvent[] = [];
+        const unsubscribe = onSnapshot(eventsQuery, (snapshot) => {
+            const eventsList: Event[] = [];
             snapshot.forEach((doc) => {
-                eventsList.push(doc.data() as TempEvent);
+                eventsList.push(doc.data() as Event);
             })
             setEvents(eventsList);
             setIsLoading(false);
         }, (error) => {
-            console.error('Error fetching people:', error);
+            console.error('Error fetching events:', error);
             setIsLoading(false);
         })
 
         return () => unsubscribe();
     }, [])
 
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        
-        setNewEvent({
-            ...newEvent,
-            [name]: value
-        })
-    }
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Guard Clauses:
-        if (!newEvent || !newEvent.title || !newEvent.date) { console.warn('Must include both title & date'); return; };
-        if (!authState.user) { return; };
-
-        setIsSubmitting(true);
-        try {
-            const newDocRef = doc(collection(db, 'users', authState.user.uid, 'events'))
-            const newEventObject: TempEvent = {
-                id: newDocRef.id,
-                title: newEvent.title,
-                date: newEvent.date, // I need to use either a basic ISO string, or use my custom CalendarDate object.
-
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            }
-
-            await setDoc(newDocRef, newEventObject);
-
-            console.log(`New Event (${newEvent.title}) created on ${newEvent.date}.`)
-            setNewEvent({ title: '', date: '' });
-
-        } catch (error) {
-            console.error('Error submitting new event. Error:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
-
     return (
         <section className={styles.eventsPage}>
             <h1>Events</h1>
 
-            <form className={styles.formCreateEvent} onSubmit={handleSubmit} autoComplete='off'>
-                <label className={styles.label}>Event Title:
-                    <input
-                        type='text'
-                        name='title'
-                        required={true}
-                        value={newEvent.title}
-                        onChange={handleInputChange}
-                    />
-                </label>
-
-                <label className={styles.label}>Date:
-                    <input
-                        type='date'
-                        name='date'
-                        required={true}
-                        value={newEvent.date}
-                        onChange={handleInputChange}
-                    />
-                </label>
-
-                <button className={styles.button}>{isSubmitting ? (<>Creating New Event...</>) : (<>Create New Event</>)}</button>
-            </form>
+            <button className={styles.addEventButton} onClick={() => setIsAddNewEventModalOpen(true)}>Add Event</button>
 
             <div className={styles.eventsContainer}>
                 {isLoading ? (
@@ -122,14 +60,25 @@ export function EventsPage () {
                             <div>No events added yet.  Create an Event to get started!</div>
                         ) : (
                             events.map((event) => (
-                                <div key={event.id} className={styles.eventCard}>
-                                    {event.title} ({event.date})
-                                </div>
+                                <Link to={`/events/${event.id}`} key={event.id} className={styles.eventCard}>
+                                    <div className={styles.eventInfo}>
+                                        <div className={styles.eventTitle}>{event.title}</div>
+                                        <div className={styles.eventDate}>
+                                            Event Date: {event.date ? (event.date) : (<span className={styles.noDateText}>No Date Set</span>)}
+                                        </div>
+                                    </div>
+                                </Link>
                             ))
                         )}
                     </div>  
                 )}
             </div>
+
+            <AddEventModal
+                isOpen={isAddNewEventModalOpen}
+                onClose={() => setIsAddNewEventModalOpen(false)}
+            />
+            
         </section>
     )
 }

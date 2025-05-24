@@ -14,27 +14,25 @@
     align-self: center;
 }
 
-.formCreateEvent {
-    width: 100%;
-    
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-}
-
-.label {
+.addEventButton {
     margin: 0;
-    padding: 0;
+    padding: 0.75rem;
 
     width: 100%;
+
+    background-color: #007bff;
+
+    border: none;
+    border-radius: 7.5px;
+
+    font-size: 1rem;
+    color: white;
+
+    cursor: pointer;
 }
 
-.label input {
-    width: 100%;
-}
-
-.formCreateEvent input, .formCreateEvent button {
-    padding: 0.5rem;
+.addEventButton:hover {
+    background-color: #0056b3;
 }
 
 .eventsGrid {
@@ -43,13 +41,50 @@
 
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.5rem;
 }
 
 .eventCard {
+    /* Overwriting default <Link>/<a> styling */
+    text-decoration: none;
+    color: inherit;
+
     margin: 0;
-    padding: 0.5rem;
+    padding: 1rem;
+
+    background: white;
 
     border: 1px solid black;
     border-radius: 7.5px;
+
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 0.5rem;
+
+    cursor: pointer;
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.eventCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.personInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.eventTitle {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.noDateText {
+    font-style: italic;
+    color: #e9ecef;
 }
