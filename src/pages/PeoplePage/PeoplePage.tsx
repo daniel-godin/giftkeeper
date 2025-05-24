@@ -1,10 +1,11 @@
-import { FormEvent, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import styles from './PeoplePage.module.css'
-import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { useAuth } from '../../contexts/AuthContext';
 import { Person } from '../../types/PersonType';
 import { AddPersonModal } from '../../components/modals/AddPersonModal/AddPersonModal';
+import { Link } from 'react-router';
 
 export function PeoplePage () {
     const { authState } = useAuth();
@@ -14,9 +15,7 @@ export function PeoplePage () {
 
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
 
-    const [newPerson, setNewPerson] = useState<string>('');
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+    // Set up Firestore onSnapshot listener for collection(db, 'users', {userId}, 'people')
     useEffect(() => {
         // Guard Clause
         if (!authState.user) {
@@ -46,60 +45,11 @@ export function PeoplePage () {
         return () => unsubscribe();
     }, [])
 
-    useEffect(() => {
-        console.log(people);
-    }, [people])
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewPerson(e.target.value);
-    }
-
-    const handleNewPersonForm = async (e: FormEvent) => {
-        e.preventDefault();
-        
-        // Guard Clauses.  If empty, return;  Add error message later when you create the modal.
-        if (!newPerson.trim()) { return; };
-        if (!authState.user) { return; };
-
-        setIsSubmitting(true);
-        try {
-            const newDocRef = doc(collection(db, 'users', authState.user.uid, 'people'));
-            const personObject: Person = {
-                id: newDocRef.id,
-                name: newPerson.trim(),
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            }
-
-            await setDoc(newDocRef, personObject);
-
-            console.log(`Person (${personObject.name}) created with ID: ${newDocRef.id}`)
-            setNewPerson('');
-        } catch (error) {
-            console.error('Error creating new person. Error:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
-
     return (
         <section className={styles.peoplePage}>
             <h1>People</h1>
 
-            <button onClick={() => setIsAddPersonModalOpen(true)}>Add Person</button>
-
-            <form className={styles.formCreatePerson} onSubmit={handleNewPersonForm}>
-                <input
-                    type='text'
-                    id='newPerson'
-                    name='newPerson'
-                    value={newPerson}
-                    onChange={handleInputChange}
-                    className={styles.textInput}
-                />
-                <button className={styles.submitButton}>{isSubmitting ? (<>Creating New Person...</>) : (<>Create New Person</>)}</button>
-            </form>
+            <button className={styles.addPersonButton} onClick={() => setIsAddPersonModalOpen(true)}>Add Person</button>
 
             <div className={styles.peopleContainer}>
                 {isLoading ? (
@@ -110,9 +60,15 @@ export function PeoplePage () {
                             <div>No people added yet.  Add someone to get get started!</div>
                         ) : (
                             people.map((person) => (
-                                <div key={person.id} className={styles.personCard}>
-                                    {person.name}
-                                </div>
+                                <Link to={`/people/${person.id}`} key={person.id} className={styles.personCard}>
+                                    <div className={styles.avatar}></div>
+                                    <div className={styles.personInfo}>
+                                        <div className={styles.personName}>{person.name}</div>
+                                        <div className={styles.personBirthday}>
+                                            Birthday: {person.birthday ? (person.birthday) : (<span className={styles.noBirthdayText}>No birthday set</span>)}
+                                        </div>
+                                    </div>
+                                </Link>
                             ))
                         )}
                     </div>  
