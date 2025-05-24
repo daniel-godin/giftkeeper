@@ -9,6 +9,7 @@ import { PeoplePage } from "./pages/PeoplePage/PeoplePage";
 import { EventsPage } from "./pages/EventsPage/EventsPage";
 import { GiftListsPage } from "./pages/GiftListsPage/GiftListsPage";
 import { WishListsPage } from "./pages/WishListsPage/WishListsPage";
+import { PersonPage } from "./pages/PersonPage/PersonPage";
 
 
 export function App() {
@@ -28,8 +29,8 @@ export function App() {
                     <Route path="profile" element={<ProfilePage />} />
 
                     <Route path="people" element={<PeoplePage />} />
-                    <Route path="people/:personId" element={<></>} />
-                    
+                    <Route path="people/:personId" element={<PersonPage />} />
+
                     <Route path="events" element={<EventsPage />} />
                     <Route path="gift-lists" element={<GiftListsPage />} />
                     <Route path="wish-lists" element={<WishListsPage />} />
