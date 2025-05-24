@@ -4,6 +4,7 @@
 
     height: 50dvh;
     width: 50dvw;
+    min-width: 300px;
 
     background-color: white;
 
