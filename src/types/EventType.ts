@@ -10,6 +10,6 @@ export interface Event {
     notes?: string;
 
     // Metadata
-    createdAt: Timestamp | FieldValue;
-    updatedAt: Timestamp | FieldValue;
+    createdAt?: Timestamp | FieldValue;
+    updatedAt?: Timestamp | FieldValue;
 }
