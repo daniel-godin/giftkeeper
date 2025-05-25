@@ -61,7 +61,7 @@ export function GiftListsPage () {
                         ) : (
                             giftLists.map((giftList) => (
                                 <Link to={`/gift-lists/${giftList.id}`} key={giftList.id} className={styles.giftListCard}>
-                                    <div className={styles.personInfo}>
+                                    <div className={styles.giftListInfo}>
                                         <div className={styles.giftListTitle}>{giftList.title}</div>
                                     </div>
                                 </Link>
@@ -75,7 +75,7 @@ export function GiftListsPage () {
                 isOpen={isAddGiftListModalOpen}
                 onClose={() => setIsAddGiftListModalOpen(false)}
             />
-            
+
         </section>
     )
 }
