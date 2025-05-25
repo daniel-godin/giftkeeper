@@ -4,6 +4,8 @@ import styles from './GiftListsPage.module.css'
 import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { GiftList } from '../../types/GiftListType';
+import { Link } from 'react-router';
+import { AddGiftListModal } from '../../components/modals/AddGiftListModal/AddGiftListModal';
 
 export function GiftListsPage () {
     const { authState } = useAuth();
@@ -11,9 +13,9 @@ export function GiftListsPage () {
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [giftLists, setGiftLists] = useState<GiftList[]>([]);
 
-    const [newGiftList, setNewGiftList] = useState({title: ''})
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isAddGiftListModalOpen, setIsAddGiftListModalOpen] = useState<boolean>(false);
 
+    // Firestore onSnapshot Listener For: collection(db, 'users', {userId}, 'giftLists')
     useEffect(() => {
         // Guard Clause
         if (!authState.user) {
@@ -43,62 +45,11 @@ export function GiftListsPage () {
         return () => unsubscribe();
     }, [])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        
-        setNewGiftList({
-            ...newGiftList,
-            [name]: value
-        })
-    }
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Guard Clauses:
-        if (!newGiftList || !newGiftList.title) { console.warn('Must include title'); return; };
-        if (!authState.user) { return; };
-
-        setIsSubmitting(true);
-        try {
-            const newDocRef = doc(collection(db, 'users', authState.user.uid, 'giftLists'))
-            const newGiftListObject: GiftList = {
-                id: newDocRef.id,
-                title: newGiftList.title,
-
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            }
-
-            await setDoc(newDocRef, newGiftListObject);
-
-            console.log(`New Gift List (${newGiftList.title}) created.`)
-            setNewGiftList({ title: '' });
-
-        } catch (error) {
-            console.error('Error submitting new gift list. Error:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
     return (
         <section className={styles.giftListsPage}>
             <h1>Gift Lists</h1>
 
-            <form className={styles.formCreateGiftList} onSubmit={handleSubmit} autoComplete='off'>
-                <label className={styles.label}>Gift List Title:
-                    <input
-                        type='text'
-                        name='title'
-                        required={true}
-                        value={newGiftList.title}
-                        onChange={handleInputChange}
-                    />
-                </label>
-
-                <button className={styles.button}>{isSubmitting ? (<>Creating New Gift List...</>) : (<>Create New Gift List</>)}</button>
-            </form>
+            <button className={styles.addGiftListButton} onClick={() => setIsAddGiftListModalOpen(true)}>Add Gift List</button>
 
             <div className={styles.giftListsContainer}>
                 {isLoading ? (
@@ -109,14 +60,22 @@ export function GiftListsPage () {
                             <div>No gift lists added yet.  Create a Gift List to get started!</div>
                         ) : (
                             giftLists.map((giftList) => (
-                                <div key={giftList.id} className={styles.giftListCard}>
-                                    {giftList.title}
-                                </div>
+                                <Link to={`/gift-lists/${giftList.id}`} key={giftList.id} className={styles.giftListCard}>
+                                    <div className={styles.personInfo}>
+                                        <div className={styles.giftListTitle}>{giftList.title}</div>
+                                    </div>
+                                </Link>
                             ))
                         )}
                     </div>  
                 )}
             </div>
+
+            <AddGiftListModal
+                isOpen={isAddGiftListModalOpen}
+                onClose={() => setIsAddGiftListModalOpen(false)}
+            />
+            
         </section>
     )
 }
