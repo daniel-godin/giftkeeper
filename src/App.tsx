@@ -12,6 +12,7 @@ import { WishListsPage } from "./pages/WishListsPage/WishListsPage";
 import { PersonPage } from "./pages/PersonPage/PersonPage";
 import { EventPage } from "./pages/EventPage/EventPage";
 import { GiftListPage } from "./pages/GiftListPage/GiftListPage";
+import { WishListPage } from "./pages/WishListPage/WishListPage";
 
 
 export function App() {
@@ -40,6 +41,7 @@ export function App() {
                     <Route path="gift-lists/:giftListId" element={<GiftListPage />} />
 
                     <Route path="wish-lists" element={<WishListsPage />} />
+                    <Route path="wish-lists/:wishListId" element={<WishListPage />} />
                 </Route>
             </Routes>
         </BrowserRouter>
