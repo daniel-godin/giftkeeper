@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext'
 import styles from './GiftListsPage.module.css'
-import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { GiftList } from '../../types/GiftListType';
 import { Link } from 'react-router';
