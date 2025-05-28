@@ -21,6 +21,12 @@ service cloud.firestore {
             match /giftLists/{giftListId} {
                 // Allow authenticated users to read, create, update, delete their own gift lists
                 allow read, write: if request.auth != null && request.auth.uid == userId;
+
+                // Match Gift Items Sub-Collection:
+                match /items/{itemId} {
+                    // Allow authenticated users to read, create, update, delete their own gift items
+                    allow read, write: if request.auth != null && request.auth.uid == userId;
+                }
             }
 
             match /wishLists/{wishListId} {
