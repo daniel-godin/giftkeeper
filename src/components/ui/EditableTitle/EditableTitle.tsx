@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import styles from './EditableTitle.module.css'
+import { Check } from 'lucide-react';
 
 interface EditableTitleProps {
     value: string;
@@ -55,6 +56,7 @@ export function EditableTitle({
                     disabled={isSaving}
                     className={`${styles.input} ${className}`}
                 />
+                <button className={styles.submitButton}><Check /></button>
             </form>
         )
     }
