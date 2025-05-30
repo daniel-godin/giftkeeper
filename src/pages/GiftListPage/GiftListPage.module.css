@@ -54,6 +54,26 @@
     align-items: center;
 }
 
+.addItemForm {
+    margin-bottom: 1rem;
+}
+
+.escapeButton {
+    /* Remove default button rules */
+    appearance: none;
+    padding: 0;
+    background-color: inherit;
+    border: none;
+}
+
+.escapeButton:hover {
+    transform: scale(1.25);
+}
+
+.inputNewItem {
+    background-color: lightgray;
+}
+
 .itemsList {
     display: flex;
     flex-direction: column;
@@ -61,7 +81,7 @@
 }
 
 .itemContainer {
-    padding: 1rem;
+    padding: 0.75rem;
 
     border: 1px solid black;
     border-radius: 7.5px;
@@ -78,7 +98,11 @@
 }
 
 .inputText {
-    padding: 0.5rem;
+    padding: 0.75rem;
 
     border: none;
+
+    font-size: 0.9rem;
+
+    border-radius: 5px;
 }

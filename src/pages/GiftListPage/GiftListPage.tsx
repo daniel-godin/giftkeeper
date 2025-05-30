@@ -1,13 +1,13 @@
 import { Link, useParams } from 'react-router';
 import styles from './GiftListPage.module.css'
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { GiftItem, GiftList } from '../../types/GiftListType';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, doc, onSnapshot, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
+import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
-import { Trash2 } from 'lucide-react';
+import { Trash2, X } from 'lucide-react';
 
 export function GiftListPage() {
     const { giftListId } = useParams();
@@ -22,7 +22,9 @@ export function GiftListPage() {
     const [isNewItemOpen, setIsNewItemOpen] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    // Firestore onSnapshot Document Listener (Gift List): // doc(db, 'users', {userId}, 'giftLists', {giftListId})
+    const newItemInputRef = useRef<HTMLInputElement>(null);
+
+    // Gift List Listener:  Firestore onSnapshot Document Listener: // doc(db, 'users', {userId}, 'giftLists', {giftListId})
     useEffect(() => {
         // Might need to put a re-direct or something to make sure unauthorized access doesn't happen.
 
@@ -61,7 +63,7 @@ export function GiftListPage() {
 
     }, []);
 
-    // Firestore onSnapshot Collection Listener (Gift Items): collection(db, 'users', {userId}, 'giftLists', {giftListId}, 'items') // Unsure about "items" as a sub-coll name.
+    // Gift Items Listener: Firestore onSnapshot Collection Listener: collection(db, 'users', {userId}, 'giftLists', {giftListId}, 'items') // Unsure about "items" as a sub-coll name.
     useEffect(() => {
         // Guard Clauses:
         if (!authState.user) {
@@ -77,7 +79,8 @@ export function GiftListPage() {
         setIsLoading(true);
 
         const giftListItemsCollRef = collection(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items');
-        const unsubscribe = onSnapshot(giftListItemsCollRef, (snapshot) => {
+        const giftItemsQuery = query(giftListItemsCollRef, orderBy('createdAt', 'desc'))
+        const unsubscribe = onSnapshot(giftItemsQuery, (snapshot) => {
             const data:GiftItem[] = [];
             snapshot.forEach((doc) => {
                 data.push(doc.data() as GiftItem);
@@ -91,6 +94,13 @@ export function GiftListPage() {
 
         return () => unsubscribe();
     }, [])
+
+    // Effect to "focus" into <input> when a user clicks the "add new item" button.
+    useEffect(() => {
+        if (isNewItemOpen && newItemInputRef.current) {
+            newItemInputRef.current.focus();
+        }
+    }, [isNewItemOpen])
 
     const handleTitleSave = async (newTitle: string) => {
         if (!authState.user) { return; }
@@ -163,6 +173,7 @@ export function GiftListPage() {
             await setDoc(newDocRef, newDocumentData);
 
             setIsNewItemOpen(false);
+            setNewItem({name: ''})
 
             console.log('New document created!');
 
@@ -214,14 +225,17 @@ export function GiftListPage() {
 
                 <div className={styles.itemsList}>
                     {isNewItemOpen && (
-                        <form className={styles.itemContainer} autoComplete='off' onSubmit={handleNewItemSubmit}>
-                            <input type='checkbox' className={styles.checkbox} />
+                        <form className={`${styles.itemContainer} ${styles.addItemForm}`} autoComplete='off' onSubmit={handleNewItemSubmit}>
+                            <button className={styles.escapeButton} onClick={() => setIsNewItemOpen(false)} type='button'>
+                                <X color='red' />
+                            </button>
                             <input 
                                 type='text' 
                                 name='newItem'
+                                ref={newItemInputRef}
                                 onChange={handleNewItemTextChange}
                                 value={newItem.name}
-                                className={styles.inputText} 
+                                className={`${styles.inputText} ${styles.inputNewItem}`} 
                             />
                             <button>Add Item</button>
                         </form>
