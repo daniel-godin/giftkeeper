@@ -144,6 +144,9 @@ export function GiftListPage() {
         }
     }
 
+    // Toggle in <header> to open/close new item box.
+    const handleNewItemToggle = () => { setIsNewItemOpen(!isNewItemOpen); };
+
     const handleNewItemTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setNewItem({
             ...newItem,
@@ -220,7 +223,7 @@ export function GiftListPage() {
             <div className={styles.itemsSection}>
                 <header className={styles.itemsSectionHeader}>
                     <h3>Gift Ideas</h3>
-                    <button onClick={() => {setIsNewItemOpen(true)}}>+ Add Item</button>
+                    <button onClick={handleNewItemToggle}>+ Add Item</button>
                 </header>
 
                 <div className={styles.itemsList}>
