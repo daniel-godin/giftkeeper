@@ -3,7 +3,7 @@ import styles from './GiftListPage.module.css'
 import { useEffect, useRef, useState } from 'react';
 import { GiftItem, GiftList } from '../../types/GiftListType';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
@@ -144,6 +144,22 @@ export function GiftListPage() {
         }
     }
 
+    const handleDeleteItem = async (item: GiftItem) => {
+        console.log('handleDeletItem clicked. Item:', item);
+
+        // Guard Clauses:
+        if (!authState.user || !giftListId || !item.id) { return; };
+
+        try {
+            const docRef = doc(db, 'users', authState.user?.uid, 'giftLists', giftListId, 'items', item.id);
+            await deleteDoc(docRef);
+
+            console.log('Item Deleted:', item);
+        } catch (error) {
+            console.error(`Error deleting Gift Item: ${item.id}. Error:`, error);
+        }
+    }
+
     // Toggle in <header> to open/close new item box.
     const handleNewItemToggle = () => { setIsNewItemOpen(!isNewItemOpen); };
 
@@ -259,7 +275,12 @@ export function GiftListPage() {
                                     onBlur={(e) => handleItemSave(e, item, 'name')}
                                     onKeyDown={(e) => handleItemSave(e, item, 'name')}
                                     className={styles.inputText} />
-                                <Trash2 />
+                                <button
+                                    className={styles.deleteItemButton}
+                                    onClick={() => { handleDeleteItem(item); } }
+                                >
+                                    <Trash2 color='red'/>
+                                </button>
                             </div>
                         ))
                     )}

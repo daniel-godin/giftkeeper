@@ -64,6 +64,8 @@
     padding: 0;
     background-color: inherit;
     border: none;
+
+    cursor: pointer;
 }
 
 .escapeButton:hover {
@@ -94,6 +96,7 @@
 }
 
 .checkbox {
+    cursor: pointer;
 
 }
 
@@ -105,4 +108,15 @@
     font-size: 0.9rem;
 
     border-radius: 5px;
+
+    cursor: pointer;
+}
+
+.deleteItemButton {
+    appearance: none;
+    padding: 0;
+    background-color: inherit;
+    border: none;
+
+    cursor: pointer;
 }
