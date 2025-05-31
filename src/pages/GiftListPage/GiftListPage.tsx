@@ -239,7 +239,7 @@ export function GiftListPage() {
             <div className={styles.itemsSection}>
                 <header className={styles.itemsSectionHeader}>
                     <h3>Gift Ideas</h3>
-                    <button onClick={handleNewItemToggle}>+ Add Item</button>
+                    <button className={styles.toggleButton} onClick={handleNewItemToggle}>+ Add Item</button>
                 </header>
 
                 <div className={styles.itemsList}>
@@ -256,7 +256,7 @@ export function GiftListPage() {
                                 value={newItem.name}
                                 className={`${styles.inputText} ${styles.inputNewItem}`} 
                             />
-                            <button>Add Item</button>
+                            <button className={styles.addItemButton}>Add Item</button>
                         </form>
                     )}
 

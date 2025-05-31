@@ -54,6 +54,10 @@
     align-items: center;
 }
 
+.toggleButton {
+    cursor: pointer;
+}
+
 .addItemForm {
     margin-bottom: 1rem;
 }
@@ -74,6 +78,10 @@
 
 .inputNewItem {
     background-color: lightgray;
+}
+
+.addItemButton {
+    cursor: pointer;
 }
 
 .itemsList {
