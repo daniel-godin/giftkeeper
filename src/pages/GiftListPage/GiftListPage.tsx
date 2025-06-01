@@ -8,6 +8,7 @@ import { db } from '../../firebase/firebase';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
 import { Trash2, X } from 'lucide-react';
+import { getGiftItemDoc, getGiftItemsCollection, getGiftListDoc, getGiftListsCollection } from '../../firebase/firestore';
 
 export function GiftListPage() {
     const { giftListId } = useParams();
@@ -41,7 +42,8 @@ export function GiftListPage() {
 
         setIsLoading(true);
 
-        const giftListRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId);
+        // const giftListRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId);
+        const giftListRef = getGiftListDoc(authState.user.uid, giftListId)
         const unsubscribe = onSnapshot(giftListRef, (snapshot) => {
             // Guard Clause
             if (!snapshot.exists()) {
@@ -59,8 +61,6 @@ export function GiftListPage() {
         })
 
         return () => unsubscribe();
-
-
     }, []);
 
     // Gift Items Listener: Firestore onSnapshot Collection Listener: collection(db, 'users', {userId}, 'giftLists', {giftListId}, 'items') // Unsure about "items" as a sub-coll name.
@@ -78,7 +78,8 @@ export function GiftListPage() {
 
         setIsLoading(true);
 
-        const giftListItemsCollRef = collection(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items');
+        // const giftListItemsCollRef = collection(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items');
+        const giftListItemsCollRef = getGiftItemsCollection(authState.user.uid, giftListId);
         const giftItemsQuery = query(giftListItemsCollRef, orderBy('createdAt', 'desc'))
         const unsubscribe = onSnapshot(giftItemsQuery, (snapshot) => {
             const data:GiftItem[] = [];
@@ -107,7 +108,8 @@ export function GiftListPage() {
         if (!giftListId) { return; }
 
         try {
-            const giftListRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId);
+            // const giftListRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId);
+            const giftListRef = getGiftListDoc(authState.user.uid, giftListId);
             await updateDoc(giftListRef, {
                 title: newTitle,
                 updatedAt: serverTimestamp()
@@ -128,7 +130,8 @@ export function GiftListPage() {
         const newValue = (e.target as HTMLInputElement).value.trim();
 
         try {
-            const docRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items', item.id);
+            // const docRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items', item.id);
+            const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
             const newData: UpdateData<GiftItem> = {
                 [fieldName]: newValue,
                 updatedAt: serverTimestamp()
@@ -151,7 +154,8 @@ export function GiftListPage() {
         if (!authState.user || !giftListId || !item.id) { return; };
 
         try {
-            const docRef = doc(db, 'users', authState.user?.uid, 'giftLists', giftListId, 'items', item.id);
+            // const docRef = doc(db, 'users', authState.user?.uid, 'giftLists', giftListId, 'items', item.id);
+            const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
             await deleteDoc(docRef);
 
             console.log('Item Deleted:', item);
@@ -181,7 +185,8 @@ export function GiftListPage() {
 
         setIsSubmitting(true);
         try {
-            const newDocRef = doc(collection(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items'))
+            // const newDocRef = doc(collection(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items'))
+            const newDocRef = doc(getGiftItemsCollection(authState.user.uid, giftListId)); // Using doc() gives me a random UUID.
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: newItem.name,
@@ -195,7 +200,6 @@ export function GiftListPage() {
             setNewItem({name: ''})
 
             console.log('New document created!');
-
         } catch (error) {
             console.error('Error submitting new item. Error:', error);
         } finally {
