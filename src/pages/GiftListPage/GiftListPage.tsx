@@ -3,12 +3,11 @@ import styles from './GiftListPage.module.css'
 import { useEffect, useRef, useState } from 'react';
 import { GiftItem, GiftList } from '../../types/GiftListType';
 import { useAuth } from '../../contexts/AuthContext';
-import { collection, deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
-import { db } from '../../firebase/firebase';
+import { deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
 import { Trash2, X } from 'lucide-react';
-import { getGiftItemDoc, getGiftItemsCollection, getGiftListDoc, getGiftListsCollection } from '../../firebase/firestore';
+import { getGiftItemDoc, getGiftItemsCollection, getGiftListDoc } from '../../firebase/firestore';
 
 export function GiftListPage() {
     const { giftListId } = useParams();
@@ -119,6 +118,21 @@ export function GiftListPage() {
         }
     }
 
+    const handlePurchasedCheckbox = async (item: GiftItem) => {
+        // Guard Clause
+        if (!authState.user || !giftListId || !item.id) { return; };
+
+        try {
+            const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
+            await updateDoc(docRef, {
+                'purchased': !item.purchased, // boolean
+                'updatedAt': serverTimestamp()
+            })
+        } catch (error) {
+            console.error('Error changing purchased boolean. Error:', error);
+        }
+    }
+
     // Established Item Name Change
     const handleItemSave = async (e: React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>, item: GiftItem, fieldName: string) => {
         // Keyboard Event Clause:
@@ -148,8 +162,6 @@ export function GiftListPage() {
     }
 
     const handleDeleteItem = async (item: GiftItem) => {
-        console.log('handleDeletItem clicked. Item:', item);
-
         // Guard Clauses:
         if (!authState.user || !giftListId || !item.id) { return; };
 
@@ -157,8 +169,6 @@ export function GiftListPage() {
             // const docRef = doc(db, 'users', authState.user?.uid, 'giftLists', giftListId, 'items', item.id);
             const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
             await deleteDoc(docRef);
-
-            console.log('Item Deleted:', item);
         } catch (error) {
             console.error(`Error deleting Gift Item: ${item.id}. Error:`, error);
         }
@@ -190,6 +200,7 @@ export function GiftListPage() {
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: newItem.name,
+                purchased: false,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
@@ -198,8 +209,6 @@ export function GiftListPage() {
 
             setIsNewItemOpen(false);
             setNewItem({name: ''})
-
-            console.log('New document created!');
         } catch (error) {
             console.error('Error submitting new item. Error:', error);
         } finally {
@@ -272,13 +281,22 @@ export function GiftListPage() {
                         // Map through giftItems array and make a list
                         giftItems.map((item) => (
                             <div key={item.id} className={styles.itemContainer}>
-                                <input type='checkbox' className={styles.checkbox} />
+                                <input 
+                                    type='checkbox'
+                                    checked={item.purchased || false}
+                                    onChange={() => handlePurchasedCheckbox(item)}
+                                    className={styles.checkbox} 
+                                />
                                 <input 
                                     type='text'
                                     defaultValue={item.name}
                                     onBlur={(e) => handleItemSave(e, item, 'name')}
                                     onKeyDown={(e) => handleItemSave(e, item, 'name')}
-                                    className={styles.inputText} />
+                                    className={`
+                                        ${styles.inputText}
+                                        ${item.purchased ? styles.purchased : ''}
+                                        `} 
+                                    />
                                 <button
                                     className={styles.deleteItemButton}
                                     onClick={() => { handleDeleteItem(item); } }

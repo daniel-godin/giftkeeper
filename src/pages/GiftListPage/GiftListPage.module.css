@@ -120,6 +120,10 @@
     cursor: pointer;
 }
 
+.purchased {
+    text-decoration: line-through;
+}
+
 .deleteItemButton {
     appearance: none;
     padding: 0;
