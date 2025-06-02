@@ -16,6 +16,9 @@ export interface GiftItem {
     giftListId?: string; // Gift List ID that this Item belongs to.
     name: string;
 
+    // Extra Data
+    purchased?: boolean;
+
     // Metadata
     createdAt?: Timestamp | FieldValue;
     updatedAt?: Timestamp | FieldValue;
