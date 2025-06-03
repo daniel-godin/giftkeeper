@@ -32,6 +32,12 @@ service cloud.firestore {
             match /wishLists/{wishListId} {
                 // Allow authenticated users to read, create, update, delete their own wish lists
                 allow read, write: if request.auth != null && request.auth.uid == userId;
+
+                // Match Gift Items Sub-Collection:
+                match /items/{itemId} {
+                    // Allow authenticated users to read, create, update, delete their own wish items
+                    allow read, write: if request.auth != null && request.auth.uid == userId;
+                }
             }
         }
     }
