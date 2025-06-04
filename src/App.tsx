@@ -13,6 +13,7 @@ import { PersonPage } from "./pages/PersonPage/PersonPage";
 import { EventPage } from "./pages/EventPage/EventPage";
 import { GiftListPage } from "./pages/GiftListPage/GiftListPage";
 import { WishListPage } from "./pages/WishListPage/WishListPage";
+import { PeopleProvider } from "./contexts/PeopleContext";
 
 
 export function App() {
@@ -50,12 +51,15 @@ export function App() {
 
 // Protected Route Provides Loading & Route Protecting/Redirection (If No User Signed In)
 function ProtectedRoute () {
-
     const { authState } = useAuth();
 
+    // Loading & Guard Clauses:
     if (authState.loading) { return <div>Loading...</div> };
-
     if (!authState.user) { return <Navigate to='/auth' replace /> };
 
-    return <Layout />
+    return (
+        <PeopleProvider>
+            <Layout />
+        </PeopleProvider>
+    )
 }
