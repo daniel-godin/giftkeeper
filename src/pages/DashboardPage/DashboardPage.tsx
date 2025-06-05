@@ -7,22 +7,32 @@ export function DashboardPage () {
     const { authState } = useAuth();
     const { people, loading: peopleLoading } = usePeople();
 
-    if (peopleLoading) {
-        <div>Loading People...</div>
-    }
-
-    if (people.length === 0) {
-        <div>
-            <h1>Welcome to Gift Keeper!</h1>
-            <p>Let's start by adding the people you buy gifts for.</p>
-            <button>Add Your First Person</button>
-        </div>
-    }
 
     return (
-        <div>
-            <h1>Dashboard</h1>
-            <p>You have {people.length} people in your circle.</p>
-        </div>
+        <section className={styles.dashboardPage}>
+            <header className={styles.header}>
+                {!peopleLoading && people.length > 0 && (
+                    <h1>Dashboard</h1>
+                )}
+            </header>
+
+            <div className={styles.mainContent}>
+                {peopleLoading ? (
+                    <div className={styles.loadingContainer}>
+                        Loading...
+                    </div>
+                ) : people.length === 0 ? (
+                    <div className={styles.onboardingForm}>
+                        <h1>Welcome to Gift Keeper!</h1>
+                        <p>Let's start by adding the people you buy gifts for.</p>
+                        <button>Add Your First Person</button>
+                    </div>
+                ) : (
+                    <div className={styles.mainDashboard}>
+                        <p>You have {people.length} people in your circle.</p>
+                    </div>
+                )}
+            </div>
+        </section>
     )
 }
