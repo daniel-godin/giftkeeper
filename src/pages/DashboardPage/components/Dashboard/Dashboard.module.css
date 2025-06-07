@@ -1,0 +1,43 @@
+.dashboard {
+    width: 90%;
+
+    align-self: center;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.dashboardBox {
+    width: 100%;
+
+    padding: 1rem;
+
+    border: 1px solid black;
+    border-radius: 7.5px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+
+}
+
+.headerText {
+    font-weight: bold;
+}
+
+.secondContainer {
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr; /* mobile default. desktop is 1fr 1fr 1fr */
+    gap: 1rem;
+}
+
+@media (min-width: 768px) {
+    .secondContainer {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}
