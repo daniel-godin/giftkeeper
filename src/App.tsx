@@ -14,6 +14,7 @@ import { EventPage } from "./pages/EventPage/EventPage";
 import { GiftListPage } from "./pages/GiftListPage/GiftListPage";
 import { WishListPage } from "./pages/WishListPage/WishListPage";
 import { PeopleProvider } from "./contexts/PeopleContext";
+import { DataProvider } from "./contexts/DataProvider";
 
 
 export function App() {
@@ -58,8 +59,8 @@ function ProtectedRoute () {
     if (!authState.user) { return <Navigate to='/auth' replace /> };
 
     return (
-        <PeopleProvider>
+        <DataProvider>
             <Layout />
-        </PeopleProvider>
+        </DataProvider>
     )
 }
