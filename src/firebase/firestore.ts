@@ -11,6 +11,10 @@ export const getPeopleCollection = (userId: string) => {
     return collection(db, 'users', userId, 'people');
 }
 
+export const getEventsCollection = (userId: string) => {
+    return collection(db, 'users', userId, 'events');
+}
+
 export const getGiftListsCollection = (userId: string) => {
     return collection(db, 'users', userId, 'giftLists');
 }
