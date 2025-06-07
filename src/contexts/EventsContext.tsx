@@ -21,7 +21,7 @@ export const useEvents = () => {
     return context;
 }
 
-export function EventProvider({ children } : { children: React.ReactNode }) {
+export function EventsProvider({ children } : { children: React.ReactNode }) {
     const { authState } = useAuth();
 
     const [eventsState, setEventsState] = useState<EventsState>({
