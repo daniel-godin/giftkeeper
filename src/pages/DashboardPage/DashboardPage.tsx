@@ -6,11 +6,14 @@ import { Person } from '../../types/PersonType';
 import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { getPeopleCollection } from '../../firebase/firestore';
+import { Dashboard } from './components/Dashboard/Dashboard';
 
 export function DashboardPage () {
     const { authState } = useAuth();
     const { people, loading: peopleLoading } = usePeople();
-
+    // const recentPeople = people
+    // .sort((a, b) => b.updatedAt - a.updatedAt)
+    // .slice(0, 5);
 
     return (
         <section className={styles.dashboardPage}>
@@ -115,12 +118,5 @@ export function OnboardingForm () {
             <button className={styles.button} type='submit'>Add Your First Person</button>
             {status && ( status )}
         </form>
-    )
-}
-
-export function Dashboard () {
-
-    return (
-        <>Dashboard</>
     )
 }
