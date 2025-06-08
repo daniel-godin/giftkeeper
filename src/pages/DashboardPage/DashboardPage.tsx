@@ -10,13 +10,10 @@ import { OnboardingForm } from './components/OnboardingForm/OnboardingForm';
 
 export function DashboardPage () {
     const { authState } = useAuth();
-
-
-    // FOR TESTING PURPOSES:
     const { people, loading: peopleLoading } = usePeople();
-    const { events } = useEvents();
-    const { giftLists } = useGiftLists();
-    const { wishLists } = useWishLists();
+    const { events, loading: eventsLoading } = useEvents();
+    const { giftLists, loading: giftListsLoading } = useGiftLists();
+    const { wishLists, loading: wishListsLoading  } = useWishLists();
 
     useEffect(() => {
         console.log('people:', people);
@@ -24,7 +21,10 @@ export function DashboardPage () {
         console.log('giftLists:', giftLists);
         console.log('wishLists:', wishLists);
 
-    }, [people, events, giftLists, wishLists])
+    }, [people, events, giftLists, wishLists]);
+
+
+    
 
     
 
