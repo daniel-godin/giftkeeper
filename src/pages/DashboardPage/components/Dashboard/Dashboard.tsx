@@ -6,6 +6,7 @@ import { usePeople } from '../../../../contexts/PeopleContext';
 import { useWishLists } from '../../../../contexts/WishListsProvider';
 import styles from './Dashboard.module.css'
 import { useEffect } from 'react';
+import { Link } from 'react-router';
 
 export function Dashboard () {
     const { authState } = useAuth();
@@ -41,7 +42,7 @@ export function Dashboard () {
                                 <p key={event.id} className={styles.item}>{event.title}</p>
                             ))}
                         </div>
-                        <button type='button' className={styles.linkButton}>View All Events</button>
+                        <Link to='/events' className={styles.link}>View All Events</Link>
                     </>
                 )}
             </div>
@@ -60,7 +61,7 @@ export function Dashboard () {
                                     <p key={person.id} className={styles.item}>{person.name}</p>
                                 ))}
                             </div>
-                            <button type='button' className={styles.linkButton}>View All People</button>
+                            <Link to='/people' className={styles.link}>View All People</Link>
                         </>
                     )}
                 </div>
@@ -78,7 +79,7 @@ export function Dashboard () {
                                     <p key={giftList.id} className={styles.item}>{giftList.title}</p>
                                 ))}
                             </div>
-                            <button type='button' className={styles.linkButton}>View All Gift Lists</button>
+                            <Link to='/gift-lists' className={styles.link}>View All Gift Lists</Link>
                         </>
                     )}
                 </div>
@@ -96,7 +97,7 @@ export function Dashboard () {
                                     <p key={wishList.id} className={styles.item}>{wishList.title}</p>
                                 ))}
                             </div>
-                            <button type='button' className={styles.linkButton}>View All Wish Lists</button>
+                            <Link to='/wish-lists' className={styles.link}>View All Wish Lists</Link>
                         </>
                     )}
                 </div>
