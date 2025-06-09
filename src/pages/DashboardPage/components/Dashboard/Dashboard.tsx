@@ -5,6 +5,7 @@ import { useGiftLists } from '../../../../contexts/GiftListsProvider';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import { useWishLists } from '../../../../contexts/WishListsProvider';
 import styles from './Dashboard.module.css'
+import { useEffect } from 'react';
 
 export function Dashboard () {
     const { authState } = useAuth();
@@ -12,6 +13,19 @@ export function Dashboard () {
     const { events, loading: eventsLoading } = useEvents();
     const { giftLists, loading: giftListsLoading } = useGiftLists();
     const { wishLists, loading: wishListsLoading  } = useWishLists();
+
+    // Need to make "seconds" Type-safe later.
+    const recent = {
+        'people': people.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
+        'events': events.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
+        'giftLists': giftLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
+        'wishLists': wishLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
+    }
+
+    // TEST USEEFFECT, DELETE FOR PROD
+    useEffect(() => {
+        console.log('recent:', recent);
+    }, [recent])
 
     return (
         <div className={styles.dashboard}>
@@ -23,7 +37,7 @@ export function Dashboard () {
                 ) : (
                     <>
                         <div className={styles.eventsList}>
-                            {events.map((event) => (
+                            {recent.events.map((event) => (
                                 <p key={event.id} className={styles.item}>{event.title}</p>
                             ))}
                         </div>
@@ -42,7 +56,7 @@ export function Dashboard () {
                         <>
                             <p className={styles.numberOfItems}>({people.length} people)</p>
                             <div className={styles.recentFiveContainer}>
-                                {people.map((person) => (
+                                {recent.people.map((person) => (
                                     <p key={person.id} className={styles.item}>{person.name}</p>
                                 ))}
                             </div>
@@ -60,7 +74,7 @@ export function Dashboard () {
                         <>
                             <p className={styles.numberOfItems}>({giftLists.length} lists)</p>
                             <div className={styles.recentFiveContainer}>
-                                {giftLists.map((giftList) => (
+                                {recent.giftLists.map((giftList) => (
                                     <p key={giftList.id} className={styles.item}>{giftList.title}</p>
                                 ))}
                             </div>
@@ -78,7 +92,7 @@ export function Dashboard () {
                         <>
                             <p className={styles.numberOfItems}>({wishLists.length} lists)</p>
                             <div className={styles.recentFiveContainer}>
-                                {wishLists.map((wishList) => (
+                                {recent.wishLists.map((wishList) => (
                                     <p key={wishList.id} className={styles.item}>{wishList.title}</p>
                                 ))}
                             </div>
