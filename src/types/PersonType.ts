@@ -5,10 +5,15 @@ import { CalendarDate } from "./CommonTypes";
 export interface Person {
     id?: string;
     name: string;
-    relationship?: string;
+
+    // Important Optional Data
     birthday?: string;
+
+    // Optional Data
     avatar?: string; // URL to profile image
+    giftBudgetRange?: { min?: number; max?: number; }; 
     notes?: string;
+    relationship?: string;
 
     // Additional special dates beyond birthday. Anniversary, etc.
     specialDates?: Array<{
@@ -23,7 +28,7 @@ export interface Person {
         dislikes?: string[];
         sizes?: Record<string, string>; // Clothing sizes, etc.
         favoriteColors?: string[];
-        interests: string[]; // Baseball, Bobbleheads, Nutcrackers, Photography, et al.
+        interests?: string[]; // Baseball, Bobbleheads, Nutcrackers, Photography, et al.
     }
 
     // Metadata
