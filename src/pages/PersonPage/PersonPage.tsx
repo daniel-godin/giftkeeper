@@ -3,12 +3,15 @@ import styles from './PersonPage.module.css'
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getPersonDocument } from '../../firebase/firestore';
-import { onSnapshot } from 'firebase/firestore';
+import { onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
+import { getDaysUntilDate } from '../../utils';
 
 export function PersonPage() {
     const { authState } = useAuth();
     const { personId } = useParams();
+
+
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [person, setPerson] = useState<Person>({ name: '' });
@@ -17,6 +20,9 @@ export function PersonPage() {
     const [formData, setFormData] = useState<Person>({ name: '' });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     
+    const birthdayStats = person.birthday ? {
+        daysUntil: getDaysUntilDate(person.birthday)
+    } : null;
 
     // Setup a Firestore listener to doc(db, 'users', {userId}, 'people', {personId})
     useEffect(() => {
@@ -52,6 +58,7 @@ export function PersonPage() {
     // ***** USE EFFECT FOR TESTING PURPOSES. DELETE IN PROD *****
     useEffect(() => {
         console.log('Person Data:', person);
+        console.log('days until:', birthdayStats)
     }, [person])
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,13 +69,31 @@ export function PersonPage() {
         })
     }
 
-    const handleDateInputChange = () => {
-        console.log('test. handleDateInputChange triggered');
+    const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        })
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('test. handleSubmit triggered.');
+    
+        if (!authState.user || !personId) return;
+        
+        setIsSubmitting(true);
+        try {
+            const personDocRef = getPersonDocument(authState.user.uid, personId);
+            await updateDoc(personDocRef, {
+                ...formData,
+                updatedAt: serverTimestamp()
+            });
+        } catch (error) {
+            console.error('Error updating person:', error);
+        } finally {
+            setIsSubmitting(false);
+        }
     }
 
     return (
@@ -92,7 +117,7 @@ export function PersonPage() {
                     <input
                         className={styles.input}
                         type='date'
-                        name='date'
+                        name='birthday'
                         required={false}
                         value={formData.birthday || ''}
                         disabled={isSubmitting}
