@@ -1,15 +1,12 @@
 import { CalendarFold, Gift, ListTodo, UsersRound } from 'lucide-react';
-import { useAuth } from '../../../../contexts/AuthContext';
 import { useEvents } from '../../../../contexts/EventsContext';
 import { useGiftLists } from '../../../../contexts/GiftListsProvider';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import { useWishLists } from '../../../../contexts/WishListsProvider';
 import styles from './Dashboard.module.css'
-import { useEffect } from 'react';
 import { Link } from 'react-router';
 
 export function Dashboard () {
-    const { authState } = useAuth();
     const { people, loading: peopleLoading } = usePeople();
     const { events, loading: eventsLoading } = useEvents();
     const { giftLists, loading: giftListsLoading } = useGiftLists();
@@ -22,11 +19,6 @@ export function Dashboard () {
         'giftLists': giftLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
         'wishLists': wishLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
     }
-
-    // TEST USEEFFECT, DELETE FOR PROD
-    useEffect(() => {
-        console.log('recent:', recent);
-    }, [recent])
 
     return (
         <div className={styles.dashboard}>
