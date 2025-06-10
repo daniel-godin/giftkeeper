@@ -13,9 +13,7 @@ import { PersonPage } from "./pages/PersonPage/PersonPage";
 import { EventPage } from "./pages/EventPage/EventPage";
 import { GiftListPage } from "./pages/GiftListPage/GiftListPage";
 import { WishListPage } from "./pages/WishListPage/WishListPage";
-import { PeopleProvider } from "./contexts/PeopleContext";
 import { DataProvider } from "./contexts/DataProvider";
-
 
 export function App() {
     return (
