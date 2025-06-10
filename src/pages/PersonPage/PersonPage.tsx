@@ -82,7 +82,7 @@ export function PersonPage() {
                         type='text'
                         name='relationship'
                         required={false}
-                        value={formData.relationship}
+                        value={formData.relationship || ''}
                         disabled={isSubmitting}
                         onChange={handleTextInputChange}
                     />
@@ -94,30 +94,45 @@ export function PersonPage() {
                         type='date'
                         name='date'
                         required={false}
-                        value={formData.birthday}
+                        value={formData.birthday || ''}
                         disabled={isSubmitting}
                         onChange={handleDateInputChange}
                     />
                 </label>
+
+                <button type='submit' className={styles.button}>Edit Person</button>
             </form>
 
             <div className={styles.personDataContainer}>
-                <div className={styles.boxesContainer}>
-                    <div className={styles.box}>
-                        {/* Days to Birthday -- Click to Change Birthday */}
+                <div className={styles.quickStats}>
+                    <div className={styles.statCard}>
+                        <div className={styles.statNumber}>3</div>
+                        <div className={styles.statLabel}>Gift Lists</div>
+                    </div>
+                    <div className={styles.statCard}>
+                        <div className={styles.statNumber}>47</div>
+                        <div className={styles.statLabel}>Days to Birthday</div>
                     </div>
 
-                    <div className={styles.box}>
-                        {/* Gift Ideas and/or Gift Lists*/}
+                    <div className={styles.statCard}>
+                        <div className={styles.statNumber}>12</div>
+                        <div className={styles.statLabel}>Gift Ideas</div>
                     </div>
                 </div>
 
-                <div className={styles.upcomingDatesContainer}>
-
+                <div className={styles.sectionContainer}>
+                    <header className={styles.sectionHeader}>
+                        Upcoming Dates
+                    </header>
+                    <div className={styles.sectionData}>
+                        {/* Some kind of conditional logic for whether birthday exists, also ordering. */}
+                    </div>
                 </div>
 
-                <div className={styles.giftIntelligenceContainer}>
-
+                <div className={styles.sectionContainer}>
+                    <header className={styles.sectionHeader}>
+                        Gift Intelligence
+                    </header>
                 </div>
             </div>
         </section>
