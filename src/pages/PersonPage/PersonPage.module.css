@@ -31,6 +31,11 @@
     gap: 0.5rem;
 }
 
+.navHeader {
+    display: flex;
+    justify-content: space-between;
+}
+
 .label {
     width: 100%;
     font-weight: bold;
@@ -48,17 +53,21 @@
 }
 
 .button {
+    margin-top: 1rem; /* To give extra space above, better visually */
     padding: 0.5rem;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
+
+    cursor: pointer;
 }
 
-
+.button:hover {
+    background-color: #0056b3;
+}
 
 .personDataContainer {
-
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -89,7 +98,6 @@
 
     display: grid;
     place-items: center;
-
 }
 
 .statNumber {
@@ -118,4 +126,18 @@
 
     font-size: 1.1rem;
     font-weight: bold;
+}
+
+.sectionData {
+    padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.dateItem {
+    display: flex;
+    gap: 0.5rem;
 }

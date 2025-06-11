@@ -1,17 +1,15 @@
-import { useParams } from 'react-router'
+import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getPersonDocument } from '../../firebase/firestore';
 import { onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
-import { getDaysUntilDate } from '../../utils';
+import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
 
 export function PersonPage() {
     const { authState } = useAuth();
     const { personId } = useParams();
-
-
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [person, setPerson] = useState<Person>({ name: '' });
@@ -19,10 +17,28 @@ export function PersonPage() {
     // State for managing changes to displayed data:
     const [formData, setFormData] = useState<Person>({ name: '' });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    
-    const birthdayStats = person.birthday ? {
-        daysUntil: getDaysUntilDate(person.birthday)
-    } : null;
+
+    const upcomingDates = useMemo(() => {
+        if (!person) { return []; }; // Guard Clause, return empty array.
+
+        const dates = [];
+
+        // Add birthday if it exists
+        if (person.birthday) {
+            dates.push({
+                title: 'Birthday',
+                date: person.birthday,
+                recurring: true,
+                type: 'birthday', 
+                daysUntil: getDaysUntilDate(person.birthday)
+            })
+        }
+
+        // Add extra/special dates here.  Christmas, Hannukah, Anniversary, etc.
+
+        // Sort by days until date
+        return dates.sort((a, b) => a.daysUntil - b.daysUntil); 
+    }, [person])
 
     // Setup a Firestore listener to doc(db, 'users', {userId}, 'people', {personId})
     useEffect(() => {
@@ -54,12 +70,6 @@ export function PersonPage() {
         
         return () => unsubscribe();
     }, []);
-
-    // ***** USE EFFECT FOR TESTING PURPOSES. DELETE IN PROD *****
-    useEffect(() => {
-        console.log('Person Data:', person);
-        console.log('days until:', birthdayStats)
-    }, [person])
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -99,7 +109,21 @@ export function PersonPage() {
     return (
         <section className={styles.personPage}>
             <form className={styles.personForm} onSubmit={handleSubmit} autoComplete='off'>
-                {person.name ? ( <h3>{person.name}</h3> ) : ( <h3>Unknown Name</h3> )}
+                <div className={styles.navHeader}>
+                    <Link to={`/people`} className={styles.backButton}>
+                        ← People
+                    </Link>
+                    {person.createdAt && (
+                        <p>Created On: {formatFirestoreDate(person.createdAt, 'long')}</p>
+                    )}
+                </div>
+
+                {person.name ? ( 
+                    // Probably put "Editable Title" here later.
+                    <h2>{person.name}</h2> 
+                ) : ( 
+                    <h3>Unknown Name</h3> 
+                )}
 
                 <label className={styles.label}>Relationship
                     <input
@@ -135,8 +159,14 @@ export function PersonPage() {
                         <div className={styles.statLabel}>Gift Lists</div>
                     </div>
                     <div className={styles.statCard}>
-                        <div className={styles.statNumber}>47</div>
-                        <div className={styles.statLabel}>Days to Birthday</div>
+                        {person.birthday ? (
+                            <>
+                                <div className={styles.statNumber}>{getDaysUntilDate(person.birthday)}</div>
+                                <div className={styles.statLabel}>Days to Birthday</div>
+                            </>
+                        ) : (
+                            <div className={styles.statLabel}>No Birthday Set</div>
+                        )}
                     </div>
 
                     <div className={styles.statCard}>
@@ -150,6 +180,16 @@ export function PersonPage() {
                         Upcoming Dates
                     </header>
                     <div className={styles.sectionData}>
+                        {upcomingDates.length === 0 ? (
+                            <p>No upcoming dates.  Please add an important date.</p>
+                        ) : (
+                            upcomingDates.map((date, index) => (
+                                <div key={index} className={styles.dateItem}>
+                                    <span><strong>{date.title}</strong> - {date.date}</span>
+                                    <span>{date.daysUntil} days</span>
+                                </div>
+                            ))
+                        )}
                         {/* Some kind of conditional logic for whether birthday exists, also ordering. */}
                     </div>
                 </div>
