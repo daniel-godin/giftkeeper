@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useAuth } from '../../../../contexts/AuthContext';
 import styles from './OnboardingForm.module.css'
 import { Person } from '../../../../types/PersonType';
-import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { getPeopleCollection } from '../../../../firebase/firestore';
+import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { getGiftListsCollection, getPeopleCollection } from '../../../../firebase/firestore';
+import { db } from '../../../../firebase/firebase';
+import { GiftList } from '../../../../types/GiftListType';
 
 export function OnboardingForm () {
     const { authState } = useAuth();
@@ -40,19 +42,38 @@ export function OnboardingForm () {
         setStatus('Adding New Person...');
 
         try {
-            const newDocRef = doc(getPeopleCollection(authState.user.uid))
+            const batch = writeBatch(db);
 
-            const newDataObject: Person = {
-                id: newDocRef.id,
+            const personRef = doc(getPeopleCollection(authState.user.uid))
+            const giftListRef = doc(getGiftListsCollection(authState.user.uid))
+
+            const personData: Person = {
+                id: personRef.id,
                 name: formData.name,
+
                 birthday: formData.birthday || '',
+
+                giftListId: giftListRef.id,
 
                 // Metadata
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
 
-            await setDoc(newDocRef, newDataObject);
+            const giftListData: GiftList = {
+                id: giftListRef.id,
+                title: `${formData.name}'s Gift List`,
+
+                personId: personRef.id,
+
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            }
+
+            batch.set(personRef, personData);
+            batch.set(giftListRef, giftListData);
+
+            await batch.commit();
 
             setStatus('✅ Person added successfully!');
             setTimeout(() => {
