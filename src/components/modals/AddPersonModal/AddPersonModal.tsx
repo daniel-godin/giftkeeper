@@ -129,7 +129,7 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
                             type='text'
                             name='name'
                             required={true}
-                            value={formData.name}
+                            value={formData.name || ''}
                             onChange={handleTextInputChange}
                         />
                     </label>
@@ -140,7 +140,7 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
                             type='date'
                             name='birthday'
                             required={false}
-                            value={formData.birthday}
+                            value={formData.birthday || ''}
                             onChange={handleDateInputChange}
                         />
                     </label>
@@ -150,10 +150,7 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
                     </output>
 
                     <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Adding New Person</>) : (<>Add New Person</>)}</button>
-
-                    
                 </form>
-
             </div>
         </BaseModal>
     )
