@@ -22,8 +22,8 @@ export interface GiftItem {
     eventId?: string; // eventId that item has been 'purchased' for.
 
     // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
-    estimatedCost: number;
-    purchasedCost: number;
+    estimatedCost?: number;
+    purchasedCost?: number;
 
     // Metadata
     createdAt?: Timestamp | FieldValue;
