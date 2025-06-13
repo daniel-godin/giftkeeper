@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import styles from './AddPersonModal.module.css'
 import { Person } from '../../../types/PersonType';
-import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
+import { getGiftListsCollection } from '../../../firebase/firestore';
+import { GiftList } from '../../../types/GiftListType';
 
 interface AddPersonalModalProps {
     isOpen: boolean;
@@ -62,19 +64,38 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
         setStatus('Adding New Person...');
 
         try {
-            const newDocRef = doc(collection(db, 'users', authState.user.uid, 'people'));
+            const batch = writeBatch(db);
 
-            const newPersonObject: Person = {
-                id: newDocRef.id,
+            const personRef = doc(collection(db, 'users', authState.user.uid, 'people'));
+            const giftListRef = doc(getGiftListsCollection(authState.user.uid))
+
+            const personData: Person = {
+                id: personRef.id,
                 name: formData.name,
+
                 birthday: formData.birthday || '',
+
+                giftListId: giftListRef.id,
 
                 // Metadata
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
 
-            await setDoc(newDocRef, newPersonObject);
+            const giftListData: GiftList = {
+                id: giftListRef.id,
+                title: `${formData.name}'s Gift List`,
+
+                personId: personRef.id,
+
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            }
+
+            batch.set(personRef, personData);
+            batch.set(giftListRef, giftListData);
+
+            await batch.commit();
 
             setStatus('New Person Added!! Closing in 2 seconds...');
             setFormData({ name: '' });
