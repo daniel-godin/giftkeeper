@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import styles from './AddPersonModal.module.css'
 import { Person } from '../../../types/PersonType';
-import { collection, doc, serverTimestamp, writeBatch } from 'firebase/firestore';
+import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
-import { getGiftListsCollection } from '../../../firebase/firestore';
+import { getGiftListsCollection, getPeopleCollection } from '../../../firebase/firestore';
 import { GiftList } from '../../../types/GiftListType';
 
 interface AddPersonalModalProps {
@@ -56,7 +56,6 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
 
         if (!formData.name.trim()) {
             setStatus('Name is required');
-            setIsSubmitting(false);
             return;
         }
 
@@ -66,7 +65,7 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
         try {
             const batch = writeBatch(db);
 
-            const personRef = doc(collection(db, 'users', authState.user.uid, 'people'));
+            const personRef = doc(getPeopleCollection(authState.user.uid));
             const giftListRef = doc(getGiftListsCollection(authState.user.uid))
 
             const personData: Person = {
