@@ -49,8 +49,6 @@ export function GiftListsPage () {
         <section className={styles.giftListsPage}>
             <h1>Gift Lists</h1>
 
-            <button className={styles.addGiftListButton} onClick={() => setIsAddGiftListModalOpen(true)}>Add Gift List</button>
-
             <div className={styles.giftListsContainer}>
                 {isLoading ? (
                     <div className={styles.loadingMessage}>Loading gift lists...</div>
