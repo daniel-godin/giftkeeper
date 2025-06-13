@@ -1,10 +1,11 @@
 import { FieldValue, Timestamp } from "firebase/firestore";
 
-
 export interface GiftList {
     id?: string;
     title: string;
-    // Add more here later.
+
+    // Associations
+    personId: string; // Person that this GiftList belongs to.
 
     // Metadata
     createdAt?: Timestamp | FieldValue;
@@ -13,15 +14,18 @@ export interface GiftList {
 
 export interface GiftItem {
     id?: string;
-    giftListId?: string; // Gift List ID that this Item belongs to.
     name: string;
 
-    // Extra Data
-    purchased?: boolean;
+    // Status & Associations
+    giftListId?: string; // Gift List ID that this Item belongs to.
+    status?: 'idea' | 'purchased'; // idea is default.
+    eventId?: string; // eventId that item has been 'purchased' for.
+
+    // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
+    estimatedCost: number;
+    purchasedCost: number;
 
     // Metadata
     createdAt?: Timestamp | FieldValue;
     updatedAt?: Timestamp | FieldValue;
-    
-    // This is v1.  Add more later.
 }

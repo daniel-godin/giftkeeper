@@ -9,6 +9,9 @@ export interface Person {
     // Important Optional Data
     birthday?: string;
 
+    // Associations
+    giftListId?: string; // ID of the user's default "Gift Ideas/Gift List"
+
     // Optional Data
     avatar?: string; // URL to profile image
     giftBudgetRange?: { min?: number; max?: number; }; 
