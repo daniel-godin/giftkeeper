@@ -5,7 +5,7 @@ export interface GiftList {
     title: string;
 
     // Associations
-    personId: string; // Person that this GiftList belongs to.
+    personId?: string; // Person that this GiftList belongs to.  Optional to accomadate *unknown items* list.
 
     // Metadata
     createdAt?: Timestamp | FieldValue;
