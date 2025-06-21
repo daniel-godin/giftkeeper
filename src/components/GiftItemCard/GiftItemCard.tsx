@@ -9,19 +9,26 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
     const { authState } = useAuth();
 
     // Established Item Name Change
-    const handleItemSave = async (e: React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>, item: GiftItem, fieldName: string) => {
+    // const handleItemSave = async (e: React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>, item: GiftItem, fieldName: string) => {
+    const handleItemSave = async (e: React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>) => {
         // Keyboard Event Clause:
         if (e.type === 'keydown' && (e as React.KeyboardEvent).key !== 'Enter') { return; } ;
 
         // Guard Clause
         if (!authState.user || !giftListId || !item.id) { return; };
 
-        const newValue = (e.target as HTMLInputElement).value.trim();
+        const { name, value } = e.target as HTMLInputElement;
+
+        if (!value.trim()) {
+            (e.target as HTMLInputElement).value = item.name; // Resets to original if empty text input box
+            return;
+        }
 
         try {
             const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
             const newData: UpdateData<GiftItem> = {
-                [fieldName]: newValue,
+                // [fieldName]: newValue,
+                [name]: value.trim(),
                 updatedAt: serverTimestamp()
             }
 
@@ -96,9 +103,12 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
             {/* Gift Item Name/Description */}
             <input 
                 type='text'
+                name='name'
                 defaultValue={item.name}
-                onBlur={(e) => handleItemSave(e, item, 'name')}
-                onKeyDown={(e) => handleItemSave(e, item, 'name')}
+                // onBlur={(e) => handleItemSave(e, item, 'name')}
+                // onKeyDown={(e) => handleItemSave(e, item, 'name')}
+                onBlur={handleItemSave}
+                onKeyDown={handleItemSave}
                 className={`
                     ${styles.inputText}
                     ${item.status === 'purchased' ? styles.purchased : ''}
