@@ -31,7 +31,27 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
             if (e.type === 'keydown') { (e.target as HTMLInputElement).blur(); }
 
         } catch (error) {
-            console.error('Error saving item. Error:', error);
+            console.error('Error saving item name/description. Error:', error);
+        }
+    }
+
+    const handleItemStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        // Guard Clause
+        if (!authState.user || !giftListId || !item.id) { return; };
+
+        const { name, value } = e.target;
+
+        try {
+            const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
+            const newData: UpdateData<GiftItem> = {
+                [name]: value,
+                updatedAt: serverTimestamp()
+            }
+
+            await updateDoc(docRef, newData)
+
+        } catch (error) {
+            console.error('Error saving item status. Error:', error);
         }
     }
 
@@ -49,6 +69,31 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
 
     return (
         <div className={styles.giftItemCard}>
+            {/* Idea/Purchased Status */}
+            <select
+                name='status'
+                defaultValue={item.status}
+                onChange={handleItemStatusChange}
+                className={`
+                    ${styles.inputText}
+                    ${item.status === 'purchased' ? styles.purchased : ''}
+                    `}
+            >
+                <option
+                    className={styles.option}
+                    value='idea'
+                >
+                    Gift Idea
+                </option>
+                <option
+                    className={styles.option}
+                    value='purchased'
+                >
+                    Purchased
+                </option>
+            </select>
+
+            {/* Gift Item Name/Description */}
             <input 
                 type='text'
                 defaultValue={item.name}
@@ -58,7 +103,9 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
                     ${styles.inputText}
                     ${item.status === 'purchased' ? styles.purchased : ''}
                     `} 
-                />
+            />
+
+            {/* Delete Gift Item Button (NOTE: No safety checks applied yet) */}
             <button
                 className={styles.deleteItemButton}
                 onClick={() => { handleDeleteItem(item); } }
