@@ -14,7 +14,7 @@ export function GiftListPage() {
     const { authState } = useAuth();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [giftList, setGiftList] = useState<GiftList>({ title: '' });
+    const [giftList, setGiftList] = useState<GiftList>({ title: '', personId: '' });
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
 
     // For adding a new item:
