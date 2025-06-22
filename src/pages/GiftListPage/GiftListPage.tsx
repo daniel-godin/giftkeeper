@@ -226,6 +226,7 @@ export function GiftListPage() {
                         // Map through giftItems array and make a list
                         giftItems.map((item) => (
                             <GiftItemCard
+                                key={item.id}
                                 item={item}
                                 giftListId={giftListId || ''}
                             />
