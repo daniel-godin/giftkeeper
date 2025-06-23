@@ -26,3 +26,13 @@ main {
 img {
     max-width: 100%; /* Prevents images from getting out of control */
 }
+
+.unstyled-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.unstyled-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
