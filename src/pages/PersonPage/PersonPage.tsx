@@ -2,10 +2,12 @@ import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getPersonDocument } from '../../firebase/firestore';
-import { onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
+import { getGiftItemsCollection, getPersonDocument } from '../../firebase/firestore';
+import { getCountFromServer, getDoc, getDocs, onSnapshot, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
+import { GiftList } from '../../types/GiftListType';
+import { User } from 'firebase/auth';
 
 export function PersonPage() {
     const { authState } = useAuth();
@@ -13,6 +15,7 @@ export function PersonPage() {
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [person, setPerson] = useState<Person>({ name: '' });
+    const [giftIdeasCount, setGiftIdeasCount] = useState(0);
 
     // State for managing changes to displayed data:
     const [formData, setFormData] = useState<Person>({ name: '' });
@@ -51,7 +54,7 @@ export function PersonPage() {
         setIsLoading(true);
 
         const personDocRef = getPersonDocument(authState.user.uid, personId);
-        const unsubscribe = onSnapshot(personDocRef, (snapshot) => {
+        const unsubscribe = onSnapshot(personDocRef, async (snapshot) => {
             // Guard Clause
             if (!snapshot.exists()) {
                 console.error('Person Document Not Found');
@@ -60,6 +63,12 @@ export function PersonPage() {
             }
 
             const data = snapshot.data() as Person;
+
+            if (authState.user && data.giftListId) {
+                const count = await fetchGiftIdeasCount(authState.user.uid, data.giftListId)
+                setGiftIdeasCount(count);
+            }
+            
             setPerson(data);
             setFormData(data);
             setIsLoading(false);
@@ -156,7 +165,7 @@ export function PersonPage() {
                 <div className={styles.quickStats}>
                     <div className={styles.statCard}>
                         <div className={styles.statNumber}>3</div>
-                        <div className={styles.statLabel}>Gift Lists</div>
+                        <div className={styles.statLabel}>Events Coming Up</div>
                     </div>
                     <div className={styles.statCard}>
                         {person.birthday ? (
@@ -170,7 +179,7 @@ export function PersonPage() {
                     </div>
 
                     <div className={styles.statCard}>
-                        <div className={styles.statNumber}>12</div>
+                        <div className={styles.statNumber}>{giftIdeasCount}</div>
                         <div className={styles.statLabel}>Gift Ideas</div>
                     </div>
                 </div>
@@ -202,4 +211,32 @@ export function PersonPage() {
             </div>
         </section>
     )
+}
+
+export async function fetchGiftIdeasCount (userId: string, giftListId: string) {
+    // Guard Clauses
+    if (!userId) {
+        console.error('Need authState.user to get item count');
+        return 0;
+    }
+
+    if (!giftListId) {
+        console.error('need giftlistId')
+        return 0;
+    }
+
+    try {
+        const collRef = getGiftItemsCollection(userId, giftListId)
+        const q = query(collRef, where('status', '==', 'idea'))
+
+        const snapshot = await getCountFromServer(q);
+        const count = snapshot.data().count;
+
+        return count;
+    } catch (error) {
+        console.error('Error getting gift list ideas count. Error', error);
+        return 0;
+    }
+
+    return 0;
 }
