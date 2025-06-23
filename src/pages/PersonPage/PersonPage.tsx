@@ -178,10 +178,12 @@ export function PersonPage() {
                         )}
                     </div>
 
-                    <div className={styles.statCard}>
-                        <div className={styles.statNumber}>{giftIdeasCount}</div>
-                        <div className={styles.statLabel}>Gift Ideas</div>
-                    </div>
+                    <Link to={`/gift-lists/${person.giftListId}`} className='unstyled-link'>
+                        <div className={styles.statCard}>
+                            <div className={styles.statNumber}>{giftIdeasCount}</div>
+                            <div className={styles.statLabel}>Gift Ideas</div>
+                        </div>
+                    </Link>
                 </div>
 
                 <div className={styles.sectionContainer}>
