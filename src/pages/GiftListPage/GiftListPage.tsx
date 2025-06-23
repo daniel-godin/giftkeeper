@@ -145,7 +145,7 @@ export function GiftListPage() {
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: newItem.name,
-                purchased: false,
+                status: 'idea',
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
