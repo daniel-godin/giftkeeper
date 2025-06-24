@@ -69,8 +69,8 @@ export function PersonPage() {
                 const querySnapshot = await getDocs(q);
 
                 querySnapshot.forEach((doc) => {
-                    const data = doc.data() as Event;
-                    events.push(data);
+                    const eventData = doc.data() as Event;
+                    events.push(eventData);
                 })
 
                 setUpcomingEvents(events);
