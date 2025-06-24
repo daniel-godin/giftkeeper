@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getBirthdayDocRef, getEventsCollection, getGiftItemsCollection, getPersonDocument } from '../../firebase/firestore';
+import { getEventsCollection, getGiftItemsCollection, getPersonDocument } from '../../firebase/firestore';
 import { getCountFromServer, getDocs, onSnapshot, orderBy, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
@@ -116,23 +116,18 @@ export function PersonPage() {
             // Need writeBatch to sync person document & birthday event document.
             const batch = writeBatch(db);
             const personDocRef = getPersonDocument(authState.user.uid, personId);
-            let birthdayDocRef;
-            if (birthdayChanged) { birthdayDocRef = getBirthdayDocRef(authState.user.uid, personId); };
+
+            if (birthdayChanged) { 
+                // TODO:  Create function to update birthday event.
+                // If birthday changed... update upcoming birthday event to reflect change.
+                // Probably leave previous birthdays alone.
+            };
             
             // Always update person
             batch.update(personDocRef, {
                 ...formData,
                 updatedAt: serverTimestamp()
             })
-
-            // Only "update" birthday event document if birthdate has changed.
-            // if (birthdayChanged) {
-            //     // Needs some date checking.
-            //     const currentYear = Date.now().toLocaleString().
-            //      batch.update(birthdayDocRef, {
-
-            //      })
-            // }
 
             await batch.commit();
         } catch (error) {
