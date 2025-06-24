@@ -13,7 +13,7 @@ export interface Event {
     recurring?: boolean; // Annual recurring events like birthdays.
 
     // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
-    budget: number; // Total budget for this event (eg. $1,000 for Christmas 2025)
+    budget?: number; // Total budget for this event (eg. $1,000 for Christmas 2025)
 
     // Extra Data
     notes?: string;
