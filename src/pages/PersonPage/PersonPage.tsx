@@ -2,20 +2,22 @@ import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getEventsCollection, getGiftItemsCollection, getPersonDocument } from '../../firebase/firestore';
-import { getCountFromServer, getDocs, onSnapshot, orderBy, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
+import { getGiftItemsCollection, getPersonDocument } from '../../firebase/firestore';
+import { getCountFromServer, onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
 import { db } from '../../firebase/firebase';
-import { Event } from '../../types/EventType';
+import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
+import { useEvents } from '../../contexts/EventsContext';
 
 export function PersonPage() {
     const { authState } = useAuth();
     const { personId } = useParams();
+    const { events, loading: eventsLoading } = useEvents();
+    const upcomingEvents = useUpcomingEvents(personId);
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [person, setPerson] = useState<Person>({ name: '' });
-    const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
     const [giftIdeasCount, setGiftIdeasCount] = useState(0);
 
     // State for managing changes to displayed data:
@@ -47,33 +49,10 @@ export function PersonPage() {
 
             const data = snapshot.data() as Person;
 
-            // Fetch Gift Ideas Count
+            // Fetch Gift Ideas Count (Possibly switch this to use a data useContext)
             if (data.giftListId) {
                 const count = await fetchGiftIdeasCount(authState.user.uid, data.giftListId)
                 setGiftIdeasCount(count);
-            }
-
-            // Fetch Upcoming Events
-            if (data.id) {
-                const events: Event[] = [];
-
-                const collRef = getEventsCollection(authState.user.uid);
-                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-                const q = query(
-                    collRef, 
-                    where('people', 'array-contains', data.id),
-                    where('date', '>=', today),
-                    orderBy('date', 'asc')
-                )
-
-                const querySnapshot = await getDocs(q);
-
-                querySnapshot.forEach((doc) => {
-                    const eventData = doc.data() as Event;
-                    events.push(eventData);
-                })
-
-                setUpcomingEvents(events);
             }
             
             setPerson(data);
@@ -213,7 +192,9 @@ export function PersonPage() {
                         Upcoming Dates
                     </header>
                     <div className={styles.sectionData}>
-                        {upcomingEvents.length === 0 ? (
+                        {eventsLoading ? (
+                            <p>Loading events...</p>
+                        ) : upcomingEvents.length === 0 ? (
                             <p>No upcoming dates.  Please add an important date.</p>
                         ) : (
                             upcomingEvents.map((event) => (
