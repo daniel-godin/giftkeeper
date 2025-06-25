@@ -6,6 +6,7 @@ import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
+import { usePeople } from '../../../contexts/PeopleContext';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -14,15 +15,20 @@ interface AddEventModalProps {
 
 export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
     const { authState } = useAuth();
+    const { people } = usePeople();
 
     const [status, setStatus] = useState<string>('');
-    const [formData, setFormData] = useState<Event>({ title: '', date: '' });
+    const [formData, setFormData] = useState<Event>({ title: '', date: '', people: [] });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     useEffect(() => {
         if (isOpen) {
-            setFormData({ title: '', date: '' })
+            setFormData({ title: '', date: '', people: [] })
             setStatus('');
+
+            console.log('test people', people);
+
+            // fetch people.
         }
     }, [isOpen])
 
@@ -43,6 +49,23 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         })
     }
 
+    // Handles adding people to the event (Ideally, at least 1 person per event)
+    const handlePersonCheckboxChange = (personId: string, checked: boolean) => {
+        console.log('test, handlePersonCheckboxChange triggered')
+
+        if (checked) {
+            setFormData({
+                ...formData,
+                people: [...formData.people, personId]
+            })
+        } else {
+            setFormData({
+                ...formData,
+                people: formData.people.filter(id => id !== personId)
+            })
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -58,6 +81,12 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
             return;
         }
 
+        if (formData.people.length === 0) {
+            setStatus('Please select at least one person');
+            setIsSubmitting(false);
+            return;
+        }
+
         setIsSubmitting(true);
         setStatus('Adding New Event...');
 
@@ -68,6 +97,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                 id: newDocRef.id,
                 title: formData.title,
                 date: formData.date || '',
+                people: formData.people,
 
                 // Metadata
                 createdAt: serverTimestamp(),
@@ -77,7 +107,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
             await setDoc(newDocRef, newEventObject);
 
             setStatus('New Event Added!! Closing in 2 seconds...');
-            setFormData({ title: '', date: '' });
+            setFormData({ title: '', date: '', people: [] });
 
             setTimeout(() => {
                 onClose();
@@ -123,6 +153,20 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                             onChange={handleDateInputChange}
                         />
                     </label>
+
+                    <fieldset className={styles.fieldset}>
+                        <legend>Select People for this Event:</legend>
+                        {people.map((person) => (
+                            <label key={person.id} className={styles.checkboxLabel}>
+                                <input
+                                    type='checkbox'
+                                    checked={formData.people.includes(person.id || '')}
+                                    onChange={(e) => handlePersonCheckboxChange(person.id || '', e.target.checked)}
+                                />
+                                {person.name}
+                            </label>
+                        ))}
+                    </fieldset>
 
                     <output>
                         {status}
