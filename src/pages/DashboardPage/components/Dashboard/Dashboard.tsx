@@ -5,17 +5,19 @@ import { usePeople } from '../../../../contexts/PeopleContext';
 import { useWishLists } from '../../../../contexts/WishListsProvider';
 import styles from './Dashboard.module.css'
 import { Link } from 'react-router';
+import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
 
 export function Dashboard () {
     const { people, loading: peopleLoading } = usePeople();
-    const { events, loading: eventsLoading } = useEvents();
+    const { loading: eventsLoading } = useEvents();
     const { giftLists, loading: giftListsLoading } = useGiftLists();
     const { wishLists, loading: wishListsLoading  } = useWishLists();
+
+    const upcomingEvents = useUpcomingEvents();
 
     // Need to make "seconds" Type-safe later.
     const recent = {
         'people': people.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
-        'events': events.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
         'giftLists': giftLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
         'wishLists': wishLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
     }
@@ -27,10 +29,12 @@ export function Dashboard () {
 
                 {eventsLoading ? (
                     <p>Loading Events...</p>
+                ) : upcomingEvents.length === 0 ? (
+                    <p>No Upcoming Dates.  Please Add An Event</p>
                 ) : (
                     <>
                         <div className={styles.eventsList}>
-                            {recent.events.map((event) => (
+                            {upcomingEvents.map((event) => (
                                 <p key={event.id} className={styles.item}>{event.title}</p>
                             ))}
                         </div>
