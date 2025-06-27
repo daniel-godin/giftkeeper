@@ -8,6 +8,7 @@ import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { getGiftListsCollection, getPeopleCollection } from '../../../firebase/firestore';
 import { GiftList } from '../../../types/GiftListType';
+import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager';
 
 interface AddPersonalModalProps {
     isOpen: boolean;
@@ -16,6 +17,7 @@ interface AddPersonalModalProps {
 
 export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
     const { authState } = useAuth();
+    const { syncBirthdayEvent } = useBirthdayEventManager();
 
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Person>({ name: '', birthday: '' });
@@ -93,6 +95,12 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
 
             batch.set(personRef, personData);
             batch.set(giftListRef, giftListData);
+
+            // Possibly change this to have an optional "batch".
+            // If birthday has been added.  Create an event of type "birthday" for person.
+            if (formData.birthday) {
+                await syncBirthdayEvent(personRef.id, formData.name, formData.birthday, batch)
+            }
 
             await batch.commit();
 
