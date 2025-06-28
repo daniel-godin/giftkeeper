@@ -9,12 +9,14 @@ import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
 import { db } from '../../firebase/firebase';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 import { useEvents } from '../../contexts/EventsContext';
+import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
 
 export function PersonPage() {
     const { authState } = useAuth();
     const { personId } = useParams();
     const { events, loading: eventsLoading } = useEvents();
     const upcomingEvents = useUpcomingEvents(personId);
+    const { syncBirthdayEvent } = useBirthdayEventManager();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [person, setPerson] = useState<Person>({ name: '' });
@@ -87,8 +89,9 @@ export function PersonPage() {
     
         if (!authState.user || !personId) return;
 
-        // Check if birthday was changed.  If (true)... get appropriate birthday event in events collection for updating/syncing.
+        // If birthdayChanged or nameChanged... means the birthday Event should be created or updated.
         const birthdayChanged = person.birthday !== formData.birthday;
+        const nameChanged = person.name !== formData.name;
 
         setIsSubmitting(true);
         try {
@@ -96,10 +99,8 @@ export function PersonPage() {
             const batch = writeBatch(db);
             const personDocRef = getPersonDocument(authState.user.uid, personId);
 
-            if (birthdayChanged) { 
-                // TODO:  Create function to update birthday event.
-                // If birthday changed... update upcoming birthday event to reflect change.
-                // Probably leave previous birthdays alone.
+            if ((birthdayChanged || nameChanged) && formData.birthday && formData.name) {
+                await syncBirthdayEvent(personId, formData.name, formData.birthday, batch)
             };
             
             // Always update person
@@ -108,7 +109,7 @@ export function PersonPage() {
                 updatedAt: serverTimestamp()
             })
 
-            await batch.commit();
+            await batch.commit()
         } catch (error) {
             console.error('Error updating person:', error);
         } finally {
