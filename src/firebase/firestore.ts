@@ -7,6 +7,7 @@ export const getUserDoc = (userId: string) => {
     return doc(db, 'users', userId);
 }
 
+// People/Person
 export const getPeopleCollection = (userId: string) => {
     return collection(db, 'users', userId, 'people');
 }
@@ -15,10 +16,16 @@ export const getPersonDocument = (userId: string, personId: string) => {
     return doc(db, 'users', userId, 'people', personId);
 }
 
+// Events:
 export const getEventsCollection = (userId: string) => {
     return collection(db, 'users', userId, 'events');
 }
 
+export const getEventDocRef = (userId: string, eventId: string) => {
+    return doc(db, 'users', userId, 'events', eventId);
+}
+
+// Gift Lists / Gift Items:
 export const getGiftListsCollection = (userId: string) => {
     return collection(db, 'users', userId, 'giftLists');
 }
@@ -33,19 +40,6 @@ export const getGiftItemsCollection = (userId: string, giftListId: string) => {
 
 export const getGiftItemDoc = (userId: string, giftListId: string, itemId: string) => {
     return doc(db, 'users', userId, 'giftLists', giftListId, 'items', itemId);
-}
-
-// Events Firestore Helpers:
-// Possibly... get"Current"BirthdayDocRef
-export const getBirthdayDocRef = async (userId: string, personId: string) => {
-    return query(
-        getEventsCollection(userId), 
-        where('personId', '==', personId),
-        where('type', '==', 'birthday'),
-        orderBy('date', 'asc')
-        // limit(1)?????, maybe do desc???
-    )
-    // const birthdayEvents = await getDocs
 }
 
 // Wish List Firestore Helpers:
