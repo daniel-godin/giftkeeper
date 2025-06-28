@@ -1,36 +1,45 @@
 // Manages creating & syncing birthday events.
 
-import { doc, serverTimestamp, setDoc, WriteBatch } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc, updateDoc, WriteBatch } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext"
 import { Event } from "../types/EventType";
 import { useUpcomingEvents } from "./useUpcomingEvents";
-import { getEventsCollection } from "../firebase/firestore";
+import { getEventDocRef, getEventsCollection } from "../firebase/firestore";
 
 export const useBirthdayEventManager = () => {
     const { authState } = useAuth();
     const upcomingEvents = useUpcomingEvents() as Event[];
 
+    // Dispatcher Function
     const syncBirthdayEvent = async (personId: string, personName: string, birthday: string, batch?: WriteBatch) => {
-        console.log('TEST.  createBirthdayEvent function triggered');
-    
         // Guard Clause
         if (!authState.user || !personId || !birthday || !personName) { 
             console.warn('Either userId, personId, personName, or birthday is missing. Cannot continue.');
             return;
         }
 
-        // Check if birthday event already exists:
-        const hasUpcomingBirthdayEventAlready = checkForUpcomingBirthday(personId); // Checks events dataContext for upcoming events with type 'birthday' & matching personId.
-        if (hasUpcomingBirthdayEventAlready) {
-            console.warn('Upcoming birthday found. Backing out.');
-            return;
+        // Checks whether an existing birthday event exists in upcomingEvents.  If yes: returns data object, if no: returns null.
+        const existingBirthdayEvent = findUpcomingBirthdayEvent(personId);
+
+        // No Birthday Event Exists, Create New Birthday Event Document in events collection.
+        if (!existingBirthdayEvent && personName && birthday) {
+            return createBirthdayEvent(authState.user.uid, personId, personName, birthday, batch);
         }
-    
-        // If *upcoming* birthday event does NOT already exist... create a new event with type: birthday
+
+        // Existing Event Exists.  Update Event With New Birthday and/or Name.
+        if (existingBirthdayEvent && existingBirthdayEvent.id && personName && birthday) {
+            return updateBirthdayEvent(authState.user.uid, existingBirthdayEvent.id, personName, birthday, batch);
+        }
+    }
+
+    // Creates a new birthday event in events collection.
+    const createBirthdayEvent = async (userId: string, personId: string, personName: string, birthday: string, batch?: WriteBatch) => {
+        console.log('TEST: createBirthdayEvent Function Triggered');
+
         try {
             const nextBirthday = getNextBirthdayDate(birthday); // Checks today's date & whether the MM-DD has passed. Returns appropriate *next, upcoming* birthday.
-    
-            const newDocRef = doc(getEventsCollection(authState.user.uid));
+
+            const newDocRef = doc(getEventsCollection(userId));
             const data: Event = {
                 id: newDocRef.id,
                 title: `${personName}'s Birthday`,
@@ -51,16 +60,45 @@ export const useBirthdayEventManager = () => {
             } else {
                 await setDoc(newDocRef, data);
             }
-    
         } catch (error) {
-            console.error('Error creating birthday event. Error:', error);
+            console.error('Error in createBirthdayEvent. Error:', error);
+        }
+    }
+
+    // Updates an existing birthday event in events collection.
+    const updateBirthdayEvent = async (userId: string, existingEventId: string, personName: string, birthday: string, batch?: WriteBatch) => {
+        console.log('TEST: updateBirthdayEvent Function Triggered');
+
+        try {
+            const nextBirthday = getNextBirthdayDate(birthday); // Checks today's date & whether the MM-DD has passed. Returns appropriate *next, upcoming* birthday.
+
+            const docRef = getEventDocRef(userId, existingEventId);
+            const updatedData = {
+                title: `${personName}'s Birthday`,
+                date: nextBirthday,
+                updatedAt: serverTimestamp() // Only needs updatedAt beacuse this is an updating function, not a creation of document function
+            };
+
+            // Using optional "batch" for person creation process in AddPersonModal. This way they all work, or none do.
+            if (batch) {
+                batch.update(docRef, updatedData);
+            } else {
+                await updateDoc(docRef, updatedData);
+            }
+        } catch (error) {
+            console.error('Error in updateBirthdayEvent. Error:', error);
         }
     }
 
     // Check's whether the MM-DD has passed for current year.  If yes... returns a YYYY-MM-DD with *next year*, otherwise uses *this year*.
     const getNextBirthdayDate = (birthday: string): string => {
         const today = new Date();
-        const birthDate = new Date(birthday);
+
+        // Parse the date components to avoid timezone issues
+        const [originalYear, originalMonth, originalDay] = birthday.split('-').map(Number);
+
+        // Create date using locale timezone (remember, month is 0-indexed)
+        const birthDate = new Date(originalYear, originalMonth - 1, originalDay);
     
         // Set to current year
         const nextBirthday = new Date(
@@ -73,19 +111,22 @@ export const useBirthdayEventManager = () => {
         if (nextBirthday <= today) {
             nextBirthday.setFullYear(today.getFullYear() + 1);
         }
-    
+
+        // Manually format to avoid timezone issues
+        const year = nextBirthday.getFullYear();
+        const month = String(nextBirthday.getMonth() + 1).padStart(2, '0');
+        const day = String(nextBirthday.getDate()).padStart(2, '0');
+
         // Return as YYYY-MM-DD string
-        return nextBirthday.toISOString().split('T')[0];
+        return `${year}-${month}-${day}`;
     }
-    
-    // Checks events data context for an upcoming event for personId & whether that event has a type of 'birthday'
-    // *TODO*:  Change to personId optional.  Use this function to check ALL person's and whether they have an upcoming birthday or not.
-    const checkForUpcomingBirthday = (personId: string): boolean => {
-        const personEvents = upcomingEvents.filter(event => {
-            event.people.includes(personId) && event.type === 'birthday'
+
+    const findUpcomingBirthdayEvent = (personId: string): Event | null => {
+        const birthdayEvents = upcomingEvents.filter(event => {
+            return event.people.includes(personId) && event.type === 'birthday'
         })
 
-        return personEvents.length > 0;
+        return birthdayEvents.length > 0 ? birthdayEvents[0] : null;
     }
 
     return { syncBirthdayEvent };
