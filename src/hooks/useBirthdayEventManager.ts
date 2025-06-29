@@ -34,8 +34,6 @@ export const useBirthdayEventManager = () => {
 
     // Creates a new birthday event in events collection.
     const createBirthdayEvent = async (userId: string, personId: string, personName: string, birthday: string, batch?: WriteBatch) => {
-        console.log('TEST: createBirthdayEvent Function Triggered');
-
         try {
             const nextBirthday = getNextBirthdayDate(birthday); // Checks today's date & whether the MM-DD has passed. Returns appropriate *next, upcoming* birthday.
 
@@ -54,12 +52,16 @@ export const useBirthdayEventManager = () => {
                 updatedAt: serverTimestamp()
             }
 
+            console.log('Creating birthday event for:', personName, 'on', nextBirthday);
+
             // Using optional "batch" for person creation process in AddPersonModal. This way they all work, or none do.
             if (batch) {
                 batch.set(newDocRef, data);
             } else {
                 await setDoc(newDocRef, data);
             }
+
+            console.log('Birthday Event Created:', data);
         } catch (error) {
             console.error('Error in createBirthdayEvent. Error:', error);
         }
@@ -67,8 +69,6 @@ export const useBirthdayEventManager = () => {
 
     // Updates an existing birthday event in events collection.
     const updateBirthdayEvent = async (userId: string, existingEventId: string, personName: string, birthday: string, batch?: WriteBatch) => {
-        console.log('TEST: updateBirthdayEvent Function Triggered');
-
         try {
             const nextBirthday = getNextBirthdayDate(birthday); // Checks today's date & whether the MM-DD has passed. Returns appropriate *next, upcoming* birthday.
 
@@ -79,12 +79,16 @@ export const useBirthdayEventManager = () => {
                 updatedAt: serverTimestamp() // Only needs updatedAt beacuse this is an updating function, not a creation of document function
             };
 
+            console.log('Updating birthday event for:', personName);
+
             // Using optional "batch" for person creation process in AddPersonModal. This way they all work, or none do.
             if (batch) {
                 batch.update(docRef, updatedData);
             } else {
                 await updateDoc(docRef, updatedData);
             }
+
+            console.log('Birthday Event Updated:', updatedData);
         } catch (error) {
             console.error('Error in updateBirthdayEvent. Error:', error);
         }
