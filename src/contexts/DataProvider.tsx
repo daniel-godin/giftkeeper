@@ -1,3 +1,4 @@
+import { DataSync } from "../services/DataSync";
 import { EventsProvider } from "./EventsContext";
 import { GiftListsProvider } from "./GiftListsProvider";
 import { PeopleProvider } from "./PeopleContext";
@@ -9,7 +10,9 @@ export function DataProvider({ children } : { children: React.ReactNode }) {
             <EventsProvider>
                 <GiftListsProvider>
                     <WishListsProvider>
-                        {children}
+                        <DataSync>
+                            {children}
+                        </DataSync>
                     </WishListsProvider>
                 </GiftListsProvider>
             </EventsProvider>
