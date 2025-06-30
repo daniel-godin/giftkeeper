@@ -1,15 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import styles from './PeoplePage.module.css'
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { db } from '../../firebase/firebase';
-import { useAuth } from '../../contexts/AuthContext';
-import { Person } from '../../types/PersonType';
 import { AddPersonModal } from '../../components/modals/AddPersonModal/AddPersonModal';
 import { Link } from 'react-router';
 import { usePeople } from '../../contexts/PeopleContext';
 
 export function PeoplePage () {
-    const { authState } = useAuth();
     const { people, loading: loadingPeople } = usePeople();
 
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
