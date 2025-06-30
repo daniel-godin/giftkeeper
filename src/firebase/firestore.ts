@@ -17,54 +17,29 @@ export const getPersonDocRef = (userId: string, personId: string) => doc(db, 'us
 // =============================================================================
 // Event References
 // =============================================================================
-export const getEventsCollRef = (userId: string) => {
-    return collection(db, 'users', userId, 'events');
-}
-
-export const getEventDocRef = (userId: string, eventId: string) => {
-    return doc(db, 'users', userId, 'events', eventId);
-}
+export const getEventsCollRef = (userId: string) => collection(db, 'users', userId, 'events');
+export const getEventDocRef = (userId: string, eventId: string) => doc(db, 'users', userId, 'events', eventId);
 
 // =============================================================================
 // Gift Lists References
 // =============================================================================
-export const getGiftListsCollRef = (userId: string) => {
-    return collection(db, 'users', userId, 'giftLists');
-}
-
-export const getGiftListDocRef = (userId: string, giftListId: string) => {
-    return doc(db, 'users', userId, 'giftLists', giftListId);
-}
+export const getGiftListsCollRef = (userId: string) => collection(db, 'users', userId, 'giftLists');
+export const getGiftListDocRef = (userId: string, giftListId: string) => doc(db, 'users', userId, 'giftLists', giftListId);
 
 // =============================================================================
 // Gift Item References
 // =============================================================================
-export const getGiftItemsCollRef = (userId: string, giftListId: string) => {
-    return collection(db, 'users', userId, 'giftLists', giftListId, 'giftItems');
-}
-
-export const getGiftItemDocRef = (userId: string, giftListId: string, itemId: string) => {
-    return doc(db, 'users', userId, 'giftLists', giftListId, 'giftItems', itemId);
-}
+export const getGiftItemsCollRef = (userId: string, giftListId: string) => collection(db, 'users', userId, 'giftLists', giftListId, 'giftItems');
+export const getGiftItemDocRef = (userId: string, giftListId: string, itemId: string) => doc(db, 'users', userId, 'giftLists', giftListId, 'giftItems', itemId);
 
 // =============================================================================
 // Wish List References
 // =============================================================================
-export const getWishListsCollRef = (userId: string) => {
-    return collection(db, 'users', userId, 'wishLists');
-}
-
-export const getWishListDocRef = (userId: string, wishListId: string) => {
-    return doc(db, 'users', userId, 'wishLists', wishListId);
-}
+export const getWishListsCollRef = (userId: string) => collection(db, 'users', userId, 'wishLists');
+export const getWishListDocRef = (userId: string, wishListId: string) => doc(db, 'users', userId, 'wishLists', wishListId);
 
 // =============================================================================
 // Wish Item References
 // =============================================================================
-export const getWishItemsCollRef = (userId: string, wishListId: string) => {
-    return collection(db, 'users', userId, 'wishLists', wishListId, 'items');
-}
-
-export const getWishItemDocRef = (userId: string, wishListId: string, itemId: string) => {
-    return doc(db, 'users', userId, 'wishLists', wishListId, 'items', itemId);
-}
+export const getWishItemsCollRef = (userId: string, wishListId: string) => collection(db, 'users', userId, 'wishLists', wishListId, 'wishItems');
+export const getWishItemDocRef = (userId: string, wishListId: string, itemId: string) => doc(db, 'users', userId, 'wishLists', wishListId, 'wishItems', itemId);
