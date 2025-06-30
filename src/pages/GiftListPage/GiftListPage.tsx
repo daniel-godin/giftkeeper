@@ -63,7 +63,7 @@ export function GiftListPage() {
         return () => unsubscribe();
     }, []);
 
-    // Gift Items Listener: Firestore onSnapshot Collection Listener: collection(db, 'users', {userId}, 'giftLists', {giftListId}, 'items') // Unsure about "items" as a sub-coll name.
+    // Gift Items Listener: Firestore onSnapshot Collection Listener: collection(db, 'users', {userId}, 'giftLists', {giftListId}, 'giftItems')
     useEffect(() => {
         // Guard Clauses:
         if (!authState.user) {
