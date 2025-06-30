@@ -1,14 +1,17 @@
-// Returns various re-used Firestore collection and document paths.
+// Each Helper Function Returns a Document/Collection REFERENCE, not the document/collection data itself.
 
-import { collection, doc, orderBy, query, where } from "firebase/firestore"
+import { collection, doc } from "firebase/firestore"
 import { db } from "./firebase";
 
-export const getUserDoc = (userId: string) => {
-    return doc(db, 'users', userId);
-}
+// =============================================================================
+// User References
+// =============================================================================
+export const getUserDocRef = (userId: string) => doc(db, 'users', userId);
 
-// People/Person
-export const getPeopleCollection = (userId: string) => {
+// =============================================================================
+// People/Person References (different than User)
+// =============================================================================
+export const getPeopleCollRef = (userId: string) => {
     return collection(db, 'users', userId, 'people');
 }
 
@@ -16,7 +19,9 @@ export const getPersonDocument = (userId: string, personId: string) => {
     return doc(db, 'users', userId, 'people', personId);
 }
 
-// Events:
+// =============================================================================
+// Event References
+// =============================================================================
 export const getEventsCollection = (userId: string) => {
     return collection(db, 'users', userId, 'events');
 }
@@ -25,7 +30,9 @@ export const getEventDocRef = (userId: string, eventId: string) => {
     return doc(db, 'users', userId, 'events', eventId);
 }
 
-// Gift Lists / Gift Items:
+// =============================================================================
+// Gift Lists & Gift Item References
+// =============================================================================
 export const getGiftListsCollection = (userId: string) => {
     return collection(db, 'users', userId, 'giftLists');
 }
@@ -42,7 +49,9 @@ export const getGiftItemDoc = (userId: string, giftListId: string, itemId: strin
     return doc(db, 'users', userId, 'giftLists', giftListId, 'giftItems', itemId);
 }
 
-// Wish List Firestore Helpers:
+// =============================================================================
+// Wish List References
+// =============================================================================
 export const getWishListsCollection = (userId: string) => {
     return collection(db, 'users', userId, 'wishLists');
 }
