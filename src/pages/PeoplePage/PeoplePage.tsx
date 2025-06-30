@@ -6,44 +6,13 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Person } from '../../types/PersonType';
 import { AddPersonModal } from '../../components/modals/AddPersonModal/AddPersonModal';
 import { Link } from 'react-router';
+import { usePeople } from '../../contexts/PeopleContext';
 
 export function PeoplePage () {
     const { authState } = useAuth();
-
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [people, setPeople] = useState<Person[]>([]);
+    const { people, loading: loadingPeople } = usePeople();
 
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
-
-    // Set up Firestore onSnapshot listener for collection(db, 'users', {userId}, 'people')
-    useEffect(() => {
-        // Guard Clause
-        if (!authState.user) {
-            setPeople([]);
-            setIsLoading(false);
-            return;
-        }
-
-        setIsLoading(true);
-
-        // Firestore Queries
-        const peopleRef = collection(db, 'users', authState.user.uid, 'people');
-        const peopleQuery = query(peopleRef, orderBy('name')); // Sorts by name
-
-        const unsubscribe = onSnapshot(peopleQuery, (snapshot) => {
-            const peopleList: Person[] = [];
-            snapshot.forEach((doc) => {
-                peopleList.push(doc.data() as Person);
-            })
-            setPeople(peopleList);
-            setIsLoading(false);
-        }, (error) => {
-            console.error('Error fetching people:', error);
-            setIsLoading(false);
-        })
-
-        return () => unsubscribe();
-    }, [])
 
     return (
         <section className={styles.peoplePage}>
@@ -52,7 +21,7 @@ export function PeoplePage () {
             <button className={styles.addPersonButton} onClick={() => setIsAddPersonModalOpen(true)}>Add Person</button>
 
             <div className={styles.peopleContainer}>
-                {isLoading ? (
+                {loadingPeople ? (
                     <div className={styles.loadingMessage}>Loading people...</div>
                 ) : (
                     <div className={styles.peopleGrid}>
