@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Person } from "../types/PersonType";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
-import { getPeopleCollection } from "../firebase/firestore";
+import { getPeopleCollRef } from "../firebase/firestore";
 import { useAuth } from "./AuthContext";
 
 interface PeopleState {
@@ -36,7 +36,7 @@ export function PeopleProvider({ children } : { children: React.ReactNode }) {
             return; 
         };
 
-        const collRef = getPeopleCollection(authState.user.uid);
+        const collRef = getPeopleCollRef(authState.user.uid);
         const peopleQuery = query(collRef, orderBy('name'));
 
         const unsubscribe = onSnapshot(peopleQuery, (snapshot) => {

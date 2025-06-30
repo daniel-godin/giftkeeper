@@ -7,7 +7,7 @@ import { doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc, writeBatch
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
 import { X } from 'lucide-react';
-import { getGiftItemsCollection, getGiftListDocRef } from '../../firebase/firestore';
+import { getGiftItemsCollRef, getGiftListDocRef } from '../../firebase/firestore';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { db } from '../../firebase/firebase';
 
@@ -78,7 +78,7 @@ export function GiftListPage() {
 
         setIsLoading(true);
 
-        const giftListItemsCollRef = getGiftItemsCollection(authState.user.uid, giftListId);
+        const giftListItemsCollRef = getGiftItemsCollRef(authState.user.uid, giftListId);
         const giftItemsQuery = query(giftListItemsCollRef, orderBy('updatedAt', 'desc'))
         const unsubscribe = onSnapshot(giftItemsQuery, (snapshot) => {
             const data:GiftItem[] = [];
@@ -140,7 +140,7 @@ export function GiftListPage() {
         try {
             const batch = writeBatch(db);
 
-            const newDocRef = doc(getGiftItemsCollection(authState.user.uid, giftListId)); // Using doc() gives me a random UUID.
+            const newDocRef = doc(getGiftItemsCollRef(authState.user.uid, giftListId)); // Using doc() gives me a random UUID.
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: newItem.name,

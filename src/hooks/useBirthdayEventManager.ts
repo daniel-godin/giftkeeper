@@ -4,7 +4,7 @@ import { doc, serverTimestamp, setDoc, updateDoc, WriteBatch } from "firebase/fi
 import { useAuth } from "../contexts/AuthContext"
 import { Event } from "../types/EventType";
 import { useUpcomingEvents } from "./useUpcomingEvents";
-import { getEventDocRef, getEventsCollection } from "../firebase/firestore";
+import { getEventDocRef, getEventsCollRef } from "../firebase/firestore";
 
 export const useBirthdayEventManager = () => {
     const { authState } = useAuth();
@@ -37,7 +37,7 @@ export const useBirthdayEventManager = () => {
         try {
             const nextBirthday = getNextBirthdayDate(birthday); // Checks today's date & whether the MM-DD has passed. Returns appropriate *next, upcoming* birthday.
 
-            const newDocRef = doc(getEventsCollection(userId));
+            const newDocRef = doc(getEventsCollRef(userId));
             const data: Event = {
                 id: newDocRef.id,
                 title: `${personName}'s Birthday`,

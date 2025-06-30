@@ -2,7 +2,7 @@ import { Trash2 } from 'lucide-react';
 import { GiftItem } from '../../types/GiftListType'
 import styles from './GiftItemCard.module.css'
 import { useAuth } from '../../contexts/AuthContext';
-import { getGiftItemDoc, getGiftListDocRef } from '../../firebase/firestore';
+import { getGiftItemDocRef, getGiftListDocRef } from '../../firebase/firestore';
 import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 
@@ -28,7 +28,7 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
         try {
             const batch = writeBatch(db);
 
-            const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
+            const docRef = getGiftItemDocRef(authState.user.uid, giftListId, item.id);
             const newData: UpdateData<GiftItem> = {
                 // [fieldName]: newValue,
                 [name]: value.trim(),
@@ -59,7 +59,7 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
         try {
             const batch = writeBatch(db);
 
-            const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
+            const docRef = getGiftItemDocRef(authState.user.uid, giftListId, item.id);
             const newData: UpdateData<GiftItem> = {
                 [name]: value,
                 updatedAt: serverTimestamp()
@@ -84,7 +84,7 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
         try {
             const batch = writeBatch(db);
 
-            const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
+            const docRef = getGiftItemDocRef(authState.user.uid, giftListId, item.id);
             const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
 
             batch.delete(docRef);

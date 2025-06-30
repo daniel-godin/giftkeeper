@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getGiftItemsCollection, getPersonDocument } from '../../firebase/firestore';
+import { getGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
 import { getCountFromServer, onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
@@ -36,7 +36,7 @@ export function PersonPage() {
 
         setIsLoading(true);
 
-        const personDocRef = getPersonDocument(authState.user.uid, personId);
+        const personDocRef = getPersonDocRef(authState.user.uid, personId);
         const unsubscribe = onSnapshot(personDocRef, async (snapshot) => {
             // Guard Clause
             if (!snapshot.exists()) {
@@ -97,7 +97,7 @@ export function PersonPage() {
         try {
             // Need writeBatch to sync person document & birthday event document.
             const batch = writeBatch(db);
-            const personDocRef = getPersonDocument(authState.user.uid, personId);
+            const personDocRef = getPersonDocRef(authState.user.uid, personId);
 
             if ((birthdayChanged || nameChanged) && formData.birthday && formData.name) {
                 await syncBirthdayEvent(personId, formData.name, formData.birthday, batch)
@@ -231,7 +231,7 @@ export async function fetchGiftIdeasCount (userId: string, giftListId: string) {
     }
 
     try {
-        const collRef = getGiftItemsCollection(userId, giftListId)
+        const collRef = getGiftItemsCollRef(userId, giftListId)
         const q = query(collRef, where('status', '==', 'idea'))
 
         const snapshot = await getCountFromServer(q);

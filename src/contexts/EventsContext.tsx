@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Event } from "../types/EventType";
 import { useAuth } from "./AuthContext";
-import { getEventsCollection } from "../firebase/firestore";
+import { getEventsCollRef } from "../firebase/firestore";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 
 interface EventsState {
@@ -36,7 +36,7 @@ export function EventsProvider({ children } : { children: React.ReactNode }) {
             return; 
         };
 
-        const collRef = getEventsCollection(authState.user.uid);
+        const collRef = getEventsCollRef(authState.user.uid);
         const eventsQuery = query(collRef, orderBy('date'));
 
         const unsubscribe = onSnapshot(eventsQuery, (snapshot) => {

@@ -3,7 +3,7 @@ import styles from './WishListPage.module.css'
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { WishItem, WishList } from '../../types/WishListType';
-import { getWishItemDoc, getWishItemsCollection, getWishListDoc } from '../../firebase/firestore';
+import { getWishItemDocRef, getWishItemsCollRef, getWishListDocRef } from '../../firebase/firestore';
 import { deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
@@ -39,7 +39,7 @@ export function WishListPage() {
 
         setIsLoading(true);
 
-        const docRef = getWishListDoc(authState.user.uid, wishListId)
+        const docRef = getWishListDocRef(authState.user.uid, wishListId)
         const unsubscribe = onSnapshot(docRef, (snapshot) => {
             // Guard Clause
             if (!snapshot.exists()) {
@@ -74,7 +74,7 @@ export function WishListPage() {
 
         setIsLoading(true);
 
-        const collRef = getWishItemsCollection(authState.user.uid, wishListId);
+        const collRef = getWishItemsCollRef(authState.user.uid, wishListId);
         const wishItemsQuery = query(collRef, orderBy('createdAt', 'desc'))
         const unsubscribe = onSnapshot(wishItemsQuery, (snapshot) => {
             const data:WishItem[] = [];
@@ -103,7 +103,7 @@ export function WishListPage() {
         if (!wishListId) { return; }
 
         try {
-            const docRef = getWishListDoc(authState.user.uid, wishListId);
+            const docRef = getWishListDocRef(authState.user.uid, wishListId);
             await updateDoc(docRef, {
                 title: newTitle,
                 updatedAt: serverTimestamp()
@@ -118,7 +118,7 @@ export function WishListPage() {
         if (!authState.user || !wishListId || !item.id) { return; };
 
         try {
-            const docRef = getWishItemDoc(authState.user.uid, wishListId, item.id);
+            const docRef = getWishItemDocRef(authState.user.uid, wishListId, item.id);
             await updateDoc(docRef, {
                 'purchased': !item.purchased, // boolean
                 'updatedAt': serverTimestamp()
@@ -139,7 +139,7 @@ export function WishListPage() {
         const newValue = (e.target as HTMLInputElement).value.trim();
 
         try {
-            const docRef = getWishItemDoc(authState.user.uid, wishListId, item.id);
+            const docRef = getWishItemDocRef(authState.user.uid, wishListId, item.id);
             const newData: UpdateData<WishItem> = {
                 [fieldName]: newValue,
                 updatedAt: serverTimestamp()
@@ -160,7 +160,7 @@ export function WishListPage() {
         if (!authState.user || !wishListId || !item.id) { return; };
 
         try {
-            const docRef = getWishItemDoc(authState.user.uid, wishListId, item.id);
+            const docRef = getWishItemDocRef(authState.user.uid, wishListId, item.id);
             await deleteDoc(docRef);
         } catch (error) {
             console.error(`Error deleting Wish Item: ${item.id}. Error:`, error);
@@ -188,7 +188,7 @@ export function WishListPage() {
 
         setIsSubmitting(true);
         try {
-            const newDocRef = doc(getWishItemsCollection(authState.user.uid, wishListId)); // Using doc() gives me a random UUID.
+            const newDocRef = doc(getWishItemsCollRef(authState.user.uid, wishListId)); // Using doc() gives me a random UUID.
             const newDocumentData: WishItem = {
                 id: newDocRef.id,
                 name: newItem.name,

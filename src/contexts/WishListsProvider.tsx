@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { WishList } from "../types/WishListType";
 import { useAuth } from "./AuthContext";
-import { getWishListsCollection } from "../firebase/firestore";
+import { getWishListsCollRef } from "../firebase/firestore";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 
 
@@ -37,7 +37,7 @@ export function WishListsProvider({ children } : { children: React.ReactNode }) 
             return; 
         };
 
-        const collRef = getWishListsCollection(authState.user.uid);
+        const collRef = getWishListsCollRef(authState.user.uid);
         const wishListsQuery = query(collRef, orderBy('createdAt'));
 
         const unsubscribe = onSnapshot(wishListsQuery, (snapshot) => {

@@ -6,7 +6,7 @@ import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
-import { getGiftListsCollection, getPeopleCollection } from '../../../firebase/firestore';
+import { getGiftListsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
 import { GiftList } from '../../../types/GiftListType';
 import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager';
 
@@ -67,8 +67,8 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
         try {
             const batch = writeBatch(db);
 
-            const personRef = doc(getPeopleCollection(authState.user.uid));
-            const giftListRef = doc(getGiftListsCollection(authState.user.uid))
+            const personRef = doc(getPeopleCollRef(authState.user.uid));
+            const giftListRef = doc(getGiftListsCollRef(authState.user.uid))
 
             const personData: Person = {
                 id: personRef.id,

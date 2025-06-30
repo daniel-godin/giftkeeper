@@ -3,7 +3,7 @@ import { useAuth } from '../../../../contexts/AuthContext';
 import styles from './OnboardingForm.module.css'
 import { Person } from '../../../../types/PersonType';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
-import { getGiftListsCollection, getPeopleCollection } from '../../../../firebase/firestore';
+import { getGiftListsCollRef, getPeopleCollRef } from '../../../../firebase/firestore';
 import { db } from '../../../../firebase/firebase';
 import { GiftList } from '../../../../types/GiftListType';
 
@@ -44,8 +44,8 @@ export function OnboardingForm () {
         try {
             const batch = writeBatch(db);
 
-            const personRef = doc(getPeopleCollection(authState.user.uid))
-            const giftListRef = doc(getGiftListsCollection(authState.user.uid))
+            const personRef = doc(getPeopleCollRef(authState.user.uid))
+            const giftListRef = doc(getGiftListsCollRef(authState.user.uid))
 
             const personData: Person = {
                 id: personRef.id,

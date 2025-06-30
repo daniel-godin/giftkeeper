@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { GiftList } from "../types/GiftListType";
 import { useAuth } from "./AuthContext";
-import { getGiftListsCollection } from "../firebase/firestore";
+import { getGiftListsCollRef } from "../firebase/firestore";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 
 interface GiftListsState {
@@ -36,7 +36,7 @@ export function GiftListsProvider({ children } : { children: React.ReactNode }) 
             return; 
         };
 
-        const collRef = getGiftListsCollection(authState.user.uid);
+        const collRef = getGiftListsCollRef(authState.user.uid);
         const giftListsQuery = query(collRef, orderBy('updatedAt', 'desc'));
 
         const unsubscribe = onSnapshot(giftListsQuery, (snapshot) => {
