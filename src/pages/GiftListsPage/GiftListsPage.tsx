@@ -1,56 +1,20 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext'
+import { useState } from 'react';
 import styles from './GiftListsPage.module.css'
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { db } from '../../firebase/firebase';
-import { GiftList } from '../../types/GiftListType';
 import { Link } from 'react-router';
 import { AddGiftListModal } from '../../components/modals/AddGiftListModal/AddGiftListModal';
+import { useGiftLists } from '../../contexts/GiftListsProvider';
 
 export function GiftListsPage () {
-    const { authState } = useAuth();
-
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [giftLists, setGiftLists] = useState<GiftList[]>([]);
+    const { giftLists, loading: loadingGiftLists } = useGiftLists();
 
     const [isAddGiftListModalOpen, setIsAddGiftListModalOpen] = useState<boolean>(false);
-
-    // Firestore onSnapshot Listener For: collection(db, 'users', {userId}, 'giftLists')
-    useEffect(() => {
-        // Guard Clause
-        if (!authState.user) {
-            setGiftLists([]);
-            setIsLoading(false);
-            return;
-        }
-
-        setIsLoading(true);
-
-        // Firestore Queries
-        const giftListsRef = collection(db, 'users', authState.user.uid, 'giftLists');
-        const giftListsQuery = query(giftListsRef, orderBy('createdAt')); // Sorts by createdAt
-
-        const unsubscribe = onSnapshot(giftListsQuery, (snapshot) => {
-            const giftListsList: GiftList[] = [];
-            snapshot.forEach((doc) => {
-                giftListsList.push(doc.data() as GiftList);
-            })
-            setGiftLists(giftListsList);
-            setIsLoading(false);
-        }, (error) => {
-            console.error('Error fetching gift lists:', error);
-            setIsLoading(false);
-        })
-
-        return () => unsubscribe();
-    }, [])
 
     return (
         <section className={styles.giftListsPage}>
             <h1>Gift Lists</h1>
 
             <div className={styles.giftListsContainer}>
-                {isLoading ? (
+                {loadingGiftLists ? (
                     <div className={styles.loadingMessage}>Loading gift lists...</div>
                 ) : (
                     <div className={styles.giftListsGrid}>
