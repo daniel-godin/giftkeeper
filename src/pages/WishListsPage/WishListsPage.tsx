@@ -1,49 +1,13 @@
-import { useEffect, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useState } from 'react';
 import styles from './WishListsPage.module.css'
-import { WishList } from '../../types/WishListType';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
-import { db } from '../../firebase/firebase';
 import { Link } from 'react-router';
 import { AddWishListModal } from '../../components/modals/AddWishListModal/AddWishListModal';
+import { useWishLists } from '../../contexts/WishListsProvider';
 
 export function WishListsPage () {
-    const { authState } = useAuth();
-
-    const [isLoading, setIsLoading] = useState<boolean>(false);
-    const [wishLists, setWishLists] = useState<WishList[]>([]);
+    const { wishLists, loading: loadingWishLists  } = useWishLists();
 
     const [isAddWishListModalOpen, setIsAddWishListModalOpen] = useState<boolean>(false);
-
-    // Firestore onSnapshot Listener For: collection(db, 'users', {userId}, 'wishlists')
-    useEffect(() => {
-        // Guard Clause
-        if (!authState.user) {
-            setWishLists([]);
-            setIsLoading(false);
-            return;
-        }
-
-        setIsLoading(true);
-
-        // Firestore Queries
-        const wishListsRef = collection(db, 'users', authState.user.uid, 'wishLists');
-        const wishListsQuery = query(wishListsRef, orderBy('createdAt')); // Sorts by createdAt
-
-        const unsubscribe = onSnapshot(wishListsQuery, (snapshot) => {
-            const wishListsList: WishList[] = [];
-            snapshot.forEach((doc) => {
-                wishListsList.push(doc.data() as WishList);
-            })
-            setWishLists(wishListsList);
-            setIsLoading(false);
-        }, (error) => {
-            console.error('Error fetching wish lists:', error);
-            setIsLoading(false);
-        })
-
-        return () => unsubscribe();
-    }, [])
 
     return (
         <section className={styles.wishListsPage}>
@@ -52,7 +16,7 @@ export function WishListsPage () {
             <button className={styles.addWishListButton} onClick={() => setIsAddWishListModalOpen(true)}>Add Wish List</button>
 
             <div className={styles.wishListsContainer}>
-                {isLoading ? (
+                {loadingWishLists ? (
                     <div className={styles.loadingMessage}>Loading wish lists...</div>
                 ) : (
                     <div className={styles.wishListsGrid}>
