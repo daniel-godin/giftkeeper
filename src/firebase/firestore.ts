@@ -35,11 +35,11 @@ export const getGiftListDocRef = (userId: string, giftListId: string) => {
 }
 
 export const getGiftItemsCollection = (userId: string, giftListId: string) => {
-    return collection(db, 'users', userId, 'giftLists', giftListId, 'items');
+    return collection(db, 'users', userId, 'giftLists', giftListId, 'giftItems');
 }
 
 export const getGiftItemDoc = (userId: string, giftListId: string, itemId: string) => {
-    return doc(db, 'users', userId, 'giftLists', giftListId, 'items', itemId);
+    return doc(db, 'users', userId, 'giftLists', giftListId, 'giftItems', itemId);
 }
 
 // Wish List Firestore Helpers:
