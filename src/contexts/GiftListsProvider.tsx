@@ -37,7 +37,7 @@ export function GiftListsProvider({ children } : { children: React.ReactNode }) 
         };
 
         const collRef = getGiftListsCollection(authState.user.uid);
-        const giftListsQuery = query(collRef, orderBy('title'));
+        const giftListsQuery = query(collRef, orderBy('updatedAt', 'desc'));
 
         const unsubscribe = onSnapshot(giftListsQuery, (snapshot) => {
             const data: GiftList[] = [];

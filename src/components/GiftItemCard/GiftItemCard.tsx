@@ -2,8 +2,9 @@ import { Trash2 } from 'lucide-react';
 import { GiftItem } from '../../types/GiftListType'
 import styles from './GiftItemCard.module.css'
 import { useAuth } from '../../contexts/AuthContext';
-import { getGiftItemDoc } from '../../firebase/firestore';
-import { deleteDoc, serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
+import { getGiftItemDoc, getGiftListDocRef } from '../../firebase/firestore';
+import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
+import { db } from '../../firebase/firebase';
 
 export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId: string }) {
     const { authState } = useAuth();
@@ -25,6 +26,8 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
         }
 
         try {
+            const batch = writeBatch(db);
+
             const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
             const newData: UpdateData<GiftItem> = {
                 // [fieldName]: newValue,
@@ -32,7 +35,12 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
                 updatedAt: serverTimestamp()
             }
 
-            await updateDoc(docRef, newData)
+            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
+
+            batch.update(docRef, newData);
+            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
+
+            batch.commit();
 
             // Remove focus after Enter
             if (e.type === 'keydown') { (e.target as HTMLInputElement).blur(); }
@@ -49,13 +57,20 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
         const { name, value } = e.target;
 
         try {
+            const batch = writeBatch(db);
+
             const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
             const newData: UpdateData<GiftItem> = {
                 [name]: value,
                 updatedAt: serverTimestamp()
             }
 
-            await updateDoc(docRef, newData)
+            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
+
+            batch.update(docRef, newData);
+            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
+
+            batch.commit();
 
         } catch (error) {
             console.error('Error saving item status. Error:', error);
@@ -67,8 +82,15 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
         if (!authState.user || !giftListId || !item.id) { return; };
 
         try {
+            const batch = writeBatch(db);
+
             const docRef = getGiftItemDoc(authState.user.uid, giftListId, item.id);
-            await deleteDoc(docRef);
+            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
+
+            batch.delete(docRef);
+            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
+
+            batch.commit();
         } catch (error) {
             console.error(`Error deleting Gift Item: ${item.id}. Error:`, error);
         }
