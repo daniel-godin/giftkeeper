@@ -3,12 +3,13 @@ import styles from './GiftListPage.module.css'
 import { useEffect, useRef, useState } from 'react';
 import { GiftItem, GiftList } from '../../types/GiftListType';
 import { useAuth } from '../../contexts/AuthContext';
-import { deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc, writeBatch } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
-import { Trash2, X } from 'lucide-react';
-import { getGiftItemDoc, getGiftItemsCollection, getGiftListDoc } from '../../firebase/firestore';
+import { X } from 'lucide-react';
+import { getGiftItemsCollection, getGiftListDocRef } from '../../firebase/firestore';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
+import { db } from '../../firebase/firebase';
 
 export function GiftListPage() {
     const { giftListId } = useParams();
@@ -42,8 +43,7 @@ export function GiftListPage() {
 
         setIsLoading(true);
 
-        // const giftListRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId);
-        const giftListRef = getGiftListDoc(authState.user.uid, giftListId)
+        const giftListRef = getGiftListDocRef(authState.user.uid, giftListId)
         const unsubscribe = onSnapshot(giftListRef, (snapshot) => {
             // Guard Clause
             if (!snapshot.exists()) {
@@ -78,9 +78,8 @@ export function GiftListPage() {
 
         setIsLoading(true);
 
-        // const giftListItemsCollRef = collection(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items');
         const giftListItemsCollRef = getGiftItemsCollection(authState.user.uid, giftListId);
-        const giftItemsQuery = query(giftListItemsCollRef, orderBy('createdAt', 'desc'))
+        const giftItemsQuery = query(giftListItemsCollRef, orderBy('updatedAt', 'desc'))
         const unsubscribe = onSnapshot(giftItemsQuery, (snapshot) => {
             const data:GiftItem[] = [];
             snapshot.forEach((doc) => {
@@ -108,8 +107,7 @@ export function GiftListPage() {
         if (!giftListId) { return; }
 
         try {
-            // const giftListRef = doc(db, 'users', authState.user.uid, 'giftLists', giftListId);
-            const giftListRef = getGiftListDoc(authState.user.uid, giftListId);
+            const giftListRef = getGiftListDocRef(authState.user.uid, giftListId);
             await updateDoc(giftListRef, {
                 title: newTitle,
                 updatedAt: serverTimestamp()
@@ -140,7 +138,8 @@ export function GiftListPage() {
 
         setIsSubmitting(true);
         try {
-            // const newDocRef = doc(collection(db, 'users', authState.user.uid, 'giftLists', giftListId, 'items'))
+            const batch = writeBatch(db);
+
             const newDocRef = doc(getGiftItemsCollection(authState.user.uid, giftListId)); // Using doc() gives me a random UUID.
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
@@ -150,7 +149,12 @@ export function GiftListPage() {
                 updatedAt: serverTimestamp()
             }
 
-            await setDoc(newDocRef, newDocumentData);
+            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
+
+            batch.set(newDocRef, newDocumentData)
+            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
+
+            batch.commit();
 
             setIsNewItemOpen(false);
             setNewItem({name: ''})
