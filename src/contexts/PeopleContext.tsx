@@ -4,14 +4,11 @@ import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { getPeopleCollection } from "../firebase/firestore";
 import { useAuth } from "./AuthContext";
 
-
 interface PeopleState {
     people: Person[];
     loading: boolean;
     error?: string;
 }
-
-
 
 const PeopleContext = createContext<PeopleState | undefined>(undefined);
 
