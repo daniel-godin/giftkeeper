@@ -30,7 +30,7 @@ export const getGiftListsCollection = (userId: string) => {
     return collection(db, 'users', userId, 'giftLists');
 }
 
-export const getGiftListDoc = (userId: string, giftListId: string) => {
+export const getGiftListDocRef = (userId: string, giftListId: string) => {
     return doc(db, 'users', userId, 'giftLists', giftListId);
 }
 
