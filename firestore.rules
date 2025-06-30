@@ -23,7 +23,7 @@ service cloud.firestore {
                 allow read, write: if request.auth != null && request.auth.uid == userId;
 
                 // Match Gift Items Sub-Collection:
-                match /items/{itemId} {
+                match /giftItems/{itemId} {
                     // Allow authenticated users to read, create, update, delete their own gift items
                     allow read, write: if request.auth != null && request.auth.uid == userId;
                 }
@@ -34,11 +34,16 @@ service cloud.firestore {
                 allow read, write: if request.auth != null && request.auth.uid == userId;
 
                 // Match Gift Items Sub-Collection:
-                match /items/{itemId} {
+                match /wishItems/{itemId} {
                     // Allow authenticated users to read, create, update, delete their own wish items
                     allow read, write: if request.auth != null && request.auth.uid == userId;
                 }
             }
+        }
+
+        // COLLECTION GROUP QUERIES 
+        match /{path=**}/giftItems/{itemId} {
+            allow read: if request.auth != null;
         }
     }
 }
