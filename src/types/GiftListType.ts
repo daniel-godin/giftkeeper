@@ -16,6 +16,10 @@ export interface GiftItem {
     id?: string;
     name: string;
 
+    // Denormalized Data
+    personId?: string; // For connecting to Person
+    personName?: string; // For displaying in UI, reduces unneeded lookups to find name in Person.
+
     // Status & Associations
     giftListId?: string; // Gift List ID that this Item belongs to.
     status?: 'idea' | 'purchased'; // idea is default.
