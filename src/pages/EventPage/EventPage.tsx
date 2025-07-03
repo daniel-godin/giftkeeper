@@ -12,6 +12,7 @@ import { ArrowLeft, Check, Lightbulb, Pencil } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
 import { useGiftLists } from '../../contexts/GiftListsProvider';
 import { capitalizeFirst } from '../../utils/stringUtils';
+import { formatCurrency } from '../../utils/currencyUtils';
 
 export function EventPage() {
     const { eventId } = useParams();
@@ -48,7 +49,6 @@ export function EventPage() {
                 const items = snapshot.docs.map(doc => {
                     const data = doc.data() as GiftItem;
                     return data;
-                    // return doc.data() as GiftItem;
                 })
 
                 setGiftItems(items);
@@ -98,7 +98,12 @@ export function EventPage() {
                         <>
                             <header className={styles.statCardHeader}>Participants</header>
                             <div className={styles.statNumber}>{event.people.length}</div>
-                            <div className={styles.statLabel}>Name of people</div>
+                            <div className={styles.statLabel}>
+                                {/* TODO:  This needs a comma if there's another person afterwards */}
+                                {associatedPeople.map(person => (
+                                    <span>{person.name}</span>
+                                ))}
+                            </div>
                         </>
                     )}
                 </div>
@@ -107,7 +112,8 @@ export function EventPage() {
                     {event && event.budget ? (
                         <>
                             <header className={styles.statCardHeader}>Budget</header>
-                            <div className={styles.statNumber}>{event.budget}</div>
+                            <div className={styles.statNumber}>{formatCurrency(event.budget)}</div>
+                            {/* TODO:  Add up all purchasedPrice for giftItems, then minus that from overall event budget.  Maybe useMemo? */}
                             <div className={styles.statLabel}>$$$ Remaining</div>
                         </>
                     ) : (
