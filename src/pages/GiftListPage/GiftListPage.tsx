@@ -10,10 +10,14 @@ import { X } from 'lucide-react';
 import { getGiftItemsCollRef, getGiftListDocRef } from '../../firebase/firestore';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { db } from '../../firebase/firebase';
+import { usePeople } from '../../contexts/PeopleContext';
+import { useEvents } from '../../contexts/EventsContext';
 
 export function GiftListPage() {
     const { giftListId } = useParams();
     const { authState } = useAuth();
+    const { people } = usePeople();
+    const { events } = useEvents();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [giftList, setGiftList] = useState<GiftList>({ title: '', personId: '' });
@@ -127,6 +131,14 @@ export function GiftListPage() {
         });
     }
 
+    const handleEventDropDownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log('handleEventDropDownChange triggered', e.target)
+        setNewItem({
+            ...newItem,
+            eventId: e.target.value,
+        })
+    }
+
     // Creation of new item in GiftList (GiftItem)
     const handleNewItemSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -140,11 +152,20 @@ export function GiftListPage() {
         try {
             const batch = writeBatch(db);
 
+            // Find Person Associated With Gift List & Attached Their ID + Name to new GiftItem.
+            const person = people.find(person => person.id === giftList.personId)
+
             const newDocRef = doc(getGiftItemsCollRef(authState.user.uid, giftListId)); // Using doc() gives me a random UUID.
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: newItem.name,
                 status: 'idea',
+
+                personId: person?.id || '',
+                personName: person?.name || '',
+
+                eventId: newItem.eventId,
+                
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
@@ -218,6 +239,27 @@ export function GiftListPage() {
                                 value={newItem.name}
                                 className={`${styles.inputText} ${styles.inputNewItem}`} 
                             />
+
+                            <select
+                                name='event'
+                                className={styles.eventDropDown}
+                                onChange={handleEventDropDownChange}
+                            >
+                                <option
+                                    className={styles.eventDropDownOption}
+                                    value=''
+                                >(optional) Select Event:</option>
+
+                                {/* All Events (Possibly Change to Upcoming Events and/or "associated" events for personId) */}
+                                {events.map(event => (
+                                    <option
+                                        key={event.id}
+                                        value={event.id}
+                                        className={styles.eventDropDownOption}
+                                    >{event.title}</option>
+                                ))}
+                            </select>
+
                             <button className={styles.addItemButton}>Add Item</button>
                         </form>
                     )}
