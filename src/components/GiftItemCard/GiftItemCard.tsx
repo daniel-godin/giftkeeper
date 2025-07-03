@@ -137,6 +137,30 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
                     `} 
             />
 
+            {/* <select
+                name='eventId'
+                defaultValue={item.eventId}
+                onChange={handleEventIdChange}
+                // className={`
+                //     ${styles.inputText}
+                //     ${item.status === 'purchased' ? styles.purchased : ''}
+                //     `}
+            >
+                {/* Need to map through all the options. */}
+                {/* <option
+                    className={styles.option}
+                    value='idea'
+                >
+                    Gift Idea
+                </option>
+                <option
+                    className={styles.option}
+                    value='purchased'
+                >
+                    Purchased
+                </option>
+            </select> */} 
+
             {/* Delete Gift Item Button (NOTE: No safety checks applied yet) */}
             <button
                 className={styles.deleteItemButton}
