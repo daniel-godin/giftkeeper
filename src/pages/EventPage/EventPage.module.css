@@ -1,0 +1,131 @@
+.eventPage {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.eventPageHeader {
+    padding: 0.5rem;
+
+    background-color: white;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.eventPageHeader > a {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.editButton {
+    padding: 0.25rem;
+
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.editButton:hover {
+    cursor: pointer;
+    transform: scale(1.1);
+}
+
+/* First Data Section. Quick Stats Section (3 boxes) */
+/* Defaults to Mobile Version */
+.quickStatsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .quickStatsContainer {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.5rem;
+    }
+}
+
+.statCard {
+    padding: 1rem;
+
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+
+    border-radius: 7.5px;
+
+    display: grid;
+    place-items: center;
+}
+
+.statCardHeader {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.statNumber {
+
+}
+
+.statLabel {
+    font-size: 1rem;
+}
+
+/* Gift Tracker Section.  Might Pull this into it's own component at some point, along with it's own CSS Module */
+/* Defaults: Mobile */
+.giftTrackerContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.giftTrackerHeader {
+    padding: 0.5rem;
+
+    background-color: white;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.addGiftButton {
+    padding: 0.5rem;
+
+    width: 100%;
+    
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .giftTrackerHeader {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    .addGiftButton {
+        width: fit-content;
+    }
+}
+
+.giftItemList {
+
+}
+
+.giftItemCard {
+
+}
+
+.giftItemCardRow {
+    display: flex;
+}
