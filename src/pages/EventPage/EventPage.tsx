@@ -8,9 +8,10 @@ import { Event } from '../../types/EventType';
 import { GiftItem } from '../../types/GiftListType';
 import { usePeople } from '../../contexts/PeopleContext';
 import { Person } from '../../types/PersonType';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Check, Lightbulb, Pencil } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
 import { useGiftLists } from '../../contexts/GiftListsProvider';
+import { capitalizeFirst } from '../../utils/stringUtils';
 
 export function EventPage() {
     const { eventId } = useParams();
@@ -141,10 +142,16 @@ export function EventPage() {
                             </div>
                             <div className={styles.giftItemCardRow}>
                                 <span className={styles.giftItemCategory}>Status</span>
-                                <span className={styles.giftItemDetail}>{item.status}</span>
+                                {item.status === 'idea' && (
+                                    <span className={styles.giftItemDetailIdea}><Lightbulb size={20}/> {capitalizeFirst(item.status)}</span>
+                                )}
+                                {item.status === 'purchased' && (
+                                    <span className={styles.giftItemDetailPurchased}><Check size={20} /> {capitalizeFirst(item.status)}</span>
+                                )}
                             </div>
                             <div className={styles.giftItemCardRow}>
                                 <span className={styles.giftItemCategory}>Cost</span>
+                                {/* TODO:  Build a helper function to convert cents to dollars.  Both ways (cents > dollars & dollars > cents) */}
                                 <span className={styles.giftItemDetail}>{item.purchasedCost}</span>
                             </div>
                         </div>

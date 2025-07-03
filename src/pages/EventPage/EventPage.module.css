@@ -119,13 +119,53 @@
 }
 
 .giftItemList {
-
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .giftItemCard {
+    padding: 0.5rem;
 
+    background-color: white;
+
+    border: 1px solid lightgray;
+    border-radius: 7.5px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .giftItemCardRow {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Text on Left Side */
+.giftItemCategory {
+    color: gray;
+}
+
+/* "Status" Text/Icon */
+.giftItemDetailIdea {
+    padding: 0.25rem 0.75rem;
+
+    background-color: #fff3e0;
+    color: #e65100;
+
+    border: none;
+    border-radius: 9999px;
+}
+
+.giftItemDetailPurchased {
+    padding: 0.25rem 0.75rem;
+
+    background-color: #e8f5e9;
+    color: #2e7d32;;
+
+
+    border: none;
+    border-radius: 9999px;
 }
