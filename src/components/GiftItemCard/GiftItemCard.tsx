@@ -5,9 +5,25 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getGiftItemDocRef, getGiftListDocRef } from '../../firebase/firestore';
 import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
+import { useEvents } from '../../contexts/EventsContext';
+import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
+import { useEffect, useState } from 'react';
+import { Event } from '../../types/EventType';
 
 export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId: string }) {
     const { authState } = useAuth();
+    const { events } = useEvents();
+    const upcomingEvents = useUpcomingEvents();
+
+    const [upcomingEventsForPerson, setUpcomingEventsForPerson] = useState<Event[]>([]);
+
+    // Figure out upcoming events for personId
+    useEffect(() => {
+        if (!upcomingEvents || !events || events.length === 0 || !item.personId) { return }; // Guard Clause
+
+        const eventsData = upcomingEvents.filter(event => event.people.includes(item.personId))
+        setUpcomingEventsForPerson(eventsData);
+    }, [upcomingEvents, item.personId])
 
     // Established Item Name Change
     // const handleItemSave = async (e: React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>, item: GiftItem, fieldName: string) => {
@@ -50,7 +66,7 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
         }
     }
 
-    const handleItemStatusChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const handleDropdownChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         // Guard Clause
         if (!authState.user || !giftListId || !item.id) { return; };
 
@@ -102,7 +118,7 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
             <select
                 name='status'
                 defaultValue={item.status}
-                onChange={handleItemStatusChange}
+                onChange={handleDropdownChange}
                 className={`
                     ${styles.inputText}
                     ${item.status === 'purchased' ? styles.purchased : ''}
@@ -127,8 +143,6 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
                 type='text'
                 name='name'
                 defaultValue={item.name}
-                // onBlur={(e) => handleItemSave(e, item, 'name')}
-                // onKeyDown={(e) => handleItemSave(e, item, 'name')}
                 onBlur={handleItemSave}
                 onKeyDown={handleItemSave}
                 className={`
@@ -137,29 +151,55 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
                     `} 
             />
 
-            {/* <select
+            {/* Estimated/Purchased Price */}
+            {/* Possibly show estimated when item is an "idea", and "purchasedPrice" if item is "purchased" */}
+            <label>cost
+            <input
+                type='number'
+                name={item.status === 'purchased' ? 'purchasedCost' : 'estimatedCost'} // 1 Input for both estimated & purchased cost
+                step='0.01' // for 'cents'
+                min='0'
+                placeholder='$0.00'
+                defaultValue={item.status === 'purchased' ? 
+                    (item.purchasedCost ? item.purchasedCost / 100 : '') :
+                    (item.estimatedCost ? item.estimatedCost / 100 : '')
+                }
+                onBlur={handleItemSave}
+                className={styles.inputText}
+            />
+            </label>
+
+            {/* Only show events if item has been *purchased* */}
+            {item.status === 'purchased' && (
+                <select
                 name='eventId'
-                defaultValue={item.eventId}
-                onChange={handleEventIdChange}
-                // className={`
-                //     ${styles.inputText}
-                //     ${item.status === 'purchased' ? styles.purchased : ''}
-                //     `}
-            >
-                {/* Need to map through all the options. */}
-                {/* <option
-                    className={styles.option}
-                    value='idea'
+                value={item.eventId}
+                onChange={handleDropdownChange}
+                className={`
+                    ${styles.inputText}
+                    ${item.status === 'purchased' ? styles.purchased : ''}
+                    `}
                 >
-                    Gift Idea
-                </option>
-                <option
-                    className={styles.option}
-                    value='purchased'
-                >
-                    Purchased
-                </option>
-            </select> */} 
+                {/* 1 Blank Option, then through all the options that make sense. */}
+                    <option
+                        className={styles.option}
+                        value=''
+                    >
+                        Choose An Event
+                    </option>
+
+                    {upcomingEventsForPerson.map(event => (
+                        <option
+                            key={event.id}
+                            className={styles.option}
+                            value={event.id}
+                        >
+                            {event.title}
+                        </option>
+                    ))}
+                </select>
+            )}
+
 
             {/* Delete Gift Item Button (NOTE: No safety checks applied yet) */}
             <button
