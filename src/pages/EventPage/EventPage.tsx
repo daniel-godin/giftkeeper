@@ -101,7 +101,7 @@ export function EventPage() {
                             <div className={styles.statLabel}>
                                 {/* TODO:  This needs a comma if there's another person afterwards */}
                                 {associatedPeople.map(person => (
-                                    <span>{person.name}</span>
+                                    <span key={person.id}>{person.name}</span>
                                 ))}
                             </div>
                         </>
