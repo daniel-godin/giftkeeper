@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from './EventPage.module.css'
 import { Link, useParams } from 'react-router';
-import { collectionGroup, getDocs, query, where } from 'firebase/firestore';
+import { collectionGroup, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { useEvents } from '../../contexts/EventsContext';
 import { Event } from '../../types/EventType';
@@ -18,10 +18,11 @@ export function EventPage() {
     const { eventId } = useParams();
     const { events, loading: eventsLoading } = useEvents();
     const { people, loading: peopleLoading } = usePeople();
-    const { giftLists, loading: giftListsLoading} = useGiftLists();
+    const { loading: giftListsLoading} = useGiftLists();
 
     const [event, setEvent] = useState<Event>();
     const [associatedPeople, setAssociatedPeople] = useState<Person[]>([]);
+    const [giftItemsLoading, setGiftItemsLoading] = useState<boolean>(false);
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
 
     // Fetch Data For UI (event details)
@@ -39,28 +40,24 @@ export function EventPage() {
         setEvent(eventDetails);
         setAssociatedPeople(peopleDetails);
 
-        const fetchGiftItems = async () => {
-            try {
-                const q = query(collectionGroup(db, 'giftItems'), where('eventId', '==', eventId))
-                
-                // Set up a listener... or just a getDocs???
-                const snapshot = await getDocs(q);
+        setGiftItemsLoading(true);
 
-                const items = snapshot.docs.map(doc => {
-                    const data = doc.data() as GiftItem;
-                    return data;
-                })
+        const q = query(collectionGroup(db, 'giftItems'), where('eventId', '==', eventId))
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const items = snapshot.docs.map(doc => {
+                const data = doc.data() as GiftItem;
+                return data;
+            });
 
-                setGiftItems(items);
+            setGiftItems(items);
+            setGiftItemsLoading(false);
+        }, (error) => {
+            console.error('Error listening to gift items. Error:', error);
+            setGiftItemsLoading(false);
+        });
 
-            } catch (error) {
-                console.error('Error fetching gift items. Error:', error);
-            }
-        }
-
-        fetchGiftItems();
-
-    }, [eventId, events, people, giftLists])
+        return () => unsubscribe();
+    }, [eventId, events, people])
 
     // Budget Calculations: Event Budget, Total of Purchased Items, Difference Between Those Two.
     const budgetCalculations = useMemo(() => {
@@ -146,41 +143,47 @@ export function EventPage() {
             </div>
 
             <div className={styles.giftTrackerContainer}>
-                <header className={styles.giftTrackerHeader}>
-                    <h3>Gift Tracker</h3>
-                    <button className={styles.addGiftButton}>+ Add Gift</button>
-                </header>
+                {giftItemsLoading ? (
+                    <div>Loading Gift Items...</div>
+                ) : (
+                    <>
+                        <header className={styles.giftTrackerHeader}>
+                            <h3>Gift Tracker</h3>
+                            <button className={styles.addGiftButton}>+ Add Gift</button>
+                        </header>
 
-                {/* Needs two versions: Mobile & Desktop. Mobile uses Cards, Desktop uses Table */}
-                <div className={styles.giftItemList}>
-                    {/* Map through associated gift items */}
-                    {/* Click on card to "edit" something?  Or use an Action button? */}
-                    {giftItems.map((item) => (
-                        <div key={item.id} className={styles.giftItemCard}>
-                            <div className={styles.giftItemCardRow}>
-                                <span className={styles.giftItemCategory}>Person</span>
-                                <span className={styles.giftItemDetail}>{item.personName}</span>
-                            </div>
-                            <div className={styles.giftItemCardRow}>
-                                <span className={styles.giftItemCategory}>Gift</span>
-                                <span className={styles.giftItemDetail}>{item.name}</span>
-                            </div>
-                            <div className={styles.giftItemCardRow}>
-                                <span className={styles.giftItemCategory}>Status</span>
-                                {item.status === 'idea' && (
-                                    <span className={styles.giftItemDetailIdea}><Lightbulb size={20}/> {capitalizeFirst(item.status)}</span>
-                                )}
-                                {item.status === 'purchased' && (
-                                    <span className={styles.giftItemDetailPurchased}><Check size={20} /> {capitalizeFirst(item.status)}</span>
-                                )}
-                            </div>
-                            <div className={styles.giftItemCardRow}>
-                                <span className={styles.giftItemCategory}>Cost</span>
-                                <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost)}</span>
-                            </div>
+                        {/* Needs two versions: Mobile & Desktop. Mobile uses Cards, Desktop uses Table */}
+                        <div className={styles.giftItemList}>
+                            {/* Map through associated gift items */}
+                            {/* Click on card to "edit" something?  Or use an Action button? */}
+                            {giftItems.map((item) => (
+                                <div key={item.id} className={styles.giftItemCard}>
+                                    <div className={styles.giftItemCardRow}>
+                                        <span className={styles.giftItemCategory}>Person</span>
+                                        <span className={styles.giftItemDetail}>{item.personName}</span>
+                                    </div>
+                                    <div className={styles.giftItemCardRow}>
+                                        <span className={styles.giftItemCategory}>Gift</span>
+                                        <span className={styles.giftItemDetail}>{item.name}</span>
+                                    </div>
+                                    <div className={styles.giftItemCardRow}>
+                                        <span className={styles.giftItemCategory}>Status</span>
+                                        {item.status === 'idea' && (
+                                            <span className={styles.giftItemDetailIdea}><Lightbulb size={20}/> {capitalizeFirst(item.status)}</span>
+                                        )}
+                                        {item.status === 'purchased' && (
+                                            <span className={styles.giftItemDetailPurchased}><Check size={20} /> {capitalizeFirst(item.status)}</span>
+                                        )}
+                                    </div>
+                                    <div className={styles.giftItemCardRow}>
+                                        <span className={styles.giftItemCategory}>Cost</span>
+                                        <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost)}</span>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
+                    </>
+                )}
             </div>
         </section>
     )
