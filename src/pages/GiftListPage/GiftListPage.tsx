@@ -53,7 +53,7 @@ export function GiftListPage() {
         })
 
         return () => unsubscribe();
-    }, [giftListId, authState.user?.uid, giftListsLoading])
+    }, [giftListId, authState.user?.uid, giftLists, giftListsLoading])
 
     // Effect to "focus" into <input> when a user clicks the "add new item" button.
     useEffect(() => {

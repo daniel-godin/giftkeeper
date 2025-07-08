@@ -4,14 +4,16 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { WishItem, WishList } from '../../types/WishListType';
 import { getWishItemDocRef, getWishItemsCollRef, getWishListDocRef } from '../../firebase/firestore';
-import { deleteDoc, doc, onSnapshot, orderBy, query, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, onSnapshot, serverTimestamp, setDoc, UpdateData, updateDoc } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
 import { Trash2, X } from 'lucide-react';
+import { useWishLists } from '../../contexts/WishListsProvider';
 
 export function WishListPage() {
     const { wishListId } = useParams();
     const { authState } = useAuth();
+    const { wishLists, loading: wishListsLoading} = useWishLists();
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [wishList, setWishList] = useState<WishList>({ title: '' });
@@ -24,72 +26,29 @@ export function WishListPage() {
 
     const newItemInputRef = useRef<HTMLInputElement>(null);
 
-    // Wish List Listener:  Firestore onSnapshot Document Listener: // doc(db, 'users', {userId}, 'wishLists', {wishListId})
+    // Grab Data for GiftListId from GiftLists data context array.
     useEffect(() => {
-        // Guard Clauses:
-        if (!authState.user) {
-            setIsLoading(false);
-            return;
-        }
+        if (!wishListId || !authState.user || wishListsLoading) { return } // Guard/Optimization Clause
 
-        if (!wishListId) { 
-            setIsLoading(false);
-            return;
-        }
+        const wishListData = wishLists.find(wishList => wishList.id === wishListId);
+        if (!wishListData) { return }; // Guard Clause -- If No Data Found, Exit.
 
-        setIsLoading(true);
-
-        const docRef = getWishListDocRef(authState.user.uid, wishListId)
-        const unsubscribe = onSnapshot(docRef, (snapshot) => {
-            // Guard Clause
-            if (!snapshot.exists()) {
-                setIsLoading(false);
-                console.error('Wish List Not Found');
-                return;
-            }
-
-            const data = snapshot.data() as WishList;
-            setWishList(data);
-            setIsLoading(false);
-        }, (error) => {
-            console.error('Error fetching gift list. Error:', error);
-            setIsLoading(false);
-        })
-
-        return () => unsubscribe();
-    }, []);
-
-    // Gift Items Listener: Firestore onSnapshot Collection Listener: collection(db, 'users', {userId}, 'wishLists', {wishListId}, 'items')
-    useEffect(() => {
-        // Guard Clauses:
-        if (!authState.user) {
-            setIsLoading(false);
-            return;
-        }
-
-        if (!wishListId) { 
-            setIsLoading(false);
-            return;
-        }
-
-        setIsLoading(true);
+        setWishList(wishListData);
 
         const collRef = getWishItemsCollRef(authState.user.uid, wishListId);
-        const wishItemsQuery = query(collRef, orderBy('createdAt', 'desc'))
-        const unsubscribe = onSnapshot(wishItemsQuery, (snapshot) => {
-            const data:WishItem[] = [];
-            snapshot.forEach((doc) => {
-                data.push(doc.data() as WishItem);
+        const unsubscribe = onSnapshot(collRef, (snapshot) => {
+            const items = snapshot.docs.map(doc => {
+                const data = doc.data() as WishItem;
+                return data;
             })
-            setWishItems(data);
-            setIsLoading(false);
+
+            setWishItems(items);
         }, (error) => {
-            console.error('Error fetching wish items. Error:', error);
-            setIsLoading(false);
+            console.error('Error listening to wish items. Error:', error);
         })
 
         return () => unsubscribe();
-    }, [])
+    }, [wishListId, authState.user?.uid, wishLists, wishListsLoading])
 
     // Effect to "focus" into <input> when a user clicks the "add new item" button.
     useEffect(() => {
@@ -209,7 +168,7 @@ export function WishListPage() {
     }
 
     if (isLoading) { return (
-        <section className={styles.giftListPage}>
+        <section className={styles.wishListPage}>
             Loading...
         </section>
     )}
