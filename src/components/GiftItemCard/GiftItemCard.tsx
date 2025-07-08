@@ -45,10 +45,20 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
             const batch = writeBatch(db);
 
             const docRef = getGiftItemDocRef(authState.user.uid, giftListId, item.id);
-            const newData: UpdateData<GiftItem> = {
-                // [fieldName]: newValue,
-                [name]: value.trim(),
-                updatedAt: serverTimestamp()
+
+            let newData: UpdateData<GiftItem>;
+
+            // estimatedCost & purchasedCost are saved in db as 'cents' (number).  This allows easier calculations.  Use helper functions to display in "dollars".
+            if (name === 'estimatedCost' || name === 'purchasedCost') {
+                newData = {
+                    [name]: Number(value.trim()) * 100, // Convert to number & multiply by 100 to get 'cents' amount.
+                    updatedAt: serverTimestamp()
+                }
+            } else {
+                newData = {
+                    [name]: value.trim(),
+                    updatedAt: serverTimestamp()
+                }
             }
 
             const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
@@ -153,7 +163,10 @@ export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId
 
             {/* Estimated/Purchased Price */}
             {/* Possibly show estimated when item is an "idea", and "purchasedPrice" if item is "purchased" */}
-            <label>cost
+
+            <label>
+                {item.status === 'idea' && (<>Estimated Cost:</>)}
+                {item.status === 'purchased' && (<>Purchased Cost:</>)}
             <input
                 type='number'
                 name={item.status === 'purchased' ? 'purchasedCost' : 'estimatedCost'} // 1 Input for both estimated & purchased cost
