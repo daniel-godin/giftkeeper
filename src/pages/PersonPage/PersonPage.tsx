@@ -3,22 +3,23 @@ import styles from './PersonPage.module.css'
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
-import { getCountFromServer, onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
+import { getCountFromServer, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
 import { db } from '../../firebase/firebase';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 import { useEvents } from '../../contexts/EventsContext';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
+import { usePeople } from '../../contexts/PeopleContext';
 
 export function PersonPage() {
     const { authState } = useAuth();
     const { personId } = useParams();
+    const { people, loading: peopleLoading } = usePeople();
     const { events, loading: eventsLoading } = useEvents();
     const upcomingEvents = useUpcomingEvents(personId);
     const { syncBirthdayEvent } = useBirthdayEventManager();
 
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [person, setPerson] = useState<Person>({ name: '' });
     const [giftIdeasCount, setGiftIdeasCount] = useState(0);
 
@@ -26,47 +27,28 @@ export function PersonPage() {
     const [formData, setFormData] = useState<Person>({ name: '' });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    // Setup a Firestore listener to doc(db, 'users', {userId}, 'people', {personId})
+    // Grab data for personId from people data context array.  Don't duplicate Firestore listener.
     useEffect(() => {
-        // Guard Clauses:
-        if (!authState.user || !personId) {
-            console.warn('No user or personId found. Cannot fetch data.');
-            return;
-        }
+        if (!personId || !people) { return }; // Guard Clause
 
-        setIsLoading(true);
+        const fetchPersonData = async () => {
+            const personData = people.find(person => person.id === personId);
+            if (!personData) { return }; // Guard Clause -- If no person found exit out.
+            // TODO:  Display some kind of message to user in UI that no person found with that ID.
+            setPerson(personData);
+            setFormData(personData);
 
-        const personDocRef = getPersonDocRef(authState.user.uid, personId);
-        const unsubscribe = onSnapshot(personDocRef, async (snapshot) => {
-            // Guard Clause
-            if (!snapshot.exists()) {
-                console.error('Person Document Not Found');
-                setIsLoading(false);
-                return;
-            }
-
-            if (!authState.user) {
-                return;
-            }
-
-            const data = snapshot.data() as Person;
-
-            // Fetch Gift Ideas Count (Possibly switch this to use a data useContext)
-            if (data.giftListId) {
-                const count = await fetchGiftIdeasCount(authState.user.uid, data.giftListId)
+            // Fetch Number of "ideas" (note: NOT purchased items) for this person:
+            if (!authState.user || !authState.user.uid || !personData.giftListId) { return } // Guard Clause
+            try {
+                const count = await fetchGiftIdeasCount(authState.user.uid, personData.giftListId);
                 setGiftIdeasCount(count);
+            } catch (error) {
+                console.error('Error fetching number of gift ideas for person. Error:', error);
             }
-            
-            setPerson(data);
-            setFormData(data);
-            setIsLoading(false);
-        }, (error) => {
-            console.error('Error setting up snapshot for person. Error:', error);
-            setIsLoading(false);
-        })
-        
-        return () => unsubscribe();
-    }, []);
+        }
+        fetchPersonData();
+    }, [personId, people, authState.user?.uid]);
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -115,6 +97,10 @@ export function PersonPage() {
         } finally {
             setIsSubmitting(false);
         }
+    }
+
+    if (peopleLoading) {
+        return <div>Loading Person...</div>
     }
 
     return (
