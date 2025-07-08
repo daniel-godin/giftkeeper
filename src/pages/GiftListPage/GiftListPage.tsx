@@ -3,7 +3,7 @@ import styles from './GiftListPage.module.css'
 import { useEffect, useRef, useState } from 'react';
 import { GiftItem, GiftList } from '../../types/GiftListType';
 import { useAuth } from '../../contexts/AuthContext';
-import { doc, onSnapshot, orderBy, query, serverTimestamp, updateDoc, writeBatch } from 'firebase/firestore';
+import { doc, onSnapshot, serverTimestamp, updateDoc, writeBatch } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
 import { X } from 'lucide-react';
@@ -12,14 +12,15 @@ import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { db } from '../../firebase/firebase';
 import { usePeople } from '../../contexts/PeopleContext';
 import { useEvents } from '../../contexts/EventsContext';
+import { useGiftLists } from '../../contexts/GiftListsProvider';
 
 export function GiftListPage() {
     const { giftListId } = useParams();
     const { authState } = useAuth();
+    const { giftLists, loading: giftListsLoading } = useGiftLists();
     const { people } = usePeople();
     const { events } = useEvents();
 
-    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [giftList, setGiftList] = useState<GiftList>({ title: '', personId: '' });
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
 
@@ -30,74 +31,29 @@ export function GiftListPage() {
 
     const newItemInputRef = useRef<HTMLInputElement>(null);
 
-    // Gift List Listener:  Firestore onSnapshot Document Listener: // doc(db, 'users', {userId}, 'giftLists', {giftListId})
+    // Grab Data for GiftListId from GiftLists data context array.
     useEffect(() => {
-        // Might need to put a re-direct or something to make sure unauthorized access doesn't happen.
+        if (!giftListId || !authState.user || giftListsLoading) { return } // Guard/Optimization Clause.
 
-        // Guard Clauses:
-        if (!authState.user) {
-            setIsLoading(false);
-            return;
-        }
+        const giftListData = giftLists.find(giftList => giftList.id === giftListId);
+        if (!giftListData) { return }; // Guard Clause -- If No Data Found Exit Out
 
-        if (!giftListId) { 
-            setIsLoading(false);
-            return;
-        }
+        setGiftList(giftListData);
 
-        setIsLoading(true);
-
-        const giftListRef = getGiftListDocRef(authState.user.uid, giftListId)
-        const unsubscribe = onSnapshot(giftListRef, (snapshot) => {
-            // Guard Clause
-            if (!snapshot.exists()) {
-                setIsLoading(false);
-                console.error('Gift List Not Found');
-                return;
-            }
-
-            const data = snapshot.data() as GiftList;
-            setGiftList(data);
-            setIsLoading(false);
-        }, (error) => {
-            console.error('Error fetching gift list. Error:', error);
-            setIsLoading(false);
-        })
-
-        return () => unsubscribe();
-    }, []);
-
-    // Gift Items Listener: Firestore onSnapshot Collection Listener: collection(db, 'users', {userId}, 'giftLists', {giftListId}, 'giftItems')
-    useEffect(() => {
-        // Guard Clauses:
-        if (!authState.user) {
-            setIsLoading(false);
-            return;
-        }
-
-        if (!giftListId) { 
-            setIsLoading(false);
-            return;
-        }
-
-        setIsLoading(true);
-
-        const giftListItemsCollRef = getGiftItemsCollRef(authState.user.uid, giftListId);
-        const giftItemsQuery = query(giftListItemsCollRef, orderBy('updatedAt', 'desc'))
-        const unsubscribe = onSnapshot(giftItemsQuery, (snapshot) => {
-            const data:GiftItem[] = [];
-            snapshot.forEach((doc) => {
-                data.push(doc.data() as GiftItem);
+        const collRef = getGiftItemsCollRef(authState.user.uid, giftListId);
+        const unsubscribe = onSnapshot(collRef, (snapshot) => {
+            const items = snapshot.docs.map(doc => {
+                const data = doc.data() as GiftItem;
+                return data;
             })
-            setGiftItems(data);
-            setIsLoading(false);
+
+            setGiftItems(items);
         }, (error) => {
-            console.error('Error fetching gift items. Error:', error);
-            setIsLoading(false);
+            console.error('Error listening to gift items. Error:', error);
         })
 
         return () => unsubscribe();
-    }, [])
+    }, [giftListId, authState.user?.uid, giftListsLoading])
 
     // Effect to "focus" into <input> when a user clicks the "add new item" button.
     useEffect(() => {
@@ -186,9 +142,9 @@ export function GiftListPage() {
         }
     }
 
-    if (isLoading) { return (
+    if (giftListsLoading) { return (
         <section className={styles.giftListPage}>
-            Loading...
+            Loading Gift List...
         </section>
     )}
 
