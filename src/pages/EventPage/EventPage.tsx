@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './EventPage.module.css'
 import { Link, useParams } from 'react-router';
 import { collectionGroup, getDocs, query, where } from 'firebase/firestore';
@@ -62,6 +62,21 @@ export function EventPage() {
 
     }, [eventId, events, people, giftLists])
 
+    // Budget Calculations: Event Budget, Total of Purchased Items, Difference Between Those Two.
+    const budgetCalculations = useMemo(() => {
+        if (!giftItems || !event || !event.budget) { return }; // Guard Clause
+
+        const totalPurchased = giftItems.reduce((sum, item) => {
+            return sum + (item.purchasedCost || 0);
+        }, 0)
+
+        return {
+            eventBudget: event.budget,
+            totalPurchased: totalPurchased,
+            budgetLeft: event.budget - totalPurchased
+        }
+    }, [giftItems, event?.budget])
+
     return (
         // Can I / Should I do an {event && ()} at the top? or ? : ('Event Not Found')
         <section className={styles.eventPage}>
@@ -99,22 +114,26 @@ export function EventPage() {
                             <header className={styles.statCardHeader}>Participants</header>
                             <div className={styles.statNumber}>{event.people.length}</div>
                             <div className={styles.statLabel}>
-                                {/* TODO:  This needs a comma if there's another person afterwards */}
-                                {associatedPeople.map(person => (
-                                    <span key={person.id}>{person.name}</span>
-                                ))}
+                                {associatedPeople.map(person => person.name).join(', ')}
                             </div>
                         </>
                     )}
                 </div>
 
                 <div className={styles.statCard}>
-                    {event && event.budget ? (
+                    {event && event.budget && budgetCalculations ? (
                         <>
                             <header className={styles.statCardHeader}>Budget</header>
-                            <div className={styles.statNumber}>{formatCurrency(event.budget)}</div>
-                            {/* TODO:  Add up all purchasedPrice for giftItems, then minus that from overall event budget.  Maybe useMemo? */}
-                            <div className={styles.statLabel}>$$$ Remaining</div>
+                            <div className={styles.statNumber}>{formatCurrency(budgetCalculations.totalPurchased)} / {formatCurrency(event.budget)}</div>
+                            {/* Third section:  Bar + money left in budget */}
+                            <div className={styles.statLabel}>
+                                <progress 
+                                    className={styles.budgetBar}
+                                    value={budgetCalculations.totalPurchased}
+                                    max={budgetCalculations.eventBudget}
+                                ></progress>
+                                <p>{formatCurrency(budgetCalculations.budgetLeft)} remaining</p>
+                            </div>
                         </>
                     ) : (
                         <>
@@ -157,8 +176,7 @@ export function EventPage() {
                             </div>
                             <div className={styles.giftItemCardRow}>
                                 <span className={styles.giftItemCategory}>Cost</span>
-                                {/* TODO:  Build a helper function to convert cents to dollars.  Both ways (cents > dollars & dollars > cents) */}
-                                <span className={styles.giftItemDetail}>{item.purchasedCost}</span>
+                                <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost)}</span>
                             </div>
                         </div>
                     ))}
