@@ -149,7 +149,6 @@ export function EventPage() {
                     <>
                         <header className={styles.giftTrackerHeader}>
                             <h3>Gift Tracker</h3>
-                            <button className={styles.addGiftButton}>+ Add Gift</button>
                         </header>
 
                         {/* Needs two versions: Mobile & Desktop. Mobile uses Cards, Desktop uses Table */}
@@ -177,7 +176,7 @@ export function EventPage() {
                                     </div>
                                     <div className={styles.giftItemCardRow}>
                                         <span className={styles.giftItemCategory}>Cost</span>
-                                        <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost)}</span>
+                                        <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost || 0)}</span>
                                     </div>
                                 </div>
                             ))}
