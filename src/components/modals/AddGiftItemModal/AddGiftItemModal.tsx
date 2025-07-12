@@ -35,6 +35,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<GiftItem>(defaultFormValues);
+    const [showOptionalFields, setShowOptionalFields] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     // Get upcoming events for selected "person" to display in dropdown.  Default is '' per defaultFormValues.
@@ -160,7 +161,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
-                    <label className={styles.label}>Gift Item:
+                    <label className={styles.label}>Gift Item Idea or Purchase: *
                         <input
                             className={styles.input}
                             type='text'
@@ -172,104 +173,126 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                     </label>
 
                     {/* Selecting "person" gives personId, personName, AND ***giftListId*** (which is needed for storing Gift Item Location) */}
-                    <select
-                        name='person'
-                        onChange={handlePersonDropdownInputChange}
-                        required={true}
-                        value={formData.personId}
-                        className={styles.dropdown}
-                    >
-                        <option
-                            value=''
-                            className={styles.option}
-                        >Choose Person</option>
-
-                        {people.map(person => (
-                            <option
-                                key={person.id}
-                                value={person.id}
-                                className={styles.option}
-                            >{person.name}</option>
-                        ))}
-                    </select>
-
-                    {/* Changing Status will change available fields: eventId (show/hide) & estimatedCost/purchasedCost. */}
-                    <select
-                        name='status'
-                        onChange={handleInputChange}
-                        required={true}
-                        value={formData.status}
-                        className={styles.dropdown}
-                    >
-                        <option
-                            value='idea'
-                            className={styles.option}
-                        >
-                            Idea
-                        </option>
-
-                        <option
-                            value='purchased'
-                            className={styles.option}
-                        >
-                            Purchased
-                        </option>
-                    </select>
-
-                    {/* Choose Event (Only if "status" === 'purchased') */}
-                    {formData.status === 'purchased' && formData.personId !== '' && (
+                    <label className={styles.label}>Select Gift Recipient: *
                         <select
-                            name='eventId'
-                            onChange={handleInputChange}
-                            required={false}
-                            className={styles.dropdown}
+                            name='person'
+                            onChange={handlePersonDropdownInputChange}
+                            required={true}
+                            value={formData.personId}
+                            className={styles.dropdownInput}
                         >
                             <option
                                 value=''
                                 className={styles.option}
-                            >Choose Event</option>
+                            >---</option>
 
-                            {eventOptions.map(event => (
+                            {people.map(person => (
                                 <option
-                                    key={event.id}
-                                    value={event.id}
+                                    key={person.id}
+                                    value={person.id}
                                     className={styles.option}
-                                >{event.title}</option>
+                                >{person.name}</option>
                             ))}
                         </select>
+                    </label>
+
+                    {/* Show/Hide Optional Input Fields Toggle */}
+                    {showOptionalFields ? (
+                        <p className={styles.showOptionalFieldsText} onClick={() => setShowOptionalFields(false)}>
+                            Hide Optional Fields
+                        </p>
+                    ) : (
+                        <p className={styles.showOptionalFieldsText} onClick={() => setShowOptionalFields(true)}>
+                            Show Optional Fields
+                        </p>
                     )}
 
-                    {/* EstimatedCost or PurchasedCost (Changes depending on status === idea/purchased) */}
-                    <label>
-                        {formData.status === 'idea' && (<>Estimated Cost:</>)}
-                        {formData.status === 'purchased' && (<>Purchased Cost:</>)}
+                    {showOptionalFields && (
+                        <>
+                            {/* Changing Status will change available fields: eventId (show/hide) & estimatedCost/purchasedCost. */}
+                            <label className={styles.label}>Gift Status:
+                                <select
+                                    name='status'
+                                    onChange={handleInputChange}
+                                    required={true}
+                                    value={formData.status}
+                                    className={styles.dropdownInput}
+                                >
+                                    <option
+                                        value='idea'
+                                        className={styles.option}
+                                    >
+                                        Idea
+                                    </option>
 
-                        <input
-                            type='number'
-                            name={formData.status === 'purchased' ? 'purchasedCost' : 'estimatedCost'} // 1 Input for both estimated & purchased cost
-                            step='0.01' // for 'cents'
-                            min='0'
-                            placeholder='$0.00'
-                            value={formData.status === 'purchased' ? 
-                                (formData.purchasedCost ? formData.purchasedCost / 100 : '') :
-                                (formData.estimatedCost ? formData.estimatedCost / 100 : '')
-                            }
-                            onChange={handleCostChange}
-                            className={styles.inputText}
-                        />
-                    </label>
+                                    <option
+                                        value='purchased'
+                                        className={styles.option}
+                                    >
+                                        Purchased
+                                    </option>
+                                </select>
+                            </label>
 
-                    {/* URL Validation happens in handleSubmit, NOT in change handler */}
-                    <label className={styles.label}>URL:
-                        <input
-                            className={styles.input}
-                            type='text'
-                            name='url'
-                            required={false}
-                            value={formData.url}
-                            onChange={handleInputChange}
-                        />
-                    </label>
+                            {/* Choose Event (Only if "status" === 'purchased') */}
+                            {formData.status === 'purchased' && formData.personId !== '' && (
+                                <select
+                                    name='eventId'
+                                    onChange={handleInputChange}
+                                    required={false}
+                                    className={styles.dropdownInput}
+                                >
+                                    <option
+                                        value=''
+                                        className={styles.option}
+                                    >Choose Event</option>
+
+                                    {eventOptions.map(event => (
+                                        <option
+                                            key={event.id}
+                                            value={event.id}
+                                            className={styles.option}
+                                        >{event.title}</option>
+                                    ))}
+                                </select>
+                            )}
+
+                            {/* EstimatedCost or PurchasedCost (Changes depending on status === idea/purchased) */}
+                            <label>
+                                {formData.status === 'idea' && (<>Estimated Cost:</>)}
+                                {formData.status === 'purchased' && (<>Purchased Cost:</>)}
+
+                                <input
+                                    type='number'
+                                    name={formData.status === 'purchased' ? 'purchasedCost' : 'estimatedCost'} // 1 Input for both estimated & purchased cost
+                                    step='0.01' // for 'cents'
+                                    min='0'
+                                    placeholder='$0.00'
+                                    value={formData.status === 'purchased' ? 
+                                        (formData.purchasedCost ? formData.purchasedCost / 100 : '') :
+                                        (formData.estimatedCost ? formData.estimatedCost / 100 : '')
+                                    }
+                                    onChange={handleCostChange}
+                                    className={styles.input}
+                                />
+                            </label>
+
+                            {/* URL Validation happens in handleSubmit, NOT in change handler */}
+                            <label className={styles.label}>URL:
+                                <input
+                                    className={styles.input}
+                                    type='text'
+                                    name='url'
+                                    required={false}
+                                    value={formData.url}
+                                    onChange={handleInputChange}
+                                />
+                            </label>
+                        </>
+                    )}
+
+
+
 
                     <output>
                         {status}
