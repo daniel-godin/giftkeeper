@@ -24,6 +24,7 @@ export interface GiftItem {
     giftListId?: string; // Gift List ID that this Item belongs to.
     status?: 'idea' | 'purchased'; // idea is default.
     eventId?: string; // eventId that item has been 'purchased' for.
+    url?: string; // URL to item. eg: amazon.com/itemURL // Possibly use referrer links
 
     // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
     estimatedCost?: number;
