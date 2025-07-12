@@ -1,0 +1,15 @@
+.quickAddButton {
+    height: 50px;
+    width: 50px;
+
+    border: none;
+    border-radius: 9999px; /* Circle */
+
+    background-color: #007bff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+}
