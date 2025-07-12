@@ -1,35 +1,22 @@
 import { Link, useParams } from 'react-router';
 import styles from './GiftListPage.module.css'
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GiftItem, GiftList } from '../../types/GiftListType';
 import { useAuth } from '../../contexts/AuthContext';
-import { doc, onSnapshot, serverTimestamp, updateDoc, writeBatch } from 'firebase/firestore';
+import { onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
-import { X } from 'lucide-react';
 import { getGiftItemsCollRef, getGiftListDocRef } from '../../firebase/firestore';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
-import { db } from '../../firebase/firebase';
-import { usePeople } from '../../contexts/PeopleContext';
-import { useEvents } from '../../contexts/EventsContext';
 import { useGiftLists } from '../../contexts/GiftListsProvider';
 
 export function GiftListPage() {
     const { giftListId } = useParams();
     const { authState } = useAuth();
     const { giftLists, loading: giftListsLoading } = useGiftLists();
-    const { people } = usePeople();
-    const { events } = useEvents();
 
     const [giftList, setGiftList] = useState<GiftList>({ title: '', personId: '' });
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
-
-    // For adding a new item:
-    const [newItem, setNewItem] = useState<GiftItem>({ name: '' });
-    const [isNewItemOpen, setIsNewItemOpen] = useState<boolean>(false);
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-    const newItemInputRef = useRef<HTMLInputElement>(null);
 
     // Grab Data for GiftListId from GiftLists data context array.
     useEffect(() => {
@@ -55,13 +42,6 @@ export function GiftListPage() {
         return () => unsubscribe();
     }, [giftListId, authState.user?.uid, giftLists, giftListsLoading])
 
-    // Effect to "focus" into <input> when a user clicks the "add new item" button.
-    useEffect(() => {
-        if (isNewItemOpen && newItemInputRef.current) {
-            newItemInputRef.current.focus();
-        }
-    }, [isNewItemOpen])
-
     const handleTitleSave = async (newTitle: string) => {
         if (!authState.user) { return; }
         if (!giftListId) { return; }
@@ -74,71 +54,6 @@ export function GiftListPage() {
             })
         } catch (error) {
             console.error('Error updating title. Error:', error);
-        }
-    }
-
-    // Toggle in <header> to open/close new item box.
-    const handleNewItemToggle = () => { setIsNewItemOpen(!isNewItemOpen); };
-
-    const handleNewItemTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setNewItem({
-            ...newItem,
-            name: e.target.value
-        });
-    }
-
-    const handleEventDropDownChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log('handleEventDropDownChange triggered', e.target)
-        setNewItem({
-            ...newItem,
-            eventId: e.target.value,
-        })
-    }
-
-    // Creation of new item in GiftList (GiftItem)
-    const handleNewItemSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        // Guard Clauses
-        if (!authState.user) { return; };
-        if (!giftListId) { return; };
-        if (!newItem.name.trim()) { return; };
-
-        setIsSubmitting(true);
-        try {
-            const batch = writeBatch(db);
-
-            // Find Person Associated With Gift List & Attached Their ID + Name to new GiftItem.
-            const person = people.find(person => person.id === giftList.personId)
-
-            const newDocRef = doc(getGiftItemsCollRef(authState.user.uid, giftListId)); // Using doc() gives me a random UUID.
-            const newDocumentData: GiftItem = {
-                id: newDocRef.id,
-                name: newItem.name,
-                status: 'idea',
-
-                personId: person?.id || '',
-                personName: person?.name || '',
-
-                eventId: newItem.eventId,
-                
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            }
-
-            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
-
-            batch.set(newDocRef, newDocumentData)
-            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
-
-            batch.commit();
-
-            setIsNewItemOpen(false);
-            setNewItem({name: ''})
-        } catch (error) {
-            console.error('Error submitting new item. Error:', error);
-        } finally {
-            setIsSubmitting(false);
         }
     }
 
@@ -178,48 +93,9 @@ export function GiftListPage() {
             <div className={styles.itemsSection}>
                 <header className={styles.itemsSectionHeader}>
                     <h3>Gift Ideas</h3>
-                    <button className={styles.toggleButton} onClick={handleNewItemToggle}>+ Add Item</button>
                 </header>
 
                 <div className={styles.itemsList}>
-                    {isNewItemOpen && (
-                        <form className={`${styles.itemContainer} ${styles.addItemForm}`} autoComplete='off' onSubmit={handleNewItemSubmit}>
-                            <button className={styles.escapeButton} onClick={() => setIsNewItemOpen(false)} type='button'>
-                                <X color='red' />
-                            </button>
-                            <input 
-                                type='text' 
-                                name='newItem'
-                                ref={newItemInputRef}
-                                onChange={handleNewItemTextChange}
-                                value={newItem.name}
-                                className={`${styles.inputText} ${styles.inputNewItem}`} 
-                            />
-
-                            <select
-                                name='event'
-                                className={styles.eventDropDown}
-                                onChange={handleEventDropDownChange}
-                            >
-                                <option
-                                    className={styles.eventDropDownOption}
-                                    value=''
-                                >(optional) Select Event:</option>
-
-                                {/* All Events (Possibly Change to Upcoming Events and/or "associated" events for personId) */}
-                                {events.map(event => (
-                                    <option
-                                        key={event.id}
-                                        value={event.id}
-                                        className={styles.eventDropDownOption}
-                                    >{event.title}</option>
-                                ))}
-                            </select>
-
-                            <button className={styles.addItemButton}>Add Item</button>
-                        </form>
-                    )}
-
                     {giftItems.length === 0 && (
                         <p>Add items to get started.</p>
                     )}
