@@ -55,7 +55,7 @@
     width: 100%;
 }
 
-.input {
+.input, .dropdownInput {
     padding: 0.5rem;
 
     width: 100%;
@@ -63,4 +63,12 @@
 
 .form input, .form button {
     padding: 0.5rem;
+}
+
+.showOptionalFieldsText {
+    color: blue;
+
+    cursor: pointer;
+
+    text-align: center;
 }
