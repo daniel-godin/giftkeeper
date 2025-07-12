@@ -135,12 +135,11 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
             batch.commit();
 
-            setStatus('New Gift Item Added!! Closing in 2 seconds...');
-            setFormData(defaultFormValues);
+            setFormData(defaultFormValues); // Reset Form After Successful batch.commit();
 
             setTimeout(() => {
                 onClose();
-            }, 2000);
+            }, 500);
 
         } catch (error) {
             console.error('Error Adding New Item. Error:', error);
