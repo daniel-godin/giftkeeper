@@ -236,25 +236,27 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
                             {/* Choose Event (Only if "status" === 'purchased') */}
                             {formData.status === 'purchased' && formData.personId !== '' && (
-                                <select
-                                    name='eventId'
-                                    onChange={handleInputChange}
-                                    required={false}
-                                    className={styles.dropdownInput}
-                                >
-                                    <option
-                                        value=''
-                                        className={styles.option}
-                                    >Choose Event</option>
-
-                                    {eventOptions.map(event => (
+                                <label className={styles.label}>Choose Event For Purchased Gift:
+                                    <select
+                                        name='eventId'
+                                        onChange={handleInputChange}
+                                        required={false}
+                                        className={styles.dropdownInput}
+                                    >
                                         <option
-                                            key={event.id}
-                                            value={event.id}
+                                            value=''
                                             className={styles.option}
-                                        >{event.title}</option>
-                                    ))}
-                                </select>
+                                        >Choose Event</option>
+
+                                        {eventOptions.map(event => (
+                                            <option
+                                                key={event.id}
+                                                value={event.id}
+                                                className={styles.option}
+                                            >{event.title}</option>
+                                        ))}
+                                    </select>
+                                </label>
                             )}
 
                             {/* EstimatedCost or PurchasedCost (Changes depending on status === idea/purchased) */}
