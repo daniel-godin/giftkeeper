@@ -2,7 +2,8 @@
     margin: 0;
     padding: 1rem;
 
-    height: 50dvh;
+    min-height: auto;
+    max-height: 80dvh;
     width: 50dvw;
     min-width: 300px;
 
