@@ -1,11 +1,9 @@
 import { Link } from 'react-router'
 import styles from './BottomNavigation.module.css'
-import { CalendarFold, Gift, ListTodo, Plus, UsersRound } from 'lucide-react'
-import { useState } from 'react'
-import { AddGiftItemModal } from '../../../components/modals/AddGiftItemModal/AddGiftItemModal';
+import { CalendarFold, Gift, ListTodo, UsersRound } from 'lucide-react'
+import { QuickAddButton } from '../../../components/ui/QuickAddButton/QuickAddButton';
 
 export function BottomNavigation () {
-    const [isAddGiftItemModalOpen, setIsAddGiftItemModalOpen] = useState<boolean>(false);
 
     return (
         <nav className={styles.bottomNav}>
@@ -22,12 +20,9 @@ export function BottomNavigation () {
                     </Link>
                 </li>
 
+                {/* Opens AddGiftItemModal */}
                 <li className={styles.navItem}>
-                    <button className={`${styles.navLink} ${styles.openModalButton}`}
-                        onClick={() => setIsAddGiftItemModalOpen(true)}
-                    >
-                        <span className={styles.icon}><Plus /></span>
-                    </button>
+                    <QuickAddButton />
                 </li>
 
                 <li className={styles.navItem}>
@@ -42,11 +37,6 @@ export function BottomNavigation () {
                     </Link>
                 </li>
             </ul>
-
-            <AddGiftItemModal
-                isOpen={isAddGiftItemModalOpen}
-                onClose={() => setIsAddGiftItemModalOpen(false)}
-            />
         </nav>
     )
 }

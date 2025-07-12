@@ -1,12 +1,13 @@
 import { Link } from 'react-router';
 import styles from './TopBar.module.css'
 import { CalendarFold, Circle, Gift, ListTodo, UsersRound } from 'lucide-react';
+import { QuickAddButton } from '../../../components/ui/QuickAddButton/QuickAddButton';
 
 interface TopBarProps {
     deviceType: 'mobile' | 'desktop';
 } 
 
-export function TopBar({ deviceType }: TopBarProps) {
+export function TopBar({ deviceType }: TopBarProps) {    
 
     return (
         <header className={styles.topBar}>
@@ -33,6 +34,11 @@ export function TopBar({ deviceType }: TopBarProps) {
                                     <span className={styles.icon}><CalendarFold /></span>
                                     <span className={styles.linkLabel}>Events</span>
                                 </Link>
+                            </li>
+
+                            {/* Quick Add (+) Modal Button -- Same as BottomNavigation */}
+                            <li className={styles.navItem}>
+                                <QuickAddButton />
                             </li>
             
                             <li className={styles.navItem}>
