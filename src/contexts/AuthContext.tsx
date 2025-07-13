@@ -56,10 +56,7 @@ export function AuthProvider({ children } : { children: React.ReactNode }) {
             }
         })
 
-        // Cleanup Function
-        return () => {
-            unsubscribeAuth();
-        }
+        return () => { unsubscribeAuth() }; // Cleanup Function
     }, [])
 
     const value: AuthContextType = {
