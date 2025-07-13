@@ -57,7 +57,23 @@ export function AuthProvider({ children } : { children: React.ReactNode }) {
         })
 
         return () => { unsubscribeAuth() }; // Cleanup Function
-    }, [])
+    }, [authState.user?.emailVerified])
+
+    // This useEffect forces a reload of the UI when a user verifies their email.
+    useEffect(() => {
+        if (authState.user && !authState.user.emailVerified) {
+            const checkVerification = async () => {
+                await authState.user!.reload();
+                setAuthState(prev => ({
+                    ...prev,
+                    user: auth.currentUser // This will trigger re-render everywhere
+                }));
+            };
+
+            const interval = setInterval(checkVerification, 3000);
+            return () => clearInterval(interval);
+        }
+    }, [authState.user?.emailVerified]); // Only runs when verification status changes
 
     const value: AuthContextType = {
         authState
