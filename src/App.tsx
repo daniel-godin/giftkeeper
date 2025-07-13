@@ -51,7 +51,7 @@ export function App() {
 // Protected Route Provides Loading & Route Protecting/Redirection (If No User Signed In)
 function ProtectedRoute () {
     const { authState } = useAuth();
-    
+
     // Loading & Guard Clauses:
     if (authState.loading) { return <div>Loading...</div> };
     if (!authState.user) { return <Navigate to='/auth' replace /> };
