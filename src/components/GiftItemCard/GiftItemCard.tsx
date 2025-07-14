@@ -1,226 +1,38 @@
-import { Trash2 } from 'lucide-react';
+import { Check, Lightbulb } from 'lucide-react';
 import { GiftItem } from '../../types/GiftListType'
 import styles from './GiftItemCard.module.css'
-import { useAuth } from '../../contexts/AuthContext';
-import { getGiftItemDocRef, getGiftListDocRef } from '../../firebase/firestore';
-import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
-import { db } from '../../firebase/firebase';
-import { useEvents } from '../../contexts/EventsContext';
-import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
-import { useEffect, useState } from 'react';
-import { Event } from '../../types/EventType';
+import { capitalizeFirst } from '../../utils/stringUtils';
+import { formatCurrency } from '../../utils/currencyUtils';
 
-export function GiftItemCard({ item, giftListId } : { item: GiftItem, giftListId: string }) {
-    const { authState } = useAuth();
-    const { events } = useEvents();
-    const upcomingEvents = useUpcomingEvents();
+interface GiftItemCardProps {
+    item: GiftItem;
+}
 
-    const [upcomingEventsForPerson, setUpcomingEventsForPerson] = useState<Event[]>([]);
-
-    // Figure out upcoming events for personId
-    useEffect(() => {
-        if (!upcomingEvents || !events || events.length === 0 || !item.personId) { return }; // Guard Clause
-
-        const eventsData = upcomingEvents.filter(event => event.people.includes(item.personId))
-        setUpcomingEventsForPerson(eventsData);
-    }, [upcomingEvents, item.personId])
-
-    // Established Item Name Change
-    // const handleItemSave = async (e: React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>, item: GiftItem, fieldName: string) => {
-    const handleItemSave = async (e: React.ChangeEvent<HTMLInputElement> | React.KeyboardEvent<HTMLInputElement>) => {
-        // Keyboard Event Clause:
-        if (e.type === 'keydown' && (e as React.KeyboardEvent).key !== 'Enter') { return; } ;
-
-        // Guard Clause
-        if (!authState.user || !giftListId || !item.id) { return; };
-
-        const { name, value } = e.target as HTMLInputElement;
-
-        if (!value.trim()) {
-            (e.target as HTMLInputElement).value = item.name; // Resets to original if empty text input box
-            return;
-        }
-
-        try {
-            const batch = writeBatch(db);
-
-            const docRef = getGiftItemDocRef(authState.user.uid, giftListId, item.id);
-
-            let newData: UpdateData<GiftItem>;
-
-            // estimatedCost & purchasedCost are saved in db as 'cents' (number).  This allows easier calculations.  Use helper functions to display in "dollars".
-            if (name === 'estimatedCost' || name === 'purchasedCost') {
-                newData = {
-                    [name]: Number(value.trim()) * 100, // Convert to number & multiply by 100 to get 'cents' amount.
-                    updatedAt: serverTimestamp()
-                }
-            } else {
-                newData = {
-                    [name]: value.trim(),
-                    updatedAt: serverTimestamp()
-                }
-            }
-
-            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
-
-            batch.update(docRef, newData);
-            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
-
-            batch.commit();
-
-            // Remove focus after Enter
-            if (e.type === 'keydown') { (e.target as HTMLInputElement).blur(); }
-
-        } catch (error) {
-            console.error('Error saving item name/description. Error:', error);
-        }
-    }
-
-    const handleDropdownChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-        // Guard Clause
-        if (!authState.user || !giftListId || !item.id) { return; };
-
-        const { name, value } = e.target;
-
-        try {
-            const batch = writeBatch(db);
-
-            const docRef = getGiftItemDocRef(authState.user.uid, giftListId, item.id);
-            const newData: UpdateData<GiftItem> = {
-                [name]: value,
-                updatedAt: serverTimestamp()
-            }
-
-            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
-
-            batch.update(docRef, newData);
-            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
-
-            batch.commit();
-
-        } catch (error) {
-            console.error('Error saving item status. Error:', error);
-        }
-    }
-
-    const handleDeleteItem = async (item: GiftItem) => {
-        // Guard Clauses:
-        if (!authState.user || !giftListId || !item.id) { return; };
-
-        try {
-            const batch = writeBatch(db);
-
-            const docRef = getGiftItemDocRef(authState.user.uid, giftListId, item.id);
-            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, giftListId);
-
-            batch.delete(docRef);
-            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
-
-            batch.commit();
-        } catch (error) {
-            console.error(`Error deleting Gift Item: ${item.id}. Error:`, error);
-        }
-    }
+export function GiftItemCard({ item } : GiftItemCardProps) {
 
     return (
-        <div className={styles.giftItemCard}>
-            {/* Idea/Purchased Status */}
-            <select
-                name='status'
-                defaultValue={item.status}
-                onChange={handleDropdownChange}
-                className={`
-                    ${styles.inputText}
-                    ${item.status === 'purchased' ? styles.purchased : ''}
-                    `}
-            >
-                <option
-                    className={styles.option}
-                    value='idea'
-                >
-                    Gift Idea
-                </option>
-                <option
-                    className={styles.option}
-                    value='purchased'
-                >
-                    Purchased
-                </option>
-            </select>
-
-            {/* Gift Item Name/Description */}
-            <input 
-                type='text'
-                name='name'
-                defaultValue={item.name}
-                onBlur={handleItemSave}
-                onKeyDown={handleItemSave}
-                className={`
-                    ${styles.inputText}
-                    ${item.status === 'purchased' ? styles.purchased : ''}
-                    `} 
-            />
-
-            {/* Estimated/Purchased Price */}
-            {/* Possibly show estimated when item is an "idea", and "purchasedPrice" if item is "purchased" */}
-
-            <label>
-                {item.status === 'idea' && (<>Estimated Cost:</>)}
-                {item.status === 'purchased' && (<>Purchased Cost:</>)}
-            <input
-                type='number'
-                name={item.status === 'purchased' ? 'purchasedCost' : 'estimatedCost'} // 1 Input for both estimated & purchased cost
-                step='0.01' // for 'cents'
-                min='0'
-                placeholder='$0.00'
-                defaultValue={item.status === 'purchased' ? 
-                    (item.purchasedCost ? item.purchasedCost / 100 : '') :
-                    (item.estimatedCost ? item.estimatedCost / 100 : '')
-                }
-                onBlur={handleItemSave}
-                className={styles.inputText}
-            />
-            </label>
-
-            {/* Only show events if item has been *purchased* */}
-            {item.status === 'purchased' && (
-                <select
-                name='eventId'
-                value={item.eventId}
-                onChange={handleDropdownChange}
-                className={`
-                    ${styles.inputText}
-                    ${item.status === 'purchased' ? styles.purchased : ''}
-                    `}
-                >
-                {/* 1 Blank Option, then through all the options that make sense. */}
-                    <option
-                        className={styles.option}
-                        value=''
-                    >
-                        Choose An Event
-                    </option>
-
-                    {upcomingEventsForPerson.map(event => (
-                        <option
-                            key={event.id}
-                            className={styles.option}
-                            value={event.id}
-                        >
-                            {event.title}
-                        </option>
-                    ))}
-                </select>
-            )}
-
-
-            {/* Delete Gift Item Button (NOTE: No safety checks applied yet) */}
-            <button
-                className={styles.deleteItemButton}
-                onClick={() => { handleDeleteItem(item); } }
-            >
-                <Trash2 color='red'/>
-            </button>
+        <div key={item.id} className={styles.giftItemCard}>
+            <div className={styles.giftItemCardRow}>
+                <span className={styles.giftItemCategory}>Person</span>
+                <span className={styles.giftItemDetail}>{item.personName}</span>
+            </div>
+            <div className={styles.giftItemCardRow}>
+                <span className={styles.giftItemCategory}>Gift</span>
+                <span className={styles.giftItemDetail}>{item.name}</span>
+            </div>
+            <div className={styles.giftItemCardRow}>
+                <span className={styles.giftItemCategory}>Status</span>
+                {item.status === 'idea' && (
+                    <span className={styles.giftItemDetailIdea}><Lightbulb size={20}/> {capitalizeFirst(item.status)}</span>
+                )}
+                {item.status === 'purchased' && (
+                    <span className={styles.giftItemDetailPurchased}><Check size={20} /> {capitalizeFirst(item.status)}</span>
+                )}
+            </div>
+            <div className={styles.giftItemCardRow}>
+                <span className={styles.giftItemCategory}>Cost</span>
+                <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost || 0)}</span>
+            </div>
         </div>
     )
 }
