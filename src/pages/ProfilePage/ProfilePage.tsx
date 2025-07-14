@@ -29,6 +29,8 @@ export function ProfilePage () {
     const handlePasswordReset = async () => {
         if (!authState.user || !authState.user.email) { return }; // Guard Clause
 
+        console.log('Reset Password Requested');
+
         try {
             await sendPasswordResetEmail(auth, authState.user.email);
         } catch (error) {
