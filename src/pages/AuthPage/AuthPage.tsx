@@ -2,8 +2,9 @@ import { useState } from 'react';
 import styles from './AuthPage.module.css'
 import { SignInForm } from './components/SignInForm/SignInForm';
 import { SignUpForm } from './components/SignUpForm/SignUpForm';
+import { PasswordResetForm } from './components/PasswordResetForm/PasswordResetForm';
 
-type AuthMode = 'signin' | 'signup';
+export type AuthMode = 'signin' | 'signup' | 'password_reset';
 
 export function AuthPage () {
     const [authMode, setAuthMode] = useState<AuthMode>('signin');
@@ -30,9 +31,16 @@ export function AuthPage () {
                 </div>
 
                 <div className={styles.formContainer}>
-                    {authMode === 'signin' && (<SignInForm />)}
+                    {authMode === 'signin' && (
+                        <SignInForm 
+                            authMode={authMode}
+                            setAuthMode={setAuthMode}
+                        />
+                    )}
 
                     {authMode === 'signup' && (<SignUpForm />)}
+
+                    {authMode === 'password_reset' && (<PasswordResetForm />)}
                 </div>
             </div>
         </div>
