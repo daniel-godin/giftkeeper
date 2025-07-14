@@ -2,7 +2,9 @@ import { useNavigate } from 'react-router';
 import styles from './SignUpForm.module.css'
 import { FormEvent, useState } from 'react';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
-import { auth } from '../../../../firebase/firebase';
+import { auth, db } from '../../../../firebase/firebase';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { getUserCollRef } from '../../../../firebase/firestore';
 
 interface SignUpFormData {
     email: string;
@@ -40,11 +42,25 @@ export function SignUpForm () {
             const newUser = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
             await sendEmailVerification(newUser.user);
 
-            setStatus('Check Email To Verify Your Email.  Redirecting you...');
+            // Create User Document In Firestore (db, 'users', {userId})
+            const newUserDocRef = doc(db, 'users', newUser.user.uid);
+            const newUserData = {
+                id: newUser.user.uid,
+                email: newUser.user.email,
+
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            }
+
+            await setDoc(newUserDocRef, newUserData);
+
+            setStatus('Check Email To Verify Your Email.  Redirecting you to dashboard...');
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1500)
         } catch (error: any) {
+            console.error('Error Creating Account. Error:', error);
+
             let errorMessage = 'Error creating account. Please try again.';
              
             if (error.code === 'auth/email-already-in-use') {
