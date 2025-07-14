@@ -179,7 +179,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
             batch.set(newDocRef, newDocumentData);
             batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
 
-            batch.commit();
+            await batch.commit();
 
             setTimeout(() => {
                 resetModal(); // Reset Form After Successful batch.commit();
