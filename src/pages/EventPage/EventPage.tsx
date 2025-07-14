@@ -8,10 +8,9 @@ import { Event } from '../../types/EventType';
 import { GiftItem } from '../../types/GiftListType';
 import { usePeople } from '../../contexts/PeopleContext';
 import { Person } from '../../types/PersonType';
-import { ArrowLeft, Check, Lightbulb, Pencil } from 'lucide-react';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
 import { useGiftLists } from '../../contexts/GiftListsProvider';
-import { capitalizeFirst } from '../../utils/stringUtils';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 
@@ -161,30 +160,6 @@ export function EventPage() {
                                     key={item.id}
                                     item={item}
                                 />
-
-                                // <div key={item.id} className={styles.giftItemCard}>
-                                //     <div className={styles.giftItemCardRow}>
-                                //         <span className={styles.giftItemCategory}>Person</span>
-                                //         <span className={styles.giftItemDetail}>{item.personName}</span>
-                                //     </div>
-                                //     <div className={styles.giftItemCardRow}>
-                                //         <span className={styles.giftItemCategory}>Gift</span>
-                                //         <span className={styles.giftItemDetail}>{item.name}</span>
-                                //     </div>
-                                //     <div className={styles.giftItemCardRow}>
-                                //         <span className={styles.giftItemCategory}>Status</span>
-                                //         {item.status === 'idea' && (
-                                //             <span className={styles.giftItemDetailIdea}><Lightbulb size={20}/> {capitalizeFirst(item.status)}</span>
-                                //         )}
-                                //         {item.status === 'purchased' && (
-                                //             <span className={styles.giftItemDetailPurchased}><Check size={20} /> {capitalizeFirst(item.status)}</span>
-                                //         )}
-                                //     </div>
-                                //     <div className={styles.giftItemCardRow}>
-                                //         <span className={styles.giftItemCategory}>Cost</span>
-                                //         <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost || 0)}</span>
-                                //     </div>
-                                // </div>
                             ))}
                         </div>
                     </>
