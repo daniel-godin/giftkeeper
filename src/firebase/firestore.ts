@@ -6,6 +6,7 @@ import { db } from "./firebase";
 // =============================================================================
 // User References
 // =============================================================================
+export const getUserCollRef = () => collection(db, 'users');
 export const getUserDocRef = (userId: string) => doc(db, 'users', userId);
 
 // =============================================================================
