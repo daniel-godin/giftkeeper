@@ -184,7 +184,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
     // Resets All State In Modal
     const resetModal = () => {
         setStatus('');
-        setFormData(defaultFormValues);
+        setFormData(DEFAULT_GIFT_ITEM);
         setIsSubmitting(false);
         setShowCreateNewPerson(false);
         setShowOptionalFields(false);
