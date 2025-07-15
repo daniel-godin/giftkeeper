@@ -1,0 +1,42 @@
+.giftItemsTable {
+    padding: 0.5rem;
+
+    background-color: white;
+
+    border: 0;
+    border-spacing: 0;
+}
+
+.tableHead {
+    background-color: grey;
+}
+
+.tableHeadRow {
+    padding: 0.5rem;
+}
+
+.tableRow {
+    padding: 0.5rem;
+}
+
+/* "Status" Text/Icon */
+.giftItemDetailIdea {
+    padding: 0.25rem 0.75rem;
+
+    background-color: #fff3e0;
+    color: #e65100;
+
+    border: none;
+    border-radius: 9999px;
+}
+
+.giftItemDetailPurchased {
+    padding: 0.25rem 0.75rem;
+
+    background-color: #e8f5e9;
+    color: #2e7d32;;
+
+
+    border: none;
+    border-radius: 9999px;
+}
