@@ -1,4 +1,4 @@
-import { Check, Lightbulb } from 'lucide-react';
+import { Check, ExternalLink, Lightbulb } from 'lucide-react';
 import { GiftItem } from '../../types/GiftListType'
 import styles from './GiftItemCard.module.css'
 import { capitalizeFirst } from '../../utils/stringUtils';
@@ -40,7 +40,18 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                 <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost || 0)}</span>
             </div>
             <div className={styles.giftItemCardRow}>
-                <span className={styles.giftItemCategory}></span>
+                <span className={styles.giftItemCategory}>                                
+                    {item.url && (
+                        <a
+                            href={item.url}
+                            target='_blank'
+                            // className='unstyled-link'
+                            title='View Item Online'
+                        >
+                            <ExternalLink size={16} />
+                        </a>
+                                )}
+                </span>
                 <button type='button' className={styles.actionsButton} onClick={() => setIsEditGiftItemModalOpen(true)}>Edit Item</button>
             </div>
             
