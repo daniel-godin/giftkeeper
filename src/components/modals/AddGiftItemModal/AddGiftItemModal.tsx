@@ -11,23 +11,11 @@ import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 import { db } from '../../../firebase/firebase';
 import { Person } from '../../../types/PersonType';
+import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
 
 interface AddGiftItemModalProps {
     isOpen: boolean;
     onClose: () => void;
-}
-
-const defaultFormValues: GiftItem = {
-    id: '',
-    name: '',
-    personId: '',
-    personName: '',
-    giftListId: '',
-    status: 'idea',
-    eventId: '',
-    url: '',
-    estimatedCost: 0,
-    purchasedCost: 0,
 }
 
 export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
@@ -35,7 +23,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
     const { people } = usePeople();
 
     const [status, setStatus] = useState<string>('');
-    const [formData, setFormData] = useState<GiftItem>(defaultFormValues);
+    const [formData, setFormData] = useState<GiftItem>(DEFAULT_GIFT_ITEM);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const [showCreateNewPerson, setShowCreateNewPerson] = useState<boolean>(false);
