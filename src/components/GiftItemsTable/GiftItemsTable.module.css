@@ -3,25 +3,39 @@
 
     background-color: white;
 
-    border: 0;
-    border-spacing: 0;
+    border-collapse: separate;
 }
 
 .tableHead {
-    background-color: grey;
+    background-color: lightgray;
+    text-align: left;
 }
 
 .tableHeadRow {
     padding: 0.5rem;
 }
 
-.tableRow {
+.tableRow:hover {
+    background-color: #f8f9fa; /* Nice hover effect */
+}
+
+.tableCell {
     padding: 0.5rem;
+
+    border-bottom: 1px solid lightgray;
 }
 
 /* "Status" Text/Icon */
+.giftItemDetailIdea, .giftItemDetailPurchased {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    justify-items: center;
+}
 .giftItemDetailIdea {
     padding: 0.25rem 0.75rem;
+
+    height: auto;
+    width: 125px;
 
     background-color: #fff3e0;
     color: #e65100;
@@ -33,9 +47,11 @@
 .giftItemDetailPurchased {
     padding: 0.25rem 0.75rem;
 
+    height: auto;
+    width: 125px;
+
     background-color: #e8f5e9;
     color: #2e7d32;;
-
 
     border: none;
     border-radius: 9999px;
