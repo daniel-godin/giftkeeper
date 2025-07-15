@@ -137,6 +137,10 @@
     gap: 0.5rem;
 }
 
+.giftItems {
+    grid-column-end: 3;
+}
+
 .eventContainer {
     display: flex;
     gap: 0.5rem;

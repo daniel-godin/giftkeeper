@@ -3,7 +3,7 @@ import styles from './PersonPage.module.css'
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
-import { getCountFromServer, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
+import { getCountFromServer, onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
 import { db } from '../../firebase/firebase';
@@ -11,10 +11,15 @@ import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 import { useEvents } from '../../contexts/EventsContext';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
 import { usePeople } from '../../contexts/PeopleContext';
+import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
+import { GiftItem } from '../../types/GiftListType';
+import { useViewport } from '../../contexts/ViewportContext';
+import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 
 export function PersonPage() {
     const { authState } = useAuth();
     const { personId } = useParams();
+    const deviceType = useViewport();
     const { people, loading: peopleLoading } = usePeople();
     const { events, loading: eventsLoading } = useEvents();
     const upcomingEvents = useUpcomingEvents(personId);
@@ -22,6 +27,7 @@ export function PersonPage() {
 
     const [person, setPerson] = useState<Person>({ name: '' });
     const [giftIdeasCount, setGiftIdeasCount] = useState(0);
+    const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
 
     // State for managing changes to displayed data:
     const [formData, setFormData] = useState<Person>({ name: '' });
@@ -49,6 +55,27 @@ export function PersonPage() {
         }
         fetchPersonData();
     }, [personId, people, authState.user?.uid]);
+
+    // Firestore Lister For Person Gift Items
+    useEffect(() => {
+        if (!authState.user || !person.giftListId) { return }; // Guard
+
+        const collRef = getGiftItemsCollRef(authState.user?.uid, person.giftListId);
+
+        const unsubscribe = onSnapshot(collRef, (snapshot) => {
+            const items = snapshot.docs.map(doc => {
+                const data = doc.data() as GiftItem;
+                return data
+            });
+
+            setGiftItems(items);
+        }, (error) => {
+            console.error('Error listening to gift items. Error:', error);
+
+        });
+
+        return () => unsubscribe();
+    }, [authState.user, person])
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -199,6 +226,22 @@ export function PersonPage() {
                         Gift Intelligence
                     </header>
                 </div>
+            </div>
+
+            <div className={styles.giftItems}>
+                <header className={styles.sectionHeader}>Gift Items</header>
+
+                {deviceType === 'mobile' && (
+                    <>
+                        {giftItems.map((item) => (
+                            <GiftItemCard
+                                key={item.id}
+                                item={item}
+                            />
+                        ))}
+                    </>
+                )}
+                {deviceType === 'desktop' && ( <GiftItemsTable data={giftItems} /> )}         
             </div>
         </section>
     )
