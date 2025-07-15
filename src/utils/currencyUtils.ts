@@ -8,5 +8,6 @@ export const centsToDollars = (cents: number): number => {
 
 // For Display Purposes - Returns Formatted String With USD ($) Sign Before
 export const formatCurrency = (cents: number): string => {
+    if (cents === 0 || !cents) { return `$0.00` };
     return `$${(cents / 100).toFixed(2)}`;
 }
