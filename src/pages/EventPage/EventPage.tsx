@@ -13,9 +13,12 @@ import { getDaysUntilDate } from '../../utils';
 import { useGiftLists } from '../../contexts/GiftListsProvider';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
+import { useViewport } from '../../contexts/ViewportContext';
+import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
 
 export function EventPage() {
     const { eventId } = useParams();
+    const deviceType = useViewport();
     const { events, loading: eventsLoading } = useEvents();
     const { people, loading: peopleLoading } = usePeople();
     const { loading: giftListsLoading} = useGiftLists();
@@ -152,16 +155,24 @@ export function EventPage() {
                         </header>
 
                         {/* Needs two versions: Mobile & Desktop. Mobile uses Cards, Desktop uses Table */}
-                        <div className={styles.giftItemList}>
-                            {/* Map through associated gift items */}
-                            {/* Click on card to "edit" something?  Or use an Action button? */}
-                            {giftItems.map((item) => (
-                                <GiftItemCard
-                                    key={item.id}
-                                    item={item}
-                                />
-                            ))}
-                        </div>
+                        {deviceType === 'mobile' && (
+                            <div className={styles.giftItemList}>
+                                {/* Map through associated gift items */}
+                                {giftItems.map((item) => (
+                                    <GiftItemCard
+                                        key={item.id}
+                                        item={item}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {deviceType === 'desktop' && (
+                            <GiftItemsTable
+                                data={giftItems}
+                            />
+                        )}
+
                     </>
                 )}
             </div>
