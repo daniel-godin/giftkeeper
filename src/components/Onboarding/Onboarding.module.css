@@ -1,0 +1,39 @@
+.onboardingContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: center;
+}
+
+.form {
+    padding: 1rem;
+
+    min-width: 350px;
+    max-width: 400px;
+
+    background-color: white;
+    border-radius: 7.5px;
+
+    align-self: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.label {
+    width: 100%;
+    font-weight: bold;
+}
+
+.input {
+    padding: 0.5rem;
+
+    width: 100%;
+}
+
+.form input, .form button {
+    width: 100%;
+    padding: 0.5rem;
+}
