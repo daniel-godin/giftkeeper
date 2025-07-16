@@ -38,15 +38,25 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
     useEffect(() => {
         if (isOpen) {
-            resetModal();
+            let initialFormData = { ...DEFAULT_GIFT_ITEM };
 
             if (personId) {
-                console.log('TEST: personId triggered', personId);
-                setFormData(prev => ({
-                    ...prev,
-                    personId
-                }))
+                const person = people.find(p => p.id === personId);
+                if (person) {
+                    initialFormData = {
+                        ...initialFormData,
+                        personId: person.id,
+                        personName: person.name,
+                        giftListId: person.giftListId
+                    }
+                }
             }
+
+            setFormData(initialFormData);
+            setStatus('');
+            setIsSubmitting(false);
+            setShowCreateNewPerson(false);
+            setShowOptionalFields(false);
         }
     }, [isOpen]);
 
