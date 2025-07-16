@@ -12,6 +12,7 @@ import { Event } from '../../../types/EventType';
 import { db } from '../../../firebase/firebase';
 import { Person } from '../../../types/PersonType';
 import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
+import { useParams } from 'react-router';
 
 interface AddGiftItemModalProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ interface AddGiftItemModalProps {
 export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
     const { authState } = useAuth();
     const { people } = usePeople();
+    const { personId } = useParams();
 
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<GiftItem>(DEFAULT_GIFT_ITEM);
@@ -37,6 +39,14 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
     useEffect(() => {
         if (isOpen) {
             resetModal();
+
+            if (personId) {
+                console.log('TEST: personId triggered', personId);
+                setFormData(prev => ({
+                    ...prev,
+                    personId
+                }))
+            }
         }
     }, [isOpen]);
 
