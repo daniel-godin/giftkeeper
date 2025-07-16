@@ -31,11 +31,13 @@ export function BottomNavigation () {
                     </Link>
                 </li>
 
-                <li className={styles.navItem}>
+                {/* // ARCHIVED: Wish Lists feature temporarily disabled
+                // TODO: Re-enable after core gift tracking is polished */}
+                {/* <li className={styles.navItem}>
                     <Link to='/wish-lists' className={styles.navLink}>
                         <span className={styles.icon}><ListTodo /></span>
                     </Link>
-                </li>
+                </li> */}
             </ul>
         </nav>
     )

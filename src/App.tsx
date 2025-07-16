@@ -40,8 +40,10 @@ export function App() {
                     <Route path="gift-lists" element={<GiftListsPage />} />
                     <Route path="gift-lists/:giftListId" element={<GiftListPage />} />
 
-                    <Route path="wish-lists" element={<WishListsPage />} />
-                    <Route path="wish-lists/:wishListId" element={<WishListPage />} />
+                    {/* // ARCHIVED: Wish Lists feature temporarily disabled
+                    // TODO: Re-enable after core gift tracking is polished */}
+                    {/* <Route path="wish-lists" element={<WishListsPage />} />
+                    <Route path="wish-lists/:wishListId" element={<WishListPage />} /> */}
                 </Route>
             </Routes>
         </BrowserRouter>
