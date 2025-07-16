@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import styles from './TopBar.module.css'
-import { CalendarFold, Circle, Gift, ListTodo, UsersRound } from 'lucide-react';
+import { CalendarFold, Circle, Gift, UsersRound } from 'lucide-react';
 import { QuickAddButton } from '../../../components/ui/QuickAddButton/QuickAddButton';
 
 interface TopBarProps {
@@ -29,24 +29,26 @@ export function TopBar({ deviceType }: TopBarProps) {
                                 </Link>
                             </li>
             
+
+
+                            {/* Quick Add (+) Modal Button -- Same as BottomNavigation */}
+                            <li className={styles.navItem}>
+                                <QuickAddButton />
+                            </li>
+
                             <li className={styles.navItem}>
                                 <Link to='/events' className={styles.navLink}>
                                     <span className={styles.icon}><CalendarFold /></span>
                                     <span className={styles.linkLabel}>Events</span>
                                 </Link>
                             </li>
-
-                            {/* Quick Add (+) Modal Button -- Same as BottomNavigation */}
-                            <li className={styles.navItem}>
-                                <QuickAddButton />
-                            </li>
             
-                            <li className={styles.navItem}>
+                            {/* <li className={styles.navItem}>
                                 <Link to='/gift-lists' className={styles.navLink}>
                                     <span className={styles.icon}><Gift /></span>
                                     <span className={styles.linkLabel}>Gift Lists</span>
                                 </Link>
-                            </li>
+                            </li> */}
             
                             {/* // ARCHIVED: Wish Lists feature temporarily disabled
                             // TODO: Re-enable after core gift tracking is polished */}

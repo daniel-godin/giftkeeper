@@ -14,22 +14,22 @@ export function BottomNavigation () {
                     </Link>
                 </li>
 
-                <li className={styles.navItem}>
-                    <Link to='/events' className={styles.navLink}>
-                        <span className={styles.icon}><CalendarFold /></span>
-                    </Link>
-                </li>
-
                 {/* Opens AddGiftItemModal */}
                 <li className={styles.navItem}>
                     <QuickAddButton />
                 </li>
 
                 <li className={styles.navItem}>
+                    <Link to='/events' className={styles.navLink}>
+                        <span className={styles.icon}><CalendarFold /></span>
+                    </Link>
+                </li>
+
+                {/* <li className={styles.navItem}>
                     <Link to='/gift-lists' className={styles.navLink}>
                         <span className={styles.icon}><Gift /></span>
                     </Link>
-                </li>
+                </li> */}
 
                 {/* // ARCHIVED: Wish Lists feature temporarily disabled
                 // TODO: Re-enable after core gift tracking is polished */}

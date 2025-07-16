@@ -37,8 +37,8 @@ export function App() {
                     <Route path="events" element={<EventsPage />} />
                     <Route path="events/:eventId" element={<EventPage />} />
 
-                    <Route path="gift-lists" element={<GiftListsPage />} />
-                    <Route path="gift-lists/:giftListId" element={<GiftListPage />} />
+                    {/* <Route path="gift-lists" element={<GiftListsPage />} />
+                    <Route path="gift-lists/:giftListId" element={<GiftListPage />} /> */}
 
                     {/* // ARCHIVED: Wish Lists feature temporarily disabled
                     // TODO: Re-enable after core gift tracking is polished */}
