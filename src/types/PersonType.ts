@@ -1,16 +1,12 @@
 import { FieldValue, Timestamp } from "firebase/firestore";
 import { CalendarDate } from "./CommonTypes";
 
-
 export interface Person {
     id?: string;
     name: string;
 
     // Important Optional Data
     birthday?: string;
-
-    // Associations
-    giftListId?: string; // ID of the user's default "Gift Ideas/Gift List"
 
     // Optional Data
     avatar?: string; // URL to profile image
