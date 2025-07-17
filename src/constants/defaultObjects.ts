@@ -6,7 +6,6 @@ export const DEFAULT_GIFT_ITEM: GiftItem ={
     name: '',
     personId: '',
     personName: '',
-    giftListId: '',
     status: 'idea', // idea is always default. 'idea' | 'purchased'
     eventId: '',
     url: '',
