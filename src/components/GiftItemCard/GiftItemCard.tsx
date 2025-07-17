@@ -1,5 +1,5 @@
 import { Check, ExternalLink, Lightbulb } from 'lucide-react';
-import { GiftItem } from '../../types/GiftListType'
+import { GiftItem } from '../../types/GiftType'
 import styles from './GiftItemCard.module.css'
 import { capitalizeFirst } from '../../utils/stringUtils';
 import { formatCurrency } from '../../utils/currencyUtils';

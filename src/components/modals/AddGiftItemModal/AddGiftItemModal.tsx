@@ -1,7 +1,7 @@
 import styles from './AddGiftItemModal.module.css';
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { GiftItem, GiftList } from "../../../types/GiftListType";
+import { GiftItem, GiftList } from "../../../types/GiftType";
 import { BaseModal } from "../BaseModal/BaseModal";
 import { X } from 'lucide-react';
 import { getGiftItemsCollRef, getGiftListDocRef, getGiftListsCollRef, getPeopleCollRef } from '../../../firebase/firestore';

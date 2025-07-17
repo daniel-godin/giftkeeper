@@ -5,7 +5,7 @@ import { collectionGroup, onSnapshot, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { useEvents } from '../../contexts/EventsContext';
 import { Event } from '../../types/EventType';
-import { GiftItem } from '../../types/GiftListType';
+import { GiftItem } from '../../types/GiftType';
 import { usePeople } from '../../contexts/PeopleContext';
 import { Person } from '../../types/PersonType';
 import { ArrowLeft, Pencil } from 'lucide-react';

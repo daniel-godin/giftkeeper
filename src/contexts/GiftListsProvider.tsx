@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { GiftList } from "../types/GiftListType";
+import { GiftList } from "../types/GiftType";
 import { useAuth } from "./AuthContext";
 import { getGiftListsCollRef } from "../firebase/firestore";
 import { onSnapshot, orderBy, query } from "firebase/firestore";

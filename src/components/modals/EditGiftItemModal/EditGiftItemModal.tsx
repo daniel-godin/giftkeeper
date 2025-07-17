@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { GiftItem } from '../../../types/GiftListType';
+import { GiftItem } from '../../../types/GiftType';
 import styles from './EditGiftItemModal.module.css'
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';

@@ -7,7 +7,7 @@ import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { getGiftListsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
-import { GiftList } from '../../../types/GiftListType';
+import { GiftList } from '../../../types/GiftType';
 import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager';
 
 interface AddPersonalModalProps {

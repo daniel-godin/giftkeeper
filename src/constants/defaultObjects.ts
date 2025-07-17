@@ -1,4 +1,4 @@
-import { GiftItem } from "../types/GiftListType";
+import { GiftItem } from "../types/GiftType";
 
 
 export const DEFAULT_GIFT_ITEM: GiftItem ={

@@ -1,7 +1,7 @@
 import { Link, useParams } from 'react-router';
 import styles from './GiftListPage.module.css'
 import { useEffect, useState } from 'react';
-import { GiftItem, GiftList } from '../../types/GiftListType';
+import { GiftItem, GiftList } from '../../types/GiftType';
 import { useAuth } from '../../contexts/AuthContext';
 import { onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';

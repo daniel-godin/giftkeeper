@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import styles from './AddGiftListModal.module.css'
-import { GiftList } from '../../../types/GiftListType';
+import { GiftList } from '../../../types/GiftType';
 import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';

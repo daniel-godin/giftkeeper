@@ -6,7 +6,7 @@ import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { getGiftListsCollRef, getPeopleCollRef } from '../../firebase/firestore';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
-import { GiftList } from '../../types/GiftListType';
+import { GiftList } from '../../types/GiftType';
 import { useNavigate } from 'react-router';
 
 export function Onboarding() {

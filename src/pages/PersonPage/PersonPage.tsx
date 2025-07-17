@@ -12,7 +12,7 @@ import { useEvents } from '../../contexts/EventsContext';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
 import { usePeople } from '../../contexts/PeopleContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
-import { GiftItem } from '../../types/GiftListType';
+import { GiftItem } from '../../types/GiftType';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 
