@@ -4,9 +4,8 @@ import styles from './Onboarding.module.css'
 import { useAuth } from '../../contexts/AuthContext';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
-import { getGiftListsCollRef, getPeopleCollRef } from '../../firebase/firestore';
+import { getPeopleCollRef } from '../../firebase/firestore';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
-import { GiftList } from '../../types/GiftType';
 import { useNavigate } from 'react-router';
 
 export function Onboarding() {
@@ -59,33 +58,18 @@ function OnboardingPersonForm() {
             const batch = writeBatch(db);
 
             const personRef = doc(getPeopleCollRef(authState.user.uid))
-            const giftListRef = doc(getGiftListsCollRef(authState.user.uid))
 
             const personData: Person = {
                 id: personRef.id,
                 name: formData.name,
-
                 birthday: formData.birthday || '',
-
-                giftListId: giftListRef.id,
 
                 // Metadata
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
 
-            const giftListData: GiftList = {
-                id: giftListRef.id,
-                title: `${formData.name}'s Gift List`,
-
-                personId: personRef.id,
-
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            }
-
             batch.set(personRef, personData);
-            batch.set(giftListRef, giftListData);
 
             if (formData.birthday) {
                 await syncBirthdayEvent(personRef.id, formData.name, formData.birthday, batch)
@@ -94,11 +78,6 @@ function OnboardingPersonForm() {
             await batch.commit();
 
             navigate(`/people/${personRef.id}`)
-
-            // setStatus('✅ Person added successfully!');
-            // setTimeout(() => {
-                
-            // }, 1000);
         } catch (error) {
             console.error('Error Adding New Person. Error:', error);
             setStatus('Error Adding New Person');
