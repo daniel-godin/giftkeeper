@@ -1,6 +1,5 @@
-import { CalendarFold, Gift, ListTodo, UsersRound } from 'lucide-react';
+import { CalendarFold, ListTodo, UsersRound } from 'lucide-react';
 import { useEvents } from '../../../../contexts/EventsContext';
-import { useGiftLists } from '../../../../contexts/GiftListsProvider';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import { useWishLists } from '../../../../contexts/WishListsProvider';
 import styles from './Dashboard.module.css'
@@ -10,7 +9,6 @@ import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
 export function Dashboard () {
     const { people, loading: peopleLoading } = usePeople();
     const { loading: eventsLoading } = useEvents();
-    const { giftLists, loading: giftListsLoading } = useGiftLists();
     const { wishLists, loading: wishListsLoading  } = useWishLists();
 
     const upcomingEvents = useUpcomingEvents();
@@ -18,7 +16,6 @@ export function Dashboard () {
     // Need to make "seconds" Type-safe later.
     const recent = {
         'people': people.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
-        'giftLists': giftLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
         'wishLists': wishLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
     }
 
@@ -58,24 +55,6 @@ export function Dashboard () {
                                 ))}
                             </div>
                             <Link to='/people' className={styles.link}>View All People</Link>
-                        </>
-                    )}
-                </div>
-
-                <div className={styles.dashboardBox}>
-                    <header className={styles.headerText}><Gift /> Gift Lists</header>
-
-                    {giftListsLoading ? (
-                        <p>Loading Gift Lists...</p>
-                    ) : (
-                        <>
-                            <p className={styles.numberOfItems}>({giftLists.length} lists)</p>
-                            <div className={styles.recentFiveContainer}>
-                                {recent.giftLists.map((giftList) => (
-                                    <p key={giftList.id} className={styles.item}>{giftList.title}</p>
-                                ))}
-                            </div>
-                            <Link to='/gift-lists' className={styles.link}>View All Gift Lists</Link>
                         </>
                     )}
                 </div>
