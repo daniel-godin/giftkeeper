@@ -1,10 +1,10 @@
 import styles from './AddGiftItemModal.module.css';
 import { useEffect, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
-import { GiftItem, GiftList } from "../../../types/GiftType";
+import { GiftItem } from "../../../types/GiftType";
 import { BaseModal } from "../BaseModal/BaseModal";
 import { X } from 'lucide-react';
-import { getPersonGiftItemsCollRef, getGiftListDocRef, getGiftListsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
+import { getPersonGiftItemsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
@@ -47,7 +47,6 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                         ...initialFormData,
                         personId: person.id,
                         personName: person.name,
-                        giftListId: person.giftListId
                     }
                 }
             }
@@ -90,7 +89,6 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
             ...prev,
             personId: person.id,
             personName: person.name,
-            giftListId: person.giftListId
         }))
     }
 
@@ -122,14 +120,11 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
             const batch = writeBatch(db); // Using batch to create GiftItem document & *update* parent GiftList updatedAt.
 
             let finalPersonId: string;
-            let finalGiftListId: string;
 
             // Create New Person & New GiftList -- Both Will Be Needed For New GiftItem
             if (showCreateNewPerson) {
                 const newPersonDocRef = doc(getPeopleCollRef(authState.user.uid));
-                const newGiftListDocRef = doc(getGiftListsCollRef(authState.user.uid));
                 finalPersonId = newPersonDocRef.id;
-                finalGiftListId = newGiftListDocRef.id;
 
                 // New Person Document Data
                 const personData: Person = {
@@ -141,24 +136,14 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                     updatedAt: serverTimestamp()
                 }
 
-                // New Gift List Document Data
-                const giftListData: GiftList = {
-                    id: finalGiftListId,
-                    title: `${formData.personName.trim()}'s Gift List`,
-                    personId: finalPersonId,
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp()
-                }
                 batch.set(newPersonDocRef, personData);
-                batch.set(newGiftListDocRef, giftListData);
 
             } else {
-                if (!formData.personId || !formData.giftListId) { setIsSubmitting(false); return }; // If not creating new person, formData *MUST* have personId & giftListId, otherwise data sync issues.
+                if (!formData.personId) { setIsSubmitting(false); return }; // If not creating new person, formData *MUST* have personId, otherwise data sync issues.
                 finalPersonId = formData.personId;
-                finalGiftListId = formData.giftListId
             }
 
-            const newDocRef = doc(getPersonGiftItemsCollRef(authState.user.uid, finalGiftListId));
+            const newDocRef = doc(getPersonGiftItemsCollRef(authState.user.uid, finalPersonId));
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: formData.name,
@@ -168,7 +153,6 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 personName: formData.personName,
 
                 // Status & Associations
-                giftListId: finalGiftListId,
                 status: formData.status,
                 eventId: formData.eventId,
                 url: validateURL(formData.url || ''),
@@ -182,10 +166,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 updatedAt: serverTimestamp()
             }
 
-            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, finalGiftListId);
-
             batch.set(newDocRef, newDocumentData);
-            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
 
             await batch.commit();
 
