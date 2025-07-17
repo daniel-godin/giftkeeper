@@ -6,8 +6,7 @@ import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
-import { getGiftListsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
-import { GiftList } from '../../../types/GiftType';
+import { getPeopleCollRef } from '../../../firebase/firestore';
 import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager';
 
 interface AddPersonalModalProps {
@@ -68,33 +67,18 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
             const batch = writeBatch(db);
 
             const personRef = doc(getPeopleCollRef(authState.user.uid));
-            const giftListRef = doc(getGiftListsCollRef(authState.user.uid))
 
             const personData: Person = {
                 id: personRef.id,
                 name: formData.name,
-
                 birthday: formData.birthday || '',
-
-                giftListId: giftListRef.id,
 
                 // Metadata
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
 
-            const giftListData: GiftList = {
-                id: giftListRef.id,
-                title: `${formData.name}'s Gift List`,
-
-                personId: personRef.id,
-
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            }
-
             batch.set(personRef, personData);
-            batch.set(giftListRef, giftListData);
 
             // Possibly change this to have an optional "batch".
             // If birthday has been added.  Create an event of type "birthday" for person.
