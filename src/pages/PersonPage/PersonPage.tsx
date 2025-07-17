@@ -45,9 +45,9 @@ export function PersonPage() {
             setFormData(personData);
 
             // Fetch Number of "ideas" (note: NOT purchased items) for this person:
-            if (!authState.user || !authState.user.uid || !personData.giftListId) { return } // Guard Clause
+            if (!authState.user || !authState.user.uid || !personData.id) { return } // Guard Clause
             try {
-                const count = await fetchGiftIdeasCount(authState.user.uid, personData.giftListId);
+                const count = await fetchGiftIdeasCount(authState.user.uid, personData.id);
                 setGiftIdeasCount(count);
             } catch (error) {
                 console.error('Error fetching number of gift ideas for person. Error:', error);
@@ -58,9 +58,9 @@ export function PersonPage() {
 
     // Firestore Lister For Person Gift Items
     useEffect(() => {
-        if (!authState.user || !person.giftListId) { return }; // Guard
+        if (!authState.user || !person.id) { return }; // Guard
 
-        const collRef = getPersonGiftItemsCollRef(authState.user?.uid, person.giftListId);
+        const collRef = getPersonGiftItemsCollRef(authState.user?.uid, person.id);
 
         const unsubscribe = onSnapshot(collRef, (snapshot) => {
             const items = snapshot.docs.map(doc => {
@@ -193,12 +193,10 @@ export function PersonPage() {
                         )}
                     </div>
 
-                    <Link to={`/gift-lists/${person.giftListId}`} className='unstyled-link'>
-                        <div className={styles.statCard}>
-                            <div className={styles.statNumber}>{giftIdeasCount}</div>
-                            <div className={styles.statLabel}>Gift Ideas</div>
-                        </div>
-                    </Link>
+                    <div className={styles.statCard}>
+                        <div className={styles.statNumber}>{giftIdeasCount}</div>
+                        <div className={styles.statLabel}>Gift Ideas</div>
+                    </div>
                 </div>
 
                 <div className={styles.sectionContainer}>
@@ -247,20 +245,20 @@ export function PersonPage() {
     )
 }
 
-export async function fetchGiftIdeasCount (userId: string, giftListId: string) {
+export async function fetchGiftIdeasCount (userId: string, personId: string) {
     // Guard Clauses
     if (!userId) {
         console.error('Need authState.user to get item count');
         return 0;
     }
 
-    if (!giftListId) {
-        console.error('need giftlistId')
+    if (!personId) {
+        console.error('need personId')
         return 0;
     }
 
     try {
-        const collRef = getPersonGiftItemsCollRef(userId, giftListId)
+        const collRef = getPersonGiftItemsCollRef(userId, personId)
         const q = query(collRef, where('status', '==', 'idea'))
 
         const snapshot = await getCountFromServer(q);
