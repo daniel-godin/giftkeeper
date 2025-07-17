@@ -45,7 +45,6 @@ export function EventPage() {
         setGiftItemsLoading(true);
 
         const q = query(getAllGiftItemsCollGroupRef(), where('eventId', '==', eventId))
-        // const q = query(collectionGroup(db, 'giftItems'), where('eventId', '==', eventId))
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const items = snapshot.docs.map(doc => {
                 const data = doc.data() as GiftItem;
