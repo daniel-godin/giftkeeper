@@ -1,7 +1,6 @@
 import { CalendarFold, ListTodo, UsersRound } from 'lucide-react';
 import { useEvents } from '../../../../contexts/EventsContext';
 import { usePeople } from '../../../../contexts/PeopleContext';
-import { useWishLists } from '../../../../contexts/WishListsProvider';
 import styles from './Dashboard.module.css'
 import { Link } from 'react-router';
 import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
@@ -9,14 +8,12 @@ import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
 export function Dashboard () {
     const { people, loading: peopleLoading } = usePeople();
     const { loading: eventsLoading } = useEvents();
-    const { wishLists, loading: wishListsLoading  } = useWishLists();
 
     const upcomingEvents = useUpcomingEvents();
 
     // Need to make "seconds" Type-safe later.
     const recent = {
         'people': people.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
-        'wishLists': wishLists.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
     }
 
     return (
@@ -55,24 +52,6 @@ export function Dashboard () {
                                 ))}
                             </div>
                             <Link to='/people' className={styles.link}>View All People</Link>
-                        </>
-                    )}
-                </div>
-
-                <div className={styles.dashboardBox}>
-                    <header className={styles.headerText}><ListTodo /> Wish Lists</header>
-
-                    {wishListsLoading ? (
-                        <p>Loading Wish Lists...</p>
-                    ) : (
-                        <>
-                            <p className={styles.numberOfItems}>({wishLists.length} lists)</p>
-                            <div className={styles.recentFiveContainer}>
-                                {recent.wishLists.map((wishList) => (
-                                    <p key={wishList.id} className={styles.item}>{wishList.title}</p>
-                                ))}
-                            </div>
-                            <Link to='/wish-lists' className={styles.link}>View All Wish Lists</Link>
                         </>
                     )}
                 </div>
