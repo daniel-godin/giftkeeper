@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import styles from './TopBar.module.css'
-import { CalendarFold, Circle, Gift, UsersRound } from 'lucide-react';
+import { CalendarFold, Circle, UsersRound } from 'lucide-react';
 import { QuickAddButton } from '../../../components/ui/QuickAddButton/QuickAddButton';
 
 interface TopBarProps {
@@ -29,8 +29,6 @@ export function TopBar({ deviceType }: TopBarProps) {
                                 </Link>
                             </li>
             
-
-
                             {/* Quick Add (+) Modal Button -- Same as BottomNavigation */}
                             <li className={styles.navItem}>
                                 <QuickAddButton />
@@ -42,23 +40,6 @@ export function TopBar({ deviceType }: TopBarProps) {
                                     <span className={styles.linkLabel}>Events</span>
                                 </Link>
                             </li>
-            
-                            {/* <li className={styles.navItem}>
-                                <Link to='/gift-lists' className={styles.navLink}>
-                                    <span className={styles.icon}><Gift /></span>
-                                    <span className={styles.linkLabel}>Gift Lists</span>
-                                </Link>
-                            </li> */}
-            
-                            {/* // ARCHIVED: Wish Lists feature temporarily disabled
-                            // TODO: Re-enable after core gift tracking is polished */}
-                            
-                            {/* <li className={styles.navItem}>
-                                <Link to='/wish-lists' className={styles.navLink}>
-                                    <span className={styles.icon}><ListTodo /></span>
-                                    <span className={styles.linkLabel}>Wish Lists</span>
-                                </Link>
-                            </li> */}
                         </ul>
                     </nav>
                 )}  
