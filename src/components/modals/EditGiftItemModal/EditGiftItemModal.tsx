@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
-import { getGiftItemDocRef, getGiftListDocRef } from '../../../firebase/firestore';
+import { getPersonGiftItemDocRef, getGiftListDocRef } from '../../../firebase/firestore';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 
@@ -70,7 +70,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
 
             if (!data || !data.id || !data.giftListId) { return };
 
-            const giftItemDocRef = getGiftItemDocRef(authState.user.uid, data.giftListId, data.id);
+            const giftItemDocRef = getPersonGiftItemDocRef(authState.user.uid, data.giftListId, data.id);
             const giftItemDocumentData: UpdateData<GiftItem> = {
                 name: formData.name,
 

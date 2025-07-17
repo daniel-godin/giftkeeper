@@ -22,16 +22,10 @@ export const getEventsCollRef = (userId: string) => collection(db, 'users', user
 export const getEventDocRef = (userId: string, eventId: string) => doc(db, 'users', userId, 'events', eventId);
 
 // =============================================================================
-// Gift Lists References
-// =============================================================================
-export const getGiftListsCollRef = (userId: string) => collection(db, 'users', userId, 'giftLists');
-export const getGiftListDocRef = (userId: string, giftListId: string) => doc(db, 'users', userId, 'giftLists', giftListId);
-
-// =============================================================================
 // Gift Item References
 // =============================================================================
-export const getGiftItemsCollRef = (userId: string, giftListId: string) => collection(db, 'users', userId, 'giftLists', giftListId, 'giftItems');
-export const getGiftItemDocRef = (userId: string, giftListId: string, itemId: string) => doc(db, 'users', userId, 'giftLists', giftListId, 'giftItems', itemId);
+export const getPersonGiftItemsCollRef = (userId: string, personId: string) => collection(db, 'users', userId, 'people', personId, 'giftItems');
+export const getPersonGiftItemDocRef = (userId: string, personId: string, itemId: string) => doc(db, 'users', userId, 'people', personId, 'giftItems', itemId);
 
 // =============================================================================
 // Wish List References

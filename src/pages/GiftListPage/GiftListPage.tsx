@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { onSnapshot, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { formatFirestoreDate } from '../../utils';
 import { EditableTitle } from '../../components/ui/EditableTitle/EditableTitle';
-import { getGiftItemsCollRef, getGiftListDocRef } from '../../firebase/firestore';
+import { getPersonGiftItemsCollRef, getGiftListDocRef } from '../../firebase/firestore';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { useGiftLists } from '../../contexts/GiftListsProvider';
 
@@ -27,7 +27,7 @@ export function GiftListPage() {
 
         setGiftList(giftListData);
 
-        const collRef = getGiftItemsCollRef(authState.user.uid, giftListId);
+        const collRef = getPersonGiftItemsCollRef(authState.user.uid, giftListId);
         const unsubscribe = onSnapshot(collRef, (snapshot) => {
             const items = snapshot.docs.map(doc => {
                 const data = doc.data() as GiftItem;

@@ -2,7 +2,7 @@ import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
+import { getPersonGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
 import { getCountFromServer, onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
@@ -60,7 +60,7 @@ export function PersonPage() {
     useEffect(() => {
         if (!authState.user || !person.giftListId) { return }; // Guard
 
-        const collRef = getGiftItemsCollRef(authState.user?.uid, person.giftListId);
+        const collRef = getPersonGiftItemsCollRef(authState.user?.uid, person.giftListId);
 
         const unsubscribe = onSnapshot(collRef, (snapshot) => {
             const items = snapshot.docs.map(doc => {
@@ -260,7 +260,7 @@ export async function fetchGiftIdeasCount (userId: string, giftListId: string) {
     }
 
     try {
-        const collRef = getGiftItemsCollRef(userId, giftListId)
+        const collRef = getPersonGiftItemsCollRef(userId, giftListId)
         const q = query(collRef, where('status', '==', 'idea'))
 
         const snapshot = await getCountFromServer(q);

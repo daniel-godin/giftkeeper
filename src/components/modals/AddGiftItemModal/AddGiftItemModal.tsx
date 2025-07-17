@@ -4,7 +4,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { GiftItem, GiftList } from "../../../types/GiftType";
 import { BaseModal } from "../BaseModal/BaseModal";
 import { X } from 'lucide-react';
-import { getGiftItemsCollRef, getGiftListDocRef, getGiftListsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
+import { getPersonGiftItemsCollRef, getGiftListDocRef, getGiftListsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
@@ -158,7 +158,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 finalGiftListId = formData.giftListId
             }
 
-            const newDocRef = doc(getGiftItemsCollRef(authState.user.uid, finalGiftListId));
+            const newDocRef = doc(getPersonGiftItemsCollRef(authState.user.uid, finalGiftListId));
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: formData.name,
