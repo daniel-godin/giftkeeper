@@ -10,18 +10,17 @@ import { usePeople } from '../../contexts/PeopleContext';
 import { Person } from '../../types/PersonType';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
-import { useGiftLists } from '../../contexts/GiftListsProvider';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
+import { getAllGiftItemsCollGroupRef } from '../../firebase/firestore';
 
 export function EventPage() {
     const { eventId } = useParams();
     const deviceType = useViewport();
     const { events, loading: eventsLoading } = useEvents();
     const { people, loading: peopleLoading } = usePeople();
-    const { loading: giftListsLoading} = useGiftLists();
 
     const [event, setEvent] = useState<Event>();
     const [associatedPeople, setAssociatedPeople] = useState<Person[]>([]);
@@ -31,7 +30,7 @@ export function EventPage() {
     // Fetch Data For UI (event details)
     useEffect(() => {
         // Guard Clause -- Wait For Data Contexts To Load
-        if (!eventId || eventsLoading || peopleLoading || giftListsLoading) { return };
+        if (!eventId || eventsLoading || peopleLoading) { return };
 
         // Find Event In Events Context
         const eventDetails = events.find(event => event.id === eventId);
@@ -45,7 +44,8 @@ export function EventPage() {
 
         setGiftItemsLoading(true);
 
-        const q = query(collectionGroup(db, 'giftItems'), where('eventId', '==', eventId))
+        const q = query(getAllGiftItemsCollGroupRef(), where('eventId', '==', eventId))
+        // const q = query(collectionGroup(db, 'giftItems'), where('eventId', '==', eventId))
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const items = snapshot.docs.map(doc => {
                 const data = doc.data() as GiftItem;
