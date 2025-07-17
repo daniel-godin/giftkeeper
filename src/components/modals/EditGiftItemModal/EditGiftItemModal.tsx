@@ -4,9 +4,8 @@ import styles from './EditGiftItemModal.module.css'
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
-import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
-import { db } from '../../../firebase/firebase';
-import { getPersonGiftItemDocRef, getGiftListDocRef } from '../../../firebase/firestore';
+import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
+import { getPersonGiftItemDocRef } from '../../../firebase/firestore';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 
@@ -61,16 +60,13 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
 
         if (!authState.user) { return }; // Guard Clause
         if (!formData.name.trim()) { return }; // Form Validation Guard Clause
+        if (!data || !data.id || !data.personId) { return }; // Guard Clause
 
         setIsSubmitting(true);
         setStatus('Updating Gift Item...');
 
         try {
-            const batch = writeBatch(db); // Using batch to create GiftItem document & *update* parent GiftList updatedAt.
-
-            if (!data || !data.id || !data.giftListId) { return };
-
-            const giftItemDocRef = getPersonGiftItemDocRef(authState.user.uid, data.giftListId, data.id);
+            const giftItemDocRef = getPersonGiftItemDocRef(authState.user.uid, data.personId, data.id);
             const giftItemDocumentData: UpdateData<GiftItem> = {
                 name: formData.name,
 
@@ -87,12 +83,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                 updatedAt: serverTimestamp()
             }
 
-            const parentGiftListDocRef = getGiftListDocRef(authState.user.uid, data.giftListId);
-
-            batch.update(giftItemDocRef, giftItemDocumentData);
-            batch.update(parentGiftListDocRef, { updatedAt: serverTimestamp() });
-
-            await batch.commit();
+            updateDoc(giftItemDocRef, giftItemDocumentData);
 
             setTimeout(() => {
                 onClose();
@@ -104,8 +95,6 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
             setStatus('Error Updating Gift Item. Try Again.');
             setIsSubmitting(false);
         }
-
-
     }
 
     // Resets All State In Modal
