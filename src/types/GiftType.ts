@@ -1,17 +1,5 @@
 import { FieldValue, Timestamp } from "firebase/firestore";
 
-export interface GiftList {
-    id?: string;
-    title: string;
-
-    // Associations
-    personId?: string; // Person that this GiftList belongs to.  Optional to accomadate *unknown items* list.
-
-    // Metadata
-    createdAt?: Timestamp | FieldValue;
-    updatedAt?: Timestamp | FieldValue;
-}
-
 export interface GiftItem {
     id?: string;
     name: string;
@@ -21,8 +9,7 @@ export interface GiftItem {
     personName?: string; // For displaying in UI, reduces unneeded lookups to find name in Person.
 
     // Status & Associations
-    giftListId?: string; // Gift List ID that this Item belongs to.
-    status?: 'idea' | 'purchased'; // idea is default.
+    status?: GiftStatus; // idea is default
     eventId?: string; // eventId that item has been 'purchased' for.
     url?: string; // URL to item. eg: amazon.com/itemURL // Possibly use referrer links
 
@@ -34,3 +21,7 @@ export interface GiftItem {
     createdAt?: Timestamp | FieldValue;
     updatedAt?: Timestamp | FieldValue;
 }
+
+export type GiftStatus = 'idea' | 'purchased'; // 'idea' is Default
+export type GiftCategory = 'clothing' | 'electronics' | 'books' | 'other';
+export type GiftPriority = 'low' | 'medium' | 'high';
