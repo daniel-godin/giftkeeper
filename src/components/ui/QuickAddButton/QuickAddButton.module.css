@@ -13,3 +13,7 @@
 
     cursor: pointer;
 }
+
+.quickAddButton:hover {
+    transform: scale(1.05);
+}

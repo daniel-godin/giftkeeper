@@ -15,6 +15,7 @@ import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
 import { GiftItem } from '../../types/GiftType';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
+import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
 
 export function PersonPage() {
     const { authState } = useAuth();
@@ -227,7 +228,12 @@ export function PersonPage() {
             </div>
 
             <div className={styles.giftItems}>
-                <header className={styles.sectionHeader}>Gift Items</header>
+                <header className={styles.sectionHeader}>
+                    <h4>Gift Items</h4>
+                    <QuickAddButton
+                        className={styles.personPageQuickAddButton}
+                    />
+                </header>
 
                 {deviceType === 'mobile' && (
                     <>
