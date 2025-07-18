@@ -1,5 +1,5 @@
 import styles from './AddGiftItemModal.module.css';
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { GiftItem } from "../../../types/GiftType";
 import { BaseModal } from "../BaseModal/BaseModal";
@@ -13,6 +13,7 @@ import { db } from '../../../firebase/firebase';
 import { Person } from '../../../types/PersonType';
 import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
 import { useParams } from 'react-router';
+import { useEvents } from '../../../contexts/EventsContext';
 
 interface AddGiftItemModalProps {
     isOpen: boolean;
@@ -22,7 +23,8 @@ interface AddGiftItemModalProps {
 export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
     const { authState } = useAuth();
     const { people } = usePeople();
-    const { personId } = useParams();
+    const { events } = useEvents();
+    const { personId, eventId } = useParams();
 
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<GiftItem>(DEFAULT_GIFT_ITEM);
@@ -34,12 +36,25 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
     // Get upcoming events for selected "person" to display in dropdown.  Default is '' per defaultFormValues.
     // eventOptions makes sure to grab personId if dropdown changed to 'purchased' & personId is valid. Otherwise empty array of <Event>[].
     const upcomingEventsForPersonId = useUpcomingEvents(formData.personId);
-    const eventOptions: Event[] = formData.status === 'purchased' && formData.personId ? upcomingEventsForPersonId : [];
+    // const eventOptions: Event[] = formData.status === 'purchased' && formData.personId ? upcomingEventsForPersonId : [];
+
+    const eventOptions: Event[] = useMemo(() => {
+        if (formData.status !== 'purchased') { return [] }; // Guard Clause. Needs to be purchased to show.
+
+        if (eventId) {
+            return events.filter(event => event.id === eventId);
+        } else if (formData.personId) {
+            return upcomingEventsForPersonId;
+        }
+
+        return [];
+    }, [formData.status, eventId, formData.personId, events, upcomingEventsForPersonId])
 
     useEffect(() => {
         if (isOpen) {
             let initialFormData = { ...DEFAULT_GIFT_ITEM };
 
+            // Pre-fill person data if on PersonPage
             if (personId) {
                 const person = people.find(p => p.id === personId);
                 if (person) {
@@ -51,13 +66,22 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 }
             }
 
+            // Pre-fill event data if on EventPage
+            if (eventId) {
+                initialFormData = {
+                    ...initialFormData,
+                    eventId: eventId,
+                    status: 'purchased' // Only on EventPage is 'purchased' the default
+                }
+            }
+
             setFormData(initialFormData);
             setStatus('');
             setIsSubmitting(false);
             setShowCreateNewPerson(false);
-            setShowOptionalFields(false);
+            setShowOptionalFields(!!eventId); // Open optional fields if on EventPage, otherwise closed.
         }
-    }, [isOpen]);
+    }, [isOpen, personId, eventId, people]);
 
     // Default Input Change Handler
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -130,7 +154,6 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 const personData: Person = {
                     id: finalPersonId,
                     name: formData.personName.trim(),
-                    giftListId: finalGiftListId,
                     birthday: '',
                     createdAt: serverTimestamp(),
                     updatedAt: serverTimestamp()
@@ -301,13 +324,14 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                             </label>
 
                             {/* Choose Event (Only if "status" === 'purchased') */}
-                            {formData.status === 'purchased' && formData.personId !== '' && (
+                            {formData.status === 'purchased' && (
                                 <label className={styles.label}>Choose Event For Purchased Gift:
                                     <select
                                         name='eventId'
                                         onChange={handleInputChange}
                                         required={false}
                                         disabled={isSubmitting}
+                                        value={formData.eventId}
                                         className={styles.dropdownInput}
                                     >
                                         <option
