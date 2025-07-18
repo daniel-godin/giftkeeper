@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from './EventPage.module.css'
 import { Link, useParams } from 'react-router';
-import { collectionGroup, onSnapshot, query, where } from 'firebase/firestore';
-import { db } from '../../firebase/firebase';
+import { onSnapshot, query, where } from 'firebase/firestore';
 import { useEvents } from '../../contexts/EventsContext';
 import { Event } from '../../types/EventType';
 import { GiftItem } from '../../types/GiftType';
@@ -15,6 +14,7 @@ import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
 import { getAllGiftItemsCollGroupRef } from '../../firebase/firestore';
+import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
 
 export function EventPage() {
     const { eventId } = useParams();
@@ -151,6 +151,9 @@ export function EventPage() {
                     <>
                         <header className={styles.giftTrackerHeader}>
                             <h3>Gift Tracker</h3>
+                            <QuickAddButton
+
+                            />
                         </header>
 
                         {/* Needs two versions: Mobile & Desktop. Mobile uses Cards, Desktop uses Table */}
