@@ -31,15 +31,3 @@ export const getPersonGiftItemDocRef = (userId: string, personId: string, itemId
 // Gift Item Collection Group Queries
 // =============================================================================
 export const getAllGiftItemsCollGroupRef = () => collectionGroup(db, 'giftItems');
-
-// =============================================================================
-// Wish List References
-// =============================================================================
-export const getWishListsCollRef = (userId: string) => collection(db, 'users', userId, 'wishLists');
-export const getWishListDocRef = (userId: string, wishListId: string) => doc(db, 'users', userId, 'wishLists', wishListId);
-
-// =============================================================================
-// Wish Item References
-// =============================================================================
-export const getWishItemsCollRef = (userId: string, wishListId: string) => collection(db, 'users', userId, 'wishLists', wishListId, 'wishItems');
-export const getWishItemDocRef = (userId: string, wishListId: string, itemId: string) => doc(db, 'users', userId, 'wishLists', wishListId, 'wishItems', itemId);
