@@ -27,6 +27,18 @@
     border-bottom: 1px solid lightgray;
 }
 
+/* Name & URL/Link Icon: Left & Right Edges. Can't use display: flex; justify-content: space-between; */
+.nameAndURL {
+    position: relative;
+}
+
+.linkIcon {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 /* "Status" Text/Icon */
 .giftItemDetailIdea, .giftItemDetailPurchased {
     display: grid;

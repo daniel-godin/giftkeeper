@@ -6,12 +6,15 @@ import { EditGiftItemModal } from '../modals/EditGiftItemModal/EditGiftItemModal
 import { useState } from 'react';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { DEFAULT_GIFT_ITEM } from '../../constants/defaultObjects';
+import { useEvents } from '../../contexts/EventsContext';
 
 interface GiftItemsTableProps {
     data: GiftItem[];
 }
 
 export function GiftItemsTable({ data } : GiftItemsTableProps) {
+    const { events } = useEvents();
+
     const [isEditGiftItemModalOpen, setIsEditGiftItemModalOpen] = useState<boolean>(false);
     const [giftItemBeingEdited, setGiftItemBeingEdited] = useState<GiftItem>(DEFAULT_GIFT_ITEM)
 
@@ -30,8 +33,9 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                     <tr className={`${styles.tableHeadRow} ${styles.tableRow}`}>
                         <th scope='col' className={styles.tableCell}>PERSON</th>
                         <th scope='col' className={styles.tableCell}>GIFT ITEM</th>
-                        <th scope='col' className={styles.tableCell}>LINK</th> 
+                        {/* <th scope='col' className={styles.tableCell}>LINK</th> */}
                         <th scope='col' className={styles.tableCell}>STATUS</th>
+                        <th scope='col' className={styles.tableCell}>EVENT</th>
                         <th scope='col' className={styles.tableCell}>COST</th> 
                         <th scope='col' className={styles.tableCell}>ACTION</th>
                     </tr>
@@ -40,15 +44,15 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                     {data.map(item => (
                         <tr key={item.id} className={styles.tableRow}>
                             <td className={styles.tableCell}>{item.personName}</td>
-                            <td className={styles.tableCell}>{item.name}</td>
-          
-                            {/* Link is based on item.url */}
-                            <td className={styles.tableCell}>
+
+                            {/* Item Name & Conditional URL Link: */}
+                            <td className={`${styles.tableCell} ${styles.nameAndURL}`}>
+                                <span>{item.name}</span>                            
                                 {item.url && (
                                     <a
                                         href={item.url}
                                         target='_blank'
-                                        // className='unstyled-link'
+                                        className={styles.linkIcon}
                                         title='View Item Online'
                                     >
                                         <ExternalLink size={16} />
@@ -60,19 +64,37 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                             {item.status === 'idea' && (
                                 <>
                                     <td className={`${styles.tableCell}`}><span className={styles.giftItemDetailIdea}><Lightbulb size={20}/> {capitalizeFirst(item.status)}</span></td>
+                                    {/* Event Data: */}
+                                    {item.eventId ? (
+                                        <td className={styles.tableCell}>
+                                            {/* TODO:  Possibly useMemo this later. */}
+                                            {events.find(event => event.id === item.eventId)?.title || 'Event Not Found'}
+                                        </td>
+                                    ) : (
+                                        <td className={styles.tableCell}>--</td>
+                                    )}
                                     <td className={styles.tableCell}>{formatCurrency(item.estimatedCost || 0)}</td>
                                 </>
                             )}
+
                             {/* status === purchased = purchasedCost & Different Display */}
                             {item.status === 'purchased' && (
                                 <>
                                     <td className={`${styles.tableCell}`}><span className={styles.giftItemDetailPurchased}><Check size={20}/> {capitalizeFirst(item.status)}</span></td>
+                                    {/* Event Data: */}
+                                    {item.eventId ? (
+                                        <td className={styles.tableCell}>
+                                            {/* TODO:  Possibly useMemo this later. */}
+                                            {events.find(event => event.id === item.eventId)?.title || 'Event Not Found'}
+                                        </td>
+                                    ) : (
+                                        <td className={styles.tableCell}>--</td>
+                                    )}
                                     <td className={styles.tableCell}>{formatCurrency(item.purchasedCost || 0)}</td>
                                 </>
                             )}
 
-
-
+                            {/* Edit Gift Item: */}
                             <td className={styles.tableCell}>
                                 <button type='button' className={styles.actionsButton} onClick={() => handleEditableItem(item)}>
                                     Edit Item
