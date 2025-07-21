@@ -10,6 +10,8 @@ export function LandingPage () {
             
                 <Link to='/auth'>Authentication Page</Link>
             </div>
+
+            <Link to='/dashboard' className={styles.dashboardLink}>Dashboard</Link>
         </div>
     )
 }
