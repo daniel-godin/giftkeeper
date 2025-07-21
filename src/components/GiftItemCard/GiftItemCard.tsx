@@ -5,24 +5,32 @@ import { capitalizeFirst } from '../../utils/stringUtils';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { useState } from 'react';
 import { EditGiftItemModal } from '../modals/EditGiftItemModal/EditGiftItemModal';
+import { useEvents } from '../../contexts/EventsContext';
 
 interface GiftItemCardProps {
     item: GiftItem;
 }
 
 export function GiftItemCard({ item } : GiftItemCardProps) {
+    const { events } = useEvents();
+
     const [isEditGiftItemModalOpen, setIsEditGiftItemModalOpen] = useState<boolean>(false);
 
     return (
         <div key={item.id} className={styles.giftItemCard}>
+            {/* Person Name */}
             <div className={styles.giftItemCardRow}>
                 <span className={styles.giftItemCategory}>Person</span>
                 <span className={styles.giftItemDetail}>{item.personName}</span>
             </div>
+
+            {/* Gift Item Name */}
             <div className={styles.giftItemCardRow}>
                 <span className={styles.giftItemCategory}>Gift</span>
                 <span className={styles.giftItemDetail}>{item.name}</span>
             </div>
+
+            {/* Gift Status */}
             <div className={styles.giftItemCardRow}>
                 <span className={styles.giftItemCategory}>Status</span>
                 {item.status === 'idea' && (
@@ -32,6 +40,20 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                     <span className={styles.giftItemDetailPurchased}><Check size={20} /> {capitalizeFirst(item.status)}</span>
                 )}
             </div>
+
+            {/* Event: */}
+            <div className={styles.giftItemCardRow}>
+                <span className={styles.giftItemCategory}>Event</span>
+                <span className={styles.giftItemDetail}>
+                    {item.eventId ? (
+                        <>{events.find(event => event.id === item.eventId)?.title || 'Event Not Found'}</>
+                    ) : (
+                        <>--</>
+                    )}
+                </span>
+            </div>
+
+            {/* Costs */}
             <div className={styles.giftItemCardRow}>
                 <span className={styles.giftItemCategory}>
                     {item.status === 'idea' && (<>Estimated Cost</>)}
@@ -39,6 +61,8 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                 </span>
                 <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost || 0)}</span>
             </div>
+
+            {/* URL & Edit Button */}
             <div className={styles.giftItemCardRow}>
                 <span className={styles.giftItemCategory}>                                
                     {item.url && (
