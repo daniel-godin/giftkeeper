@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GiftItem } from '../../../types/GiftType';
 import styles from './EditGiftItemModal.module.css'
 import { BaseModal } from '../BaseModal/BaseModal';
@@ -27,6 +27,14 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
     // eventOptions makes sure to grab personId if dropdown changed to 'purchased' & personId is valid. Otherwise empty array of <Event>[].
     const upcomingEventsForPersonId = useUpcomingEvents(data.personId);
     const eventOptions: Event[] = formData.status === 'purchased' && data.personId ? upcomingEventsForPersonId : [];
+
+    const transformedEventOptions = useMemo(() =>
+        eventOptions.map(event => ({
+            optionLabel: event.title,
+            optionValue: event.id || ''
+        })), [eventOptions]
+    );
+
 
     useEffect(() => {
         if (isOpen) { setFormData(data); };
@@ -143,29 +151,16 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
 
                     {/* Choose Event (Only if "status" === 'purchased') */}
                     {formData.status === 'purchased' && data.personId !== '' && (
-                        <label className={styles.label}>Choose Event For Purchased Gift:
-                            <select
-                                name='eventId'
-                                value={formData.eventId}
-                                onChange={handleInputChange}
-                                required={false}
-                                disabled={isSubmitting}
-                                className={styles.dropdownInput}
-                            >
-                                <option
-                                    value=''
-                                    className={styles.option}
-                                >Choose Event</option>
-
-                                {eventOptions.map(event => (
-                                    <option
-                                        key={event.id}
-                                        value={event.id}
-                                        className={styles.option}
-                                    >{event.title}</option>
-                                ))}
-                            </select>
-                        </label>
+                        <FormSelect
+                            label='Choose Event For Purchased Gift:'
+                            options={transformedEventOptions}
+                            name='eventId'
+                            placeholder='Choose Event'
+                            required={false}
+                            disabled={isSubmitting}
+                            value={formData.eventId}
+                            onChange={handleInputChange}
+                        />
                     )}
 
                     {/* EstimatedCost or PurchasedCost (Changes depending on status === idea/purchased) */}
