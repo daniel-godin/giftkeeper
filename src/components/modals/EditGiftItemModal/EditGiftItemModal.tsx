@@ -146,6 +146,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                         <label className={styles.label}>Choose Event For Purchased Gift:
                             <select
                                 name='eventId'
+                                value={formData.eventId}
                                 onChange={handleInputChange}
                                 required={false}
                                 disabled={isSubmitting}
