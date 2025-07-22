@@ -5,3 +5,4 @@ export { QuickAddButton } from './QuickAddButton/QuickAddButton';
 
 // Form Components:
 export { FormInput } from './FormInput/FormInput';
+export * from './FormSelect/FormSelect';
