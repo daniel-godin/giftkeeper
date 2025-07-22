@@ -8,7 +8,7 @@ import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
 import { getPersonGiftItemDocRef } from '../../../firebase/firestore';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
-import { FormInput } from '../../ui';
+import { FormInput, FormSelect } from '../../ui';
 
 interface EditGiftItemModalProps {
     isOpen: boolean;
@@ -128,30 +128,18 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                     />
 
                     {/* Changing Status will change available fields: eventId (show/hide) & estimatedCost/purchasedCost. */}
-                    <label className={styles.label}>Gift Status:
-                        <select
-                            name='status'
-                            onChange={handleInputChange}
-                            required={true}
-                            value={formData.status}
-                            disabled={isSubmitting}
-                            className={styles.dropdownInput}
-                        >
-                            <option
-                                value='idea'
-                                className={styles.option}
-                            >
-                                Idea
-                            </option>
-
-                            <option
-                                value='purchased'
-                                className={styles.option}
-                            >
-                                Purchased
-                            </option>
-                        </select>
-                    </label>
+                    <FormSelect
+                        label='Gift Status (idea/purchased):'
+                        options={[
+                            { optionLabel: 'Idea', optionValue: 'idea' },
+                            { optionLabel: 'Purchased', optionValue: 'purchased' }
+                        ]}
+                        name='status'
+                        required={true}
+                        disabled={isSubmitting}
+                        value={formData.status}
+                        onChange={handleInputChange}
+                    />
 
                     {/* Choose Event (Only if "status" === 'purchased') */}
                     {formData.status === 'purchased' && data.personId !== '' && (
