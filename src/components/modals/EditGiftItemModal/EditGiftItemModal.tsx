@@ -8,6 +8,7 @@ import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
 import { getPersonGiftItemDocRef } from '../../../firebase/firestore';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
+import { FormInput } from '../../ui';
 
 interface EditGiftItemModalProps {
     isOpen: boolean;
@@ -28,7 +29,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
     const eventOptions: Event[] = formData.status === 'purchased' && data.personId ? upcomingEventsForPersonId : [];
 
     useEffect(() => {
-        if (isOpen) { setFormData(data) };
+        if (isOpen) { setFormData(data); };
     }, [isOpen])
 
     // Default Input Change Handler
@@ -115,17 +116,16 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
-                    <label className={styles.label}>Gift Item Idea or Purchase: *
-                        <input
-                            className={styles.input}
-                            type='text'
-                            name='name'
-                            required={true}
-                            value={formData.name}
-                            disabled={isSubmitting}
-                            onChange={handleInputChange}
-                        />
-                    </label>
+                    {/* Gift Item Name/Title: */}
+                    <FormInput
+                        label='Gift Item Idea or Purchase:'
+                        type='text'
+                        name='name'
+                        required={true}
+                        disabled={isSubmitting}
+                        value={formData.name}
+                        onChange={handleInputChange}
+                    />
 
                     {/* Changing Status will change available fields: eventId (show/hide) & estimatedCost/purchasedCost. */}
                     <label className={styles.label}>Gift Status:
@@ -202,17 +202,15 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                     </label>
 
                     {/* URL Validation happens in handleSubmit, NOT in change handler */}
-                    <label className={styles.label}>URL:
-                        <input
-                            className={styles.input}
-                            type='text'
-                            name='url'
-                            required={false}
-                            value={formData.url}
-                            disabled={isSubmitting}
-                            onChange={handleInputChange}
-                        />
-                    </label>
+                    <FormInput
+                        label='URL:'
+                        type='text'
+                        name='url'
+                        required={false}
+                        disabled={isSubmitting}
+                        value={formData.url}
+                        onChange={handleInputChange}
+                    />
 
                     <output>
                         {status}
