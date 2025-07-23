@@ -7,6 +7,7 @@ import { db } from '../../../firebase/firebase';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { usePeople } from '../../../contexts/PeopleContext';
+import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -18,17 +19,13 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
     const { people } = usePeople();
 
     const [status, setStatus] = useState<string>('');
-    const [formData, setFormData] = useState<Event>({ title: '', date: '', people: [] });
+    const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     useEffect(() => {
         if (isOpen) {
-            setFormData({ title: '', date: '', people: [] })
+            setFormData(DEFAULT_EVENT)
             setStatus('');
-
-            console.log('test people', people);
-
-            // fetch people.
         }
     }, [isOpen])
 
@@ -51,7 +48,6 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
 
     // Handles adding people to the event (Ideally, at least 1 person per event)
     const handlePersonCheckboxChange = (personId: string, checked: boolean) => {
-        console.log('test, handlePersonCheckboxChange triggered')
 
         if (checked) {
             setFormData({
