@@ -9,6 +9,7 @@ import { getPersonGiftItemDocRef } from '../../../firebase/firestore';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 import { FormInput, FormSelect } from '../../ui';
+import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
 
 interface EditGiftItemModalProps {
     isOpen: boolean;
@@ -20,7 +21,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
     const { authState } = useAuth();
 
     const [status, setStatus] = useState<string>('');
-    const [formData, setFormData] = useState<GiftItem>(data);
+    const [formData, setFormData] = useState<GiftItem>(DEFAULT_GIFT_ITEM);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     // Get upcoming events for selected "person" to display in dropdown.  Default is '' per defaultFormValues.
