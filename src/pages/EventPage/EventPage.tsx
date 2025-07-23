@@ -15,6 +15,8 @@ import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
 import { getAllGiftItemsCollGroupRef } from '../../firebase/firestore';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
+import { EditEventModal } from '../../components/modals/EditEventModal/EditEventModal';
+import { DEFAULT_EVENT } from '../../constants/defaultObjects';
 
 export function EventPage() {
     const { eventId } = useParams();
@@ -26,6 +28,10 @@ export function EventPage() {
     const [associatedPeople, setAssociatedPeople] = useState<Person[]>([]);
     const [giftItemsLoading, setGiftItemsLoading] = useState<boolean>(false);
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
+
+    // State For EditEventModal:
+    const [isEditEventModalOpen, setIsEditEventModalOpen] = useState<boolean>(false);
+    const [editEventModalData, setEditEventModalData] = useState<Event>(DEFAULT_EVENT)
 
     // Fetch Data For UI (event details)
     useEffect(() => {
@@ -88,9 +94,11 @@ export function EventPage() {
                     <h3>{event.title}</h3>
                 )}
 
+                {/* Edit Button. Opens editEventModal */}
                 <button 
                     type='button'
                     className={styles.editButton}
+                    onClick={() => { setEditEventModalData(event || DEFAULT_EVENT); setIsEditEventModalOpen(true); }}
                 >
                     <Pencil /> Edit
                 </button>
@@ -178,6 +186,12 @@ export function EventPage() {
                     </>
                 )}
             </div>
+
+            <EditEventModal
+                isOpen={isEditEventModalOpen}
+                onClose={() => setIsEditEventModalOpen(false)}
+                data={editEventModalData}
+            />
         </section>
     )
 }
