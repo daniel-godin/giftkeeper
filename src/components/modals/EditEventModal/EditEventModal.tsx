@@ -4,7 +4,11 @@ import { Event } from '../../../types/EventType';
 import { BaseModal } from '../BaseModal/BaseModal'
 import styles from './EditEventModal.module.css'
 import { X } from 'lucide-react';
-import { FormInput } from '../../ui';
+import { FormCheckbox, FormInput } from '../../ui';
+import { usePeople } from '../../../contexts/PeopleContext';
+import { getEventDocRef } from '../../../firebase/firestore';
+import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
+import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
 
 interface EditEventModalProps {
     isOpen: boolean;
@@ -14,17 +18,18 @@ interface EditEventModalProps {
 
 export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) {
     const { authState } = useAuth();
+    const { people } = usePeople();
 
     const [status, setStatus] = useState<string>('');
-    const [formData, setFormData] = useState<Event>(data);
+    const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-    // FOR TESTING ONLY. TODO: DELETE THIS BEFORE PROD
     useEffect(() => {
         if (isOpen) {
-            setFormData(data); // Seems to force/make sure data is loaded.  Probably race condition in EventPage is causing this mis-match.  Possibly just use DEFAULT_EVENT.
+            setStatus('');
+            setFormData(data); // Make sure data is loaded into formData.
+            setIsSubmitting(false);
         }
-        console.log('editEvent FormData:', formData);
     }, [isOpen])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -35,44 +40,67 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
         }))
     }
 
+    const handlePersonCheckboxChange = (personId: string, checkedStatus: boolean) => {
+        if (checkedStatus) {
+            // Add personId to people array
+            setFormData(prev => ({
+                ...prev,
+                people: [...prev.people, personId]
+            }));
+        } else {
+            // Remove personId from people array
+            setFormData(prev => ({
+                ...prev,
+                people: prev.people.filter(id => id !== personId)
+            }))
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!authState.user) { return }; // Guard Clause
+        if (!data || !data.id) { return };
 
         setIsSubmitting(true);
         setStatus('Updating Event...');
 
-        // try {
-        //     const giftItemDocRef = getPersonGiftItemDocRef(authState.user.uid, data.personId, data.id);
-        //     const giftItemDocumentData: UpdateData<GiftItem> = {
-        //         name: formData.name,
+        try {
+            const eventDocRef = getEventDocRef(authState.user.uid, data.id);
+            const eventDocumentData: UpdateData<Event> = {
+                title: formData.title,
+                people: formData.people,
+                date: formData.date,
+                // type: formData.type,
+                // recurring: formData.recurring,
+                // budget: formData.budget,
+                // notes: formData.notes,
 
-        //         // Status & Associations
-        //         status: formData.status,
-        //         eventId: formData.eventId,
-        //         url: validateURL(formData.url || ''),
+                // Metadata
+                updatedAt: serverTimestamp()
+            }
 
-        //         // // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
-        //         estimatedCost: formData.estimatedCost,
-        //         purchasedCost: formData.purchasedCost,
+            updateDoc(eventDocRef, eventDocumentData);
 
-        //         // Metadata
-        //         updatedAt: serverTimestamp()
-        //     }
+            console.log('Successfully updated event document');
 
-        //     updateDoc(giftItemDocRef, giftItemDocumentData);
+            setTimeout(() => {
+                onClose();
+                resetModal();
+            }, 500);
 
-        //     setTimeout(() => {
-        //         onClose();
-        //         resetModal();
-        //     }, 500);
+        } catch (error) {
+            console.error('Error Updating Event. Error:', error);
+            setStatus('Error Updating Event. Try Again.');
+            setIsSubmitting(false);
+        }
+    }
 
-        // } catch (error) {
-        //     console.error('Error Updating Gift Item. Error:', error);
-        //     setStatus('Error Updating Gift Item. Try Again.');
-        //     setIsSubmitting(false);
-        // }
+    // Resets All State In Modal
+    const resetModal = () => {
+        setStatus('');
+        // setFormData(defaultFormValues);
+        setIsSubmitting(false);
     }
 
     return (
@@ -109,7 +137,21 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                     />
 
                     {/* People To Buy Gifts For At This Event */}
+                    {/* Checklist + Create New Person */}
+                    <fieldset className={styles.fieldset}>
+                        <legend className={styles.legend}>People To Buy Gifts For:</legend>
 
+                        {people.map(person => (
+                            <FormCheckbox
+                                key={person.id}
+                                label={person.name}
+                                name={person.id}
+                                checked={formData.people.includes(person.id || '')}
+                                onChange={(checked) => handlePersonCheckboxChange(person.id || '', checked)}
+                            />
+                        ))}
+                        
+                    </fieldset>
 
 
                     {/* Notes About Event */}
