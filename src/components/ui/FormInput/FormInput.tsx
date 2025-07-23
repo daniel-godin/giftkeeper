@@ -15,6 +15,11 @@ interface FormInputProps {
     onFocus?: () => void;
     onBlur?: () => void;
     inputClassName?: string
+
+    // For type: 'number':
+    min?: string;
+    max?: string;
+    step?: string;
 }
 
 export function FormInput({
@@ -26,6 +31,9 @@ export function FormInput({
     placeholder,
     required = false,
     disabled = false,
+    min,
+    max,
+    step,
     value,
     onChange,
     onFocus,
@@ -41,6 +49,9 @@ export function FormInput({
             placeholder={placeholder}
             required={required} // Default: false
             disabled={disabled} // Default: false
+            min={min}
+            max={max}
+            step={step}
             value={value}
             onChange={onChange}
             onFocus={onFocus}
