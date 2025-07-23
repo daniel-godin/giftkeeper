@@ -56,6 +56,21 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
         }
     }
 
+    const handleBudgetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const numValue = parseFloat(value) || 0; // Converts HTML Input Element From String to Number
+
+        // Allow empty string for better UX
+        if (value === '') { setFormData(prev => ({ ...prev, [name]: 0 })); return};
+
+        // Prevent Negative Number, but still update
+        const sanitizedValue = Math.max(0, numValue); // Returns larger between the two, so... if negative, returns 0.
+        setFormData(prev => ({
+            ...prev,
+            [name]: Math.round(sanitizedValue * 100) // Convert to cents
+        }))
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -73,7 +88,7 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                 date: formData.date,
                 // type: formData.type,
                 // recurring: formData.recurring,
-                // budget: formData.budget,
+                budget: formData.budget,
                 // notes: formData.notes,
 
                 // Metadata
@@ -150,8 +165,21 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                                 onChange={(checked) => handlePersonCheckboxChange(person.id || '', checked)}
                             />
                         ))}
-                        
                     </fieldset>
+
+                    {/* Event Gift Budget */}
+                    <FormInput
+                        label='Event Budget (total):'
+                        type='number'
+                        name='budget'
+                        placeholder='$0.00'
+                        min='0'
+                        step='0.01'
+                        required={false}
+                        disabled={isSubmitting}
+                        value={formData.budget ? formData.budget / 100 : ''}
+                        onChange={handleBudgetChange}
+                    />
 
 
                     {/* Notes About Event */}
