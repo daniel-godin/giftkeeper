@@ -8,6 +8,7 @@ import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
+import { FormPeopleSelector } from '../../ui';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -46,19 +47,19 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         })
     }
 
-    // Handles adding people to the event (Ideally, at least 1 person per event)
-    const handlePersonCheckboxChange = (personId: string, checked: boolean) => {
-
-        if (checked) {
-            setFormData({
-                ...formData,
-                people: [...formData.people, personId]
-            })
+    const handlePersonCheckboxChange = (personId: string, checkedStatus: boolean) => {
+        if (checkedStatus) {
+            // Add personId to people array
+            setFormData(prev => ({
+                ...prev,
+                people: [...prev.people, personId]
+            }));
         } else {
-            setFormData({
-                ...formData,
-                people: formData.people.filter(id => id !== personId)
-            })
+            // Remove personId from people array
+            setFormData(prev => ({
+                ...prev,
+                people: prev.people.filter(id => id !== personId)
+            }))
         }
     }
 
@@ -150,19 +151,14 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                         />
                     </label>
 
-                    <fieldset className={styles.fieldset}>
-                        <legend>Select People for this Event:</legend>
-                        {people.map((person) => (
-                            <label key={person.id} className={styles.checkboxLabel}>
-                                <input
-                                    type='checkbox'
-                                    checked={formData.people.includes(person.id || '')}
-                                    onChange={(e) => handlePersonCheckboxChange(person.id || '', e.target.checked)}
-                                />
-                                {person.name}
-                            </label>
-                        ))}
-                    </fieldset>
+                    <FormPeopleSelector
+                        legendText='Select People for this Event:'
+                        people={people}
+                        selectedPeopleIds={formData.people}
+                        disabled={isSubmitting}
+                        onChange={handlePersonCheckboxChange}
+                        allowCreateNewPerson={true}
+                    />
 
                     <output>
                         {status}
