@@ -14,10 +14,8 @@ interface FormPeopleSelectorProps {
     selectedPeopleIds?: string[];
     disabled?: boolean;
     onChange: (personId: string, checked: boolean) => void;
-
-    // For Creating a New "Person"
     allowCreateNewPerson?: boolean;
-    onCreatePerson?: (personData: Person) => void;
+    onCreatePerson?: (personData: Person) => void; // I don't know if I actually need this.
 }
 
 export function FormPeopleSelector({
