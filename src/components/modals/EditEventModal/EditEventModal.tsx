@@ -4,7 +4,7 @@ import { Event } from '../../../types/EventType';
 import { BaseModal } from '../BaseModal/BaseModal'
 import styles from './EditEventModal.module.css'
 import { X } from 'lucide-react';
-import { FormCheckbox, FormInput } from '../../ui';
+import { FormCheckbox, FormInput, FormPeopleSelector } from '../../ui';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { getEventDocRef } from '../../../firebase/firestore';
 import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
@@ -152,20 +152,12 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                     />
 
                     {/* People To Buy Gifts For At This Event */}
-                    {/* Checklist + Create New Person */}
-                    <fieldset className={styles.fieldset}>
-                        <legend className={styles.legend}>People To Buy Gifts For:</legend>
-
-                        {people.map(person => (
-                            <FormCheckbox
-                                key={person.id}
-                                label={person.name}
-                                name={person.id}
-                                checked={formData.people.includes(person.id || '')}
-                                onChange={(checked) => handlePersonCheckboxChange(person.id || '', checked)}
-                            />
-                        ))}
-                    </fieldset>
+                    <FormPeopleSelector
+                        people={people}
+                        selectedPeopleIds={formData.people}
+                        onChange={handlePersonCheckboxChange}
+                        allowCreateNewPerson={true}
+                    />
 
                     {/* Event Gift Budget */}
                     <FormInput
