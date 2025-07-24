@@ -1,6 +1,14 @@
 import { Event } from "../types/EventType";
 import { GiftItem } from "../types/GiftType";
+import { Person } from "../types/PersonType";
 
+export const DEFAULT_PERSON: Person = {
+    id: '',
+    name: '',
+    birthday: '',
+    notes: '',
+    relationship: '',
+}
 
 export const DEFAULT_GIFT_ITEM: GiftItem = {
     id: '',
