@@ -121,6 +121,7 @@ export function EventPage() {
                             <header className={styles.statCardHeader}>Participants</header>
                             <div className={styles.statNumber}>{event.people.length}</div>
                             <div className={styles.statLabel}>
+                                {/* TODO:  Make these link to their respective PersonPage */}
                                 {associatedPeople.map(person => person.name).join(', ')}
                             </div>
                         </>
