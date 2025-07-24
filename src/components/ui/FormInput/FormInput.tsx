@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import styles from './FormInput.module.css'
 
 interface FormInputProps {
@@ -14,6 +15,7 @@ interface FormInputProps {
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     onFocus?: () => void;
     onBlur?: () => void;
+    onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
     inputClassName?: string
 
     // For type: 'number':
@@ -22,7 +24,7 @@ interface FormInputProps {
     step?: string;
 }
 
-export function FormInput({
+export const FormInput = forwardRef<HTMLInputElement, FormInputProps>(({
     label,
     labelClassName,
     type = 'text',
@@ -38,11 +40,13 @@ export function FormInput({
     onChange,
     onFocus,
     onBlur,
+    onKeyDown,
     inputClassName
-} : FormInputProps) {
+}, ref) => {
 
     const inputElement = (
         <input
+            ref={ref}
             type={type} // Default: 'text'
             name={name}
             id={id}
@@ -56,6 +60,7 @@ export function FormInput({
             onChange={onChange}
             onFocus={onFocus}
             onBlur={onBlur}
+            onKeyDown={onKeyDown}
             aria-required={required}
             className={`${styles.input} ${inputClassName || ''}`}
         />
@@ -70,4 +75,4 @@ export function FormInput({
     ) : (
         inputElement
     )
-}
+})
