@@ -26,9 +26,7 @@ export function FormPeopleSelector({
     selectedPeopleIds = [],
     disabled = false,
     onChange,
-
     allowCreateNewPerson = false,
-    onCreatePerson
 } : FormPeopleSelectorProps) {
     const { authState } = useAuth();
 
