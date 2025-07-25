@@ -5,7 +5,7 @@ import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
-import { getPersonGiftItemDocRef } from '../../../firebase/firestore';
+import { getGiftItemDocRef } from '../../../firebase/firestore';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 import { FormInput, FormSelect } from '../../ui';
@@ -36,10 +36,14 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
         })), [eventOptions]
     );
 
-
     useEffect(() => {
-        if (isOpen) { setFormData(data); };
-    }, [isOpen])
+        if (isOpen) { 
+            setFormData({
+                ...DEFAULT_GIFT_ITEM,
+                ...data
+            }); 
+        };
+    }, [isOpen, data])
 
     // Default Input Change Handler
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -70,13 +74,13 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
 
         if (!authState.user) { return }; // Guard Clause
         if (!formData.name.trim()) { return }; // Form Validation Guard Clause
-        if (!data || !data.id || !data.personId) { return }; // Guard Clause
+        if (!data || !data.id) { return }; // Guard Clause
 
         setIsSubmitting(true);
         setStatus('Updating Gift Item...');
 
         try {
-            const giftItemDocRef = getPersonGiftItemDocRef(authState.user.uid, data.personId, data.id);
+            const giftItemDocRef = getGiftItemDocRef(authState.user.uid, data.id);
             const giftItemDocumentData: UpdateData<GiftItem> = {
                 name: formData.name,
 
@@ -93,7 +97,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                 updatedAt: serverTimestamp()
             }
 
-            updateDoc(giftItemDocRef, giftItemDocumentData);
+            await updateDoc(giftItemDocRef, giftItemDocumentData);
 
             setTimeout(() => {
                 onClose();
