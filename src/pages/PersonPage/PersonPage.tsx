@@ -1,9 +1,9 @@
 import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getPersonGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
-import { getCountFromServer, onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
+import { getPersonDocRef, getGiftItemsCollRef } from '../../firebase/firestore';
+import { onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
 import { db } from '../../firebase/firebase';
@@ -27,12 +27,15 @@ export function PersonPage() {
     const { syncBirthdayEvent } = useBirthdayEventManager();
 
     const [person, setPerson] = useState<Person>({ name: '' });
-    const [giftIdeasCount, setGiftIdeasCount] = useState(0);
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
 
     // State for managing changes to displayed data:
     const [formData, setFormData] = useState<Person>({ name: '' });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    const giftIdeasCount = useMemo(() => {
+        return giftItems.filter(item => item.status === 'idea').length;
+    }, [giftItems])
 
     // Grab data for personId from people data context array.  Don't duplicate Firestore listener.
     useEffect(() => {
@@ -44,26 +47,19 @@ export function PersonPage() {
             // TODO:  Display some kind of message to user in UI that no person found with that ID.
             setPerson(personData);
             setFormData(personData);
-
-            // Fetch Number of "ideas" (note: NOT purchased items) for this person:
-            if (!authState.user || !authState.user.uid || !personData.id) { return } // Guard Clause
-            try {
-                const count = await fetchGiftIdeasCount(authState.user.uid, personData.id);
-                setGiftIdeasCount(count);
-            } catch (error) {
-                console.error('Error fetching number of gift ideas for person. Error:', error);
-            }
         }
+
         fetchPersonData();
     }, [personId, people, authState.user?.uid]);
 
-    // Firestore Lister For Person Gift Items
+    // Firestore Listener For Gift Items For Specific Person
     useEffect(() => {
-        if (!authState.user || !person.id) { return }; // Guard
+        if (!authState.user || !personId) { return }; // Guard
 
-        const collRef = getPersonGiftItemsCollRef(authState.user?.uid, person.id);
+        const collRef = getGiftItemsCollRef(authState.user.uid);
+        const q = query(collRef, where('personId', '==', personId));
 
-        const unsubscribe = onSnapshot(collRef, (snapshot) => {
+        const unsubscribe = onSnapshot(q, (snapshot) => {
             const items = snapshot.docs.map(doc => {
                 const data = doc.data() as GiftItem;
                 return data
@@ -72,11 +68,10 @@ export function PersonPage() {
             setGiftItems(items);
         }, (error) => {
             console.error('Error listening to gift items. Error:', error);
-
         });
 
         return () => unsubscribe();
-    }, [authState.user, person])
+    }, [authState.user, personId])
 
     const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -249,30 +244,4 @@ export function PersonPage() {
             </div>
         </section>
     )
-}
-
-export async function fetchGiftIdeasCount (userId: string, personId: string) {
-    // Guard Clauses
-    if (!userId) {
-        console.error('Need authState.user to get item count');
-        return 0;
-    }
-
-    if (!personId) {
-        console.error('need personId')
-        return 0;
-    }
-
-    try {
-        const collRef = getPersonGiftItemsCollRef(userId, personId)
-        const q = query(collRef, where('status', '==', 'idea'))
-
-        const snapshot = await getCountFromServer(q);
-        const count = snapshot.data().count;
-
-        return count;
-    } catch (error) {
-        console.error('Error getting gift list ideas count. Error', error);
-        return 0;
-    }
 }
