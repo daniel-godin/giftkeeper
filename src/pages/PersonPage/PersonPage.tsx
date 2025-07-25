@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getPersonDocRef, getGiftItemsCollRef } from '../../firebase/firestore';
 import { onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
-import { formatFirestoreDate, getDaysUntilDate } from '../../utils';
+import { getDaysUntilDate } from '../../utils';
 import { db } from '../../firebase/firebase';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 import { useEvents } from '../../contexts/EventsContext';
@@ -16,6 +16,8 @@ import { GiftItem } from '../../types/GiftType';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
+import { ArrowLeft, Pencil } from 'lucide-react';
+import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 
 export function PersonPage() {
     const { authState } = useAuth();
@@ -32,6 +34,10 @@ export function PersonPage() {
     // State for managing changes to displayed data:
     const [formData, setFormData] = useState<Person>({ name: '' });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+
+    // State For EditPersonModal:
+    const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
+    const [editPersonModalData, setEditPersonModalData] = useState<Person>(DEFAULT_PERSON);
 
     const giftIdeasCount = useMemo(() => {
         return giftItems.filter(item => item.status === 'idea').length;
@@ -128,7 +134,35 @@ export function PersonPage() {
 
     return (
         <section className={styles.personPage}>
-            <form className={styles.personForm} onSubmit={handleSubmit} autoComplete='off'>
+
+            <header className={styles.personPageHeader}>
+                <Link to={`/people`} className='unstyled-link'>
+                    <ArrowLeft /> People
+                </Link>
+
+                {person && person.name && (
+                    <>
+                        <h3>{person.name}</h3>
+                        {person.relationship && (<span>({person.relationship})</span>)}
+                    </>
+                )}
+
+                {/* Edit Button. Opens editEventModal */}
+                <button 
+                    type='button'
+                    className={styles.editButton}
+                    onClick={() => { setEditPersonModalData(person || DEFAULT_PERSON); setIsEditPersonModalOpen(true); }}
+                >
+                    <Pencil /> Edit
+                </button>
+            </header>
+
+
+
+
+
+
+            {/* <form className={styles.personForm} onSubmit={handleSubmit} autoComplete='off'>
                 <div className={styles.navHeader}>
                     <Link to={`/people`} className={styles.backButton}>
                         ← People
@@ -170,7 +204,7 @@ export function PersonPage() {
                 </label>
 
                 <button type='submit' className={styles.button}>Edit Person</button>
-            </form>
+            </form> */}
 
             <div className={styles.personDataContainer}>
                 <div className={styles.quickStats}>
@@ -215,11 +249,6 @@ export function PersonPage() {
                     </div>
                 </div>
 
-                <div className={styles.sectionContainer}>
-                    <header className={styles.sectionHeader}>
-                        Gift Intelligence
-                    </header>
-                </div>
             </div>
 
             <div className={styles.giftItems}>
