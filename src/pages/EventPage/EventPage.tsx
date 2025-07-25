@@ -13,12 +13,14 @@ import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
-import { getAllGiftItemsCollGroupRef } from '../../firebase/firestore';
+import { getGiftItemsCollRef } from '../../firebase/firestore';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
 import { EditEventModal } from '../../components/modals/EditEventModal/EditEventModal';
 import { DEFAULT_EVENT } from '../../constants/defaultObjects';
+import { useAuth } from '../../contexts/AuthContext';
 
 export function EventPage() {
+    const { authState } = useAuth();
     const { eventId } = useParams();
     const deviceType = useViewport();
     const { events, loading: eventsLoading } = useEvents();
@@ -36,7 +38,7 @@ export function EventPage() {
     // Fetch Data For UI (event details)
     useEffect(() => {
         // Guard Clause -- Wait For Data Contexts To Load
-        if (!eventId || eventsLoading || peopleLoading) { return };
+        if (!authState.user || !eventId || eventsLoading || peopleLoading) { return };
 
         // Find Event In Events Context
         const eventDetails = events.find(event => event.id === eventId);
@@ -50,7 +52,7 @@ export function EventPage() {
 
         setGiftItemsLoading(true);
 
-        const q = query(getAllGiftItemsCollGroupRef(), where('eventId', '==', eventId))
+        const q = query(getGiftItemsCollRef(authState.user.uid), where('eventId', '==', eventId))
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const items = snapshot.docs.map(doc => {
                 const data = doc.data() as GiftItem;
@@ -65,7 +67,7 @@ export function EventPage() {
         });
 
         return () => unsubscribe();
-    }, [eventId, events, people])
+    }, [authState.user, eventId, events, people])
 
     // Budget Calculations: Event Budget, Total of Purchased Items, Difference Between Those Two.
     const budgetCalculations = useMemo(() => {
