@@ -34,7 +34,7 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
             })
             setIsSubmitting(false);
         }
-    }, [isOpen])
+    }, [isOpen, data])
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
