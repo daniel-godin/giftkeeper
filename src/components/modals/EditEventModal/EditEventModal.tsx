@@ -4,7 +4,7 @@ import { Event } from '../../../types/EventType';
 import { BaseModal } from '../BaseModal/BaseModal'
 import styles from './EditEventModal.module.css'
 import { X } from 'lucide-react';
-import { FormCheckbox, FormInput, FormPeopleSelector } from '../../ui';
+import { FormInput, FormPeopleSelector, FormTextArea } from '../../ui';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { getEventDocRef } from '../../../firebase/firestore';
 import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
@@ -24,15 +24,19 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
     const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+    // Makes sure state is cleared and then populated with appropriate data.
     useEffect(() => {
         if (isOpen) {
             setStatus('');
-            setFormData(data); // Make sure data is loaded into formData.
+            setFormData({
+                ...DEFAULT_EVENT,
+                ...data
+            })
             setIsSubmitting(false);
         }
     }, [isOpen])
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -86,18 +90,14 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                 title: formData.title,
                 people: formData.people,
                 date: formData.date,
-                // type: formData.type,
-                // recurring: formData.recurring,
                 budget: formData.budget,
-                // notes: formData.notes,
+                notes: formData.notes,
 
                 // Metadata
                 updatedAt: serverTimestamp()
             }
 
             updateDoc(eventDocRef, eventDocumentData);
-
-            console.log('Successfully updated event document');
 
             setTimeout(() => {
                 onClose();
@@ -114,7 +114,7 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
     // Resets All State In Modal
     const resetModal = () => {
         setStatus('');
-        // setFormData(defaultFormValues);
+        setFormData(DEFAULT_EVENT);
         setIsSubmitting(false);
     }
 
@@ -173,20 +173,19 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                         onChange={handleBudgetChange}
                     />
 
-
                     {/* Notes About Event */}
+                    <FormTextArea
+                        label='Notes:'
+                        name='notes'
+                        required={false}
+                        disabled={isSubmitting}
+                        value={formData.notes}
+                        onChange={handleInputChange}
+                    />
 
-
-
-                    {/* Type of Event (Birthday, Holiday, Anniversary, etc.) */}
-
-
-
-                    {/* Recurring Event?  Boolean */}
-
-                    
                     <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Updating Event...</>) : (<>Update Event</>)}</button>
 
+                    {status && <span>{status}</span>}
                 </form>
             </div>
         </BaseModal>
