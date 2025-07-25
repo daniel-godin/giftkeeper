@@ -33,7 +33,7 @@ export function EventPage() {
 
     // State For EditEventModal:
     const [isEditEventModalOpen, setIsEditEventModalOpen] = useState<boolean>(false);
-    const [editEventModalData, setEditEventModalData] = useState<Event>(DEFAULT_EVENT)
+    const [editEventModalData, setEditEventModalData] = useState<Event>(DEFAULT_EVENT);
 
     // Fetch Data For UI (event details)
     useEffect(() => {
@@ -85,7 +85,6 @@ export function EventPage() {
     }, [giftItems, event?.budget])
 
     return (
-        // Can I / Should I do an {event && ()} at the top? or ? : ('Event Not Found')
         <section className={styles.eventPage}>
             <header className={styles.eventPageHeader}>
                 <Link to={`/events`} className='unstyled-link'>
