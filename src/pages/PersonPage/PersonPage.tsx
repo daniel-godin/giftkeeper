@@ -2,14 +2,12 @@ import { Link, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getPersonDocRef, getGiftItemsCollRef } from '../../firebase/firestore';
-import { onSnapshot, query, serverTimestamp, where, writeBatch } from 'firebase/firestore';
+import { getGiftItemsCollRef } from '../../firebase/firestore';
+import { onSnapshot, query, where } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { getDaysUntilDate } from '../../utils';
-import { db } from '../../firebase/firebase';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 import { useEvents } from '../../contexts/EventsContext';
-import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
 import { usePeople } from '../../contexts/PeopleContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
 import { GiftItem } from '../../types/GiftType';
@@ -18,6 +16,7 @@ import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { DEFAULT_PERSON } from '../../constants/defaultObjects';
+import { EditPersonModal } from '../../components/modals/EditPersonModal/EditPersonModal';
 
 export function PersonPage() {
     const { authState } = useAuth();
@@ -26,14 +25,9 @@ export function PersonPage() {
     const { people, loading: peopleLoading } = usePeople();
     const { events, loading: eventsLoading } = useEvents();
     const upcomingEvents = useUpcomingEvents(personId);
-    const { syncBirthdayEvent } = useBirthdayEventManager();
 
     const [person, setPerson] = useState<Person>({ name: '' });
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
-
-    // State for managing changes to displayed data:
-    const [formData, setFormData] = useState<Person>({ name: '' });
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     // State For EditPersonModal:
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
@@ -52,7 +46,6 @@ export function PersonPage() {
             if (!personData) { return }; // Guard Clause -- If no person found exit out.
             // TODO:  Display some kind of message to user in UI that no person found with that ID.
             setPerson(personData);
-            setFormData(personData);
         }
 
         fetchPersonData();
@@ -79,55 +72,6 @@ export function PersonPage() {
         return () => unsubscribe();
     }, [authState.user, personId])
 
-    const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        })
-    }
-
-    const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        })
-    }
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-    
-        if (!authState.user || !personId) return;
-
-        // If birthdayChanged or nameChanged... means the birthday Event should be created or updated.
-        const birthdayChanged = person.birthday !== formData.birthday;
-        const nameChanged = person.name !== formData.name;
-
-        setIsSubmitting(true);
-        try {
-            // Need writeBatch to sync person document & birthday event document.
-            const batch = writeBatch(db);
-            const personDocRef = getPersonDocRef(authState.user.uid, personId);
-
-            if ((birthdayChanged || nameChanged) && formData.birthday && formData.name) {
-                await syncBirthdayEvent(personId, formData.name, formData.birthday, batch)
-            };
-            
-            // Always update person
-            batch.update(personDocRef, {
-                ...formData,
-                updatedAt: serverTimestamp()
-            })
-
-            await batch.commit()
-        } catch (error) {
-            console.error('Error updating person:', error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    }
-
     if (peopleLoading) {
         return <div>Loading Person...</div>
     }
@@ -141,10 +85,7 @@ export function PersonPage() {
                 </Link>
 
                 {person && person.name && (
-                    <>
-                        <h3>{person.name}</h3>
-                        {person.relationship && (<span>({person.relationship})</span>)}
-                    </>
+                    <h3>{person.name} {person.relationship && (`(${person.relationship})`)}</h3>
                 )}
 
                 {/* Edit Button. Opens editEventModal */}
@@ -156,55 +97,6 @@ export function PersonPage() {
                     <Pencil /> Edit
                 </button>
             </header>
-
-
-
-
-
-
-            {/* <form className={styles.personForm} onSubmit={handleSubmit} autoComplete='off'>
-                <div className={styles.navHeader}>
-                    <Link to={`/people`} className={styles.backButton}>
-                        ← People
-                    </Link>
-                    {person.createdAt && (
-                        <p>Created On: {formatFirestoreDate(person.createdAt, 'long')}</p>
-                    )}
-                </div>
-
-                {person.name ? ( 
-                    // Probably put "Editable Title" here later.
-                    <h2>{person.name}</h2> 
-                ) : ( 
-                    <h3>Unknown Name</h3> 
-                )}
-
-                <label className={styles.label}>Relationship
-                    <input
-                        className={styles.input}
-                        type='text'
-                        name='relationship'
-                        required={false}
-                        value={formData.relationship || ''}
-                        disabled={isSubmitting}
-                        onChange={handleTextInputChange}
-                    />
-                </label>
-                    
-                <label className={styles.label}>Birthday
-                    <input
-                        className={styles.input}
-                        type='date'
-                        name='birthday'
-                        required={false}
-                        value={formData.birthday || ''}
-                        disabled={isSubmitting}
-                        onChange={handleDateInputChange}
-                    />
-                </label>
-
-                <button type='submit' className={styles.button}>Edit Person</button>
-            </form> */}
 
             <div className={styles.personDataContainer}>
                 <div className={styles.quickStats}>
@@ -271,6 +163,12 @@ export function PersonPage() {
                 )}
                 {deviceType === 'desktop' && ( <GiftItemsTable data={giftItems} /> )}         
             </div>
+
+            <EditPersonModal
+                isOpen={isEditPersonModalOpen}
+                onClose={() => setIsEditPersonModalOpen(false)}
+                data={editPersonModalData}
+            />
         </section>
     )
 }
