@@ -7,12 +7,8 @@ import { Layout } from "./layouts/Layout";
 import { ProfilePage } from "./pages/ProfilePage/ProfilePage";
 import { PeoplePage } from "./pages/PeoplePage/PeoplePage";
 import { EventsPage } from "./pages/EventsPage/EventsPage";
-import { GiftListsPage } from "./pages/GiftListsPage/GiftListsPage";
-import { WishListsPage } from "./pages/WishListsPage/WishListsPage";
 import { PersonPage } from "./pages/PersonPage/PersonPage";
 import { EventPage } from "./pages/EventPage/EventPage";
-import { GiftListPage } from "./pages/GiftListPage/GiftListPage";
-import { WishListPage } from "./pages/WishListPage/WishListPage";
 import { DataProvider } from "./contexts/DataProvider";
 
 export function App() {
