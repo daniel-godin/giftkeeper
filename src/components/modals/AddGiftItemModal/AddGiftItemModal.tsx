@@ -145,7 +145,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
             let finalPersonId: string;
 
-            // Create New Person & New GiftList -- Both Will Be Needed For New GiftItem
+            // Create New Person & New Person (if needed) -- Both Will Be Needed For New GiftItem
             if (showCreateNewPerson) {
                 const newPersonDocRef = doc(getPeopleCollRef(authState.user.uid));
                 finalPersonId = newPersonDocRef.id;
