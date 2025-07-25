@@ -1,6 +1,6 @@
 // Each Helper Function Returns a Document/Collection REFERENCE, not the document/collection data itself.
 
-import { collection, collectionGroup, doc } from "firebase/firestore"
+import { collection, doc } from "firebase/firestore"
 import { db } from "./firebase";
 
 // =============================================================================
@@ -24,10 +24,5 @@ export const getEventDocRef = (userId: string, eventId: string) => doc(db, 'user
 // =============================================================================
 // Gift Item References
 // =============================================================================
-export const getPersonGiftItemsCollRef = (userId: string, personId: string) => collection(db, 'users', userId, 'people', personId, 'giftItems');
-export const getPersonGiftItemDocRef = (userId: string, personId: string, itemId: string) => doc(db, 'users', userId, 'people', personId, 'giftItems', itemId);
-
-// =============================================================================
-// Gift Item Collection Group Queries
-// =============================================================================
-export const getAllGiftItemsCollGroupRef = () => collectionGroup(db, 'giftItems');
+export const getGiftItemsCollRef = (userId: string) => collection(db, 'users', userId, 'giftItems');
+export const getGiftItemDocRef = (userId: string, giftItemId: string) => doc(db, 'users', userId, 'giftItems', giftItemId);
