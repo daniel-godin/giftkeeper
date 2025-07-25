@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext"
 import { Event } from "../types/EventType";
 import { useUpcomingEvents } from "./useUpcomingEvents";
 import { getEventDocRef, getEventsCollRef } from "../firebase/firestore";
+import { DEFAULT_EVENT } from "../constants/defaultObjects";
 
 export const useBirthdayEventManager = () => {
     const { authState } = useAuth();
@@ -39,6 +40,7 @@ export const useBirthdayEventManager = () => {
 
             const newDocRef = doc(getEventsCollRef(userId));
             const data: Event = {
+                ...DEFAULT_EVENT,
                 id: newDocRef.id,
                 title: `${personName}'s Birthday`,
                 date: nextBirthday,
