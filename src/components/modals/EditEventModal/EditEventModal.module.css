@@ -19,7 +19,7 @@
 }
 
 @media (min-width: 768px) {
-    .addGiftItemModal {
+    .editEventModal {
         width: 50dvw;
         min-width: 400px;
     }
