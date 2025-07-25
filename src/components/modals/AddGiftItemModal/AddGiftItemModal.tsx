@@ -4,7 +4,7 @@ import { useAuth } from "../../../contexts/AuthContext";
 import { GiftItem } from "../../../types/GiftType";
 import { BaseModal } from "../BaseModal/BaseModal";
 import { X } from 'lucide-react';
-import { getPersonGiftItemsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
+import { getGiftItemsCollRef, getPeopleCollRef } from '../../../firebase/firestore';
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
@@ -141,7 +141,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
         setStatus('Adding New Gift Item...');
 
         try {
-            const batch = writeBatch(db); // Using batch to create GiftItem document & *update* parent GiftList updatedAt.
+            const batch = writeBatch(db); // Using Batch for a possible GiftItem + New Person combo.
 
             let finalPersonId: string;
 
@@ -166,7 +166,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 finalPersonId = formData.personId;
             }
 
-            const newDocRef = doc(getPersonGiftItemsCollRef(authState.user.uid, finalPersonId));
+            const newDocRef = doc(getGiftItemsCollRef(authState.user.uid));
             const newDocumentData: GiftItem = {
                 id: newDocRef.id,
                 name: formData.name,
@@ -237,7 +237,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                         />
                     </label>
 
-                    {/* Selecting "person" gives personId, personName, AND ***giftListId*** (which is needed for storing Gift Item Location) */}
+                    {/* Select Person */}
                     <label className={styles.label}>Select Gift Recipient: *
                         <select
                             name='person'
