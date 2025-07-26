@@ -8,99 +8,90 @@ import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { getPeopleCollRef } from '../../../firebase/firestore';
 import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager';
+import { DEFAULT_PERSON } from '../../../constants/defaultObjects';
+import { FormInput, FormTextArea } from '../../ui';
+import { useNavigate } from 'react-router';
 
-interface AddPersonalModalProps {
+interface AddPersonModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
-export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
+export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
     const { authState } = useAuth();
     const { syncBirthdayEvent } = useBirthdayEventManager();
+    const navigate = useNavigate();
 
     const [status, setStatus] = useState<string>('');
-    const [formData, setFormData] = useState<Person>({ name: '', birthday: '' });
+    const [formData, setFormData] = useState<Person>(DEFAULT_PERSON);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
+    const [showOptionalFields, setShowOptionalFields] = useState<boolean>(false);
+
     useEffect(() => {
-        if (isOpen) {
-            setFormData({ name: '', birthday: '' })
-            setStatus('');
-        }
+        if (isOpen) { resetModal(); } // onOpen... Reset Modal To Empty State
     }, [isOpen])
 
-    const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setFormData(prev => ({
+            ...prev,
             [name]: value
-        })
-    }
-
-    // For now, handleTextInputChange works the same as handleDateInputChange.  Later will use a custom Date object most likely.  For now it's just a now ISO string "yyyy-mm-dd".
-    const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        })
+        }))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Guard Clauses:
-        if (!authState.user) { 
-            console.error('Cannot add new person without being logged in.');
-            return;
-        }
-
-        if (!formData.name.trim()) {
-            setStatus('Name is required');
-            return;
-        }
+        if (!authState.user) { return }; // Guard Clause
+        if (!formData.name.trim()) { return }; // Form Validation / Guard Clause
 
         setIsSubmitting(true);
         setStatus('Adding New Person...');
 
         try {
             const batch = writeBatch(db);
-
-            const personRef = doc(getPeopleCollRef(authState.user.uid));
-
-            const personData: Person = {
-                id: personRef.id,
-                name: formData.name,
-                birthday: formData.birthday || '',
+            const newDocRef = doc(getPeopleCollRef(authState.user.uid));
+            const newDocData: Person = {
+                ...DEFAULT_PERSON,
+                ...formData,
 
                 // Metadata
+                id: newDocRef.id,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
 
-            batch.set(personRef, personData);
+            batch.set(newDocRef, newDocData);
 
-            // Possibly change this to have an optional "batch".
             // If birthday has been added.  Create an event of type "birthday" for person.
             if (formData.birthday) {
-                await syncBirthdayEvent(personRef.id, formData.name, formData.birthday, batch)
+                setStatus('Creating Birthday Event...');
+                await syncBirthdayEvent(newDocRef.id, formData.name, formData.birthday, batch)
             }
 
             await batch.commit();
 
-            setStatus('New Person Added!! Closing in 2 seconds...');
-            setFormData({ name: '' });
+            setStatus('New Person Added!!');
 
             setTimeout(() => {
                 onClose();
-            }, 2000);
+                resetModal();
+                navigate(`/people/${newDocRef.id}`)
+            }, 500);
 
         } catch (error) {
             console.error('Error Adding New Person. Error:', error);
             setStatus('Error Adding New Person');
-        } finally {
             setIsSubmitting(false);
         }
+    }
+
+    const resetModal = () => {
+        setStatus('');
+        setFormData(DEFAULT_PERSON);
+        setIsSubmitting(false);
+        setShowOptionalFields(false);
     }
 
     return (
@@ -114,27 +105,64 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonalModalProps) {
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
-                    <label className={styles.label}>Name:
-                        <input
-                            className={styles.input}
-                            type='text'
-                            name='name'
-                            required={true}
-                            value={formData.name || ''}
-                            onChange={handleTextInputChange}
-                        />
-                    </label>
 
-                    <label className={styles.label}>Birthday:
-                        <input
-                            className={styles.input}
-                            type='date'
-                            name='birthday'
+                    {/* Person Name: */}
+                    <FormInput
+                        label='Name:'
+                        type='text'
+                        name='name'
+                        required={true}
+                        disabled={isSubmitting}
+                        value={formData.name}
+                        onChange={handleInputChange}
+                    />
+
+                    {/* Birthday: (optional, but encouraged) */}
+                    <FormInput
+                        label='Birthday:'
+                        type='date'
+                        name='birthday'
+                        required={false}
+                        disabled={isSubmitting}
+                        value={formData.birthday}
+                        onChange={handleInputChange}
+                    />
+
+                    {/* Show/Hide Optional Input Fields Toggle */}
+                    {showOptionalFields ? (
+                        <p className={styles.showOptionalFieldsText} onClick={() => setShowOptionalFields(false)}>
+                            Hide Optional Fields
+                        </p>
+                    ) : (
+                        <p className={styles.showOptionalFieldsText} onClick={() => setShowOptionalFields(true)}>
+                            Show Optional Fields
+                        </p>
+                    )}
+
+                    {/* Relationship (optional) */}
+                    {showOptionalFields && (
+                        <FormInput
+                            label='Relationship:'
+                            type='text'
+                            name='relationship'
                             required={false}
-                            value={formData.birthday || ''}
-                            onChange={handleDateInputChange}
+                            disabled={isSubmitting}
+                            value={formData.relationship}
+                            onChange={handleInputChange}
                         />
-                    </label>
+                    )}
+
+                    {/* Person Notes (optional) */}
+                    {showOptionalFields && (
+                        <FormTextArea
+                            label='Notes:'
+                            name='notes'
+                            required={false}
+                            disabled={isSubmitting}
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                        />
+                    )}
 
                     <output>
                         {status}
