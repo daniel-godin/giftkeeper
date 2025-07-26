@@ -2,7 +2,8 @@
     margin: 0;
     padding: 1rem;
 
-    height: 50dvh;
+    min-height: auto;
+    max-height: 85dvh;
     width: 50dvw;
     min-width: 300px;
 
@@ -76,4 +77,20 @@
 .checkboxLabel {
     display: flex;
     gap: 0.5rem;
+}
+
+.showOptionalFieldsText {
+    color: #007bff;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 6px;
+    
+    transition: all 0.2s ease;
+}
+
+.showOptionalFieldsText:hover {
+    background-color: #f8f9fa;
+    text-decoration: underline;
 }
