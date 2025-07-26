@@ -153,6 +153,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                         legendText='Select People for this Event:'
                         people={people}
                         selectedPeopleIds={formData.people}
+                        required={true}
                         disabled={isSubmitting}
                         onChange={handlePersonCheckboxChange}
                         allowCreateNewPerson={true}

@@ -12,6 +12,7 @@ interface FormPeopleSelectorProps {
     legendText?: string;
     people?: Person[];
     selectedPeopleIds?: string[];
+    required?: boolean; // NOTE THAT THIS DOES NOT WORK LIKE <input required="true">. Needs manual validation.
     disabled?: boolean;
     onChange: (personId: string, checked: boolean) => void;
     allowCreateNewPerson?: boolean;
@@ -22,6 +23,7 @@ export function FormPeopleSelector({
     legendText = 'Select People:',
     people = [],
     selectedPeopleIds = [],
+    required = false,
     disabled = false,
     onChange,
     allowCreateNewPerson = false,
@@ -89,7 +91,7 @@ export function FormPeopleSelector({
 
     return (
         <fieldset className={styles.fieldset}>
-            <legend className={styles.legend}>{legendText}</legend>
+            <legend className={styles.legend}>{legendText} {required && (<span className={styles.required}>*</span>)}</legend>
 
             {people.map(person => (
                 <FormCheckbox
