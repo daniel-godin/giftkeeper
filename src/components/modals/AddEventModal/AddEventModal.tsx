@@ -24,7 +24,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-    
+
     const [showOptionalFields, setShowOptionalFields] = useState<boolean>(false);
 
     useEffect(() => {
@@ -114,6 +114,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         setStatus('');
         setFormData(DEFAULT_EVENT);
         setIsSubmitting(false);
+        setShowOptionalFields(false);
     }
 
     return (
