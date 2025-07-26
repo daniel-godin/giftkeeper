@@ -9,6 +9,7 @@ import { X } from 'lucide-react';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
 import { FormPeopleSelector } from '../../ui';
+import { useNavigate } from 'react-router';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -18,6 +19,7 @@ interface AddEventModalProps {
 export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
     const { authState } = useAuth();
     const { people } = usePeople();
+    const navigate = useNavigate();
 
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
@@ -25,8 +27,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
 
     useEffect(() => {
         if (isOpen) {
-            setFormData(DEFAULT_EVENT)
-            setStatus('');
+            resetModal(); // Resets to default empty modal.
         }
     }, [isOpen])
 
@@ -103,12 +104,13 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
 
             await setDoc(newDocRef, newEventObject);
 
-            setStatus('New Event Added!! Closing in 2 seconds...');
-            setFormData({ title: '', date: '', people: [] });
+            setStatus('New Event Added!!');
 
             setTimeout(() => {
-                onClose();
-            }, 2000);
+                // onClose(); // Do I even need the onClose since I'm navigating away?  This should de-mount the component.
+                resetModal();
+                navigate(`/events/${newDocRef.id}`);
+            }, 500);
 
         } catch (error) {
             console.error('Error Adding New Event. Error:', error);
@@ -116,6 +118,12 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         } finally {
             setIsSubmitting(false);
         }
+    }
+
+    const resetModal = () => {
+        setStatus('');
+        setFormData(DEFAULT_EVENT);
+        setIsSubmitting(false);
     }
 
     return (
