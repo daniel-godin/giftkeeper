@@ -10,7 +10,7 @@
     border-bottom: 1px solid black;
 
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: 125px 1fr 125px;
     align-items: center;
     justify-items: center;
     gap: 0.5rem;
@@ -18,6 +18,14 @@
 
 .topNav, .middleContainer {
     width: 100%;
+}
+
+.logo {
+    justify-self: start;
+}
+
+.profileIcon {
+    justify-self: end;
 }
 
 .navList {
