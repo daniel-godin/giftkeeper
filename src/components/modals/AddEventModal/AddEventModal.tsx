@@ -2,14 +2,14 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../../../contexts/AuthContext';
 import styles from './AddEventModal.module.css'
 import { Event } from '../../../types/EventType';
-import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { db } from '../../../firebase/firebase';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
-import { FormInput, FormPeopleSelector } from '../../ui';
+import { FormInput, FormPeopleSelector, FormTextArea } from '../../ui';
 import { useNavigate } from 'react-router';
+import { getEventsCollRef } from '../../../firebase/firestore';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -24,6 +24,8 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [showOptionalFields, setShowOptionalFields] = useState<boolean>(false);
+
 
     useEffect(() => {
         if (isOpen) {
@@ -55,50 +57,47 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         }
     }
 
+    const handleBudgetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        const numValue = parseFloat(value) || 0; // Converts HTML Input Element From String to Number
+
+        // Allow empty string for better UX
+        if (value === '') { setFormData(prev => ({ ...prev, [name]: 0 })); return};
+
+        // Prevent Negative Number, but still update
+        const sanitizedValue = Math.max(0, numValue); // Returns larger between the two, so... if negative, returns 0.
+        setFormData(prev => ({
+            ...prev,
+            [name]: Math.round(sanitizedValue * 100) // Convert to cents
+        }))
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Guard Clauses:
-        if (!authState.user) { 
-            console.error('Cannot add new event without being logged in.');
-            return;
-        }
-
-        if (!formData.title.trim()) {
-            setStatus('Title is required');
-            setIsSubmitting(false);
-            return;
-        }
-
-        if (formData.people.length === 0) {
-            setStatus('Please select at least one person');
-            setIsSubmitting(false);
-            return;
-        }
+        if (!authState.user) { return }; // Guard Clause
+        if (!formData.title.trim() || !formData.date || formData.people.length === 0) { return }; // Form Validation Guard Clause
 
         setIsSubmitting(true);
         setStatus('Adding New Event...');
 
         try {
-            const newDocRef = doc(collection(db, 'users', authState.user.uid, 'events'));
-
-            const newEventObject: Event = {
-                id: newDocRef.id,
-                title: formData.title,
-                date: formData.date || '',
-                people: formData.people,
+            const newDocRef = doc(getEventsCollRef(authState.user.uid));
+            const newDocumentData: Event = {
+                ...DEFAULT_EVENT,
+                ...formData,
 
                 // Metadata
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
 
-            await setDoc(newDocRef, newEventObject);
+            await setDoc(newDocRef, newDocumentData);
 
             setStatus('New Event Added!!');
 
             setTimeout(() => {
-                // onClose(); // Do I even need the onClose since I'm navigating away?  This should de-mount the component.
+                onClose();
                 resetModal();
                 navigate(`/events/${newDocRef.id}`);
             }, 500);
@@ -106,7 +105,6 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         } catch (error) {
             console.error('Error Adding New Event. Error:', error);
             setStatus('Error Adding New Event');
-        } finally {
             setIsSubmitting(false);
         }
     }
@@ -159,6 +157,45 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                         onChange={handlePersonCheckboxChange}
                         allowCreateNewPerson={true}
                     />
+
+                    {/* Show/Hide Optional Input Fields Toggle */}
+                    {showOptionalFields ? (
+                        <p className={styles.showOptionalFieldsText} onClick={() => setShowOptionalFields(false)}>
+                            Hide Optional Fields
+                        </p>
+                    ) : (
+                        <p className={styles.showOptionalFieldsText} onClick={() => setShowOptionalFields(true)}>
+                            Show Optional Fields
+                        </p>
+                    )}
+
+                    {/* Event Gift Budget (optional) */}
+                    {showOptionalFields && (
+                        <FormInput
+                            label='Event Budget (total):'
+                            type='number'
+                            name='budget'
+                            placeholder='$0.00'
+                            min='0'
+                            step='0.01'
+                            required={false}
+                            disabled={isSubmitting}
+                            value={formData.budget ? formData.budget / 100 : ''}
+                            onChange={handleBudgetChange}
+                        />
+                    )}
+
+                    {/* Event Notes (optional) */}
+                    {showOptionalFields && (
+                        <FormTextArea
+                            label='Notes:'
+                            name='notes'
+                            required={false}
+                            disabled={isSubmitting}
+                            value={formData.notes}
+                            onChange={handleInputChange}
+                        />
+                    )}
 
                     <output>
                         {status}
