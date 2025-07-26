@@ -88,6 +88,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                 ...formData,
 
                 // Metadata
+                id: newDocRef.id,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
