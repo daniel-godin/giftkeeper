@@ -87,11 +87,8 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
         try {
             const eventDocRef = getEventDocRef(authState.user.uid, data.id);
             const eventDocumentData: UpdateData<Event> = {
-                title: formData.title,
-                people: formData.people,
-                date: formData.date,
-                budget: formData.budget,
-                notes: formData.notes,
+                ...DEFAULT_EVENT,
+                ...formData,
 
                 // Metadata
                 updatedAt: serverTimestamp()
