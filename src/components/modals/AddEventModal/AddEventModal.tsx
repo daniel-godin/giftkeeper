@@ -8,7 +8,7 @@ import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
-import { FormPeopleSelector } from '../../ui';
+import { FormInput, FormPeopleSelector } from '../../ui';
 import { useNavigate } from 'react-router';
 
 interface AddEventModalProps {
@@ -29,23 +29,14 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         if (isOpen) {
             resetModal(); // Resets to default empty modal.
         }
-    }, [isOpen])
+    }, [isOpen]);
 
-    const handleTextInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
+        setFormData(prev => ({
+            ...prev,
             [name]: value
-        })
-    }
-
-    // For now, handleTextInputChange works the same as handleDateInputChange.  Later will use a custom Date object most likely.  For now it's just a now ISO string "yyyy-mm-dd".
-    const handleDateInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        })
+        }))
     }
 
     const handlePersonCheckboxChange = (personId: string, checkedStatus: boolean) => {
@@ -137,28 +128,29 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
-                    <label className={styles.label}>Event Title:
-                        <input
-                            className={styles.input}
-                            type='text'
-                            name='title'
-                            required={true}
-                            value={formData.title}
-                            onChange={handleTextInputChange}
-                        />
-                    </label>
+                    {/* Event Title: */}
+                    <FormInput
+                        label='Event Title:'
+                        type='text'
+                        name='title'
+                        required={true}
+                        disabled={isSubmitting}
+                        value={formData.title}
+                        onChange={handleInputChange}
+                    />
 
-                    <label className={styles.label}>Event Date:
-                        <input
-                            className={styles.input}
-                            type='date'
-                            name='date'
-                            required={false}
-                            value={formData.date}
-                            onChange={handleDateInputChange}
-                        />
-                    </label>
+                    {/* Event Date: */}
+                    <FormInput
+                        label='Date of Event:'
+                        type='date'
+                        name='date'
+                        required={true}
+                        disabled={isSubmitting}
+                        value={formData.date}
+                        onChange={handleInputChange}
+                    />
 
+                    {/* People To Buy Gifts For At This Event */}
                     <FormPeopleSelector
                         legendText='Select People for this Event:'
                         people={people}
