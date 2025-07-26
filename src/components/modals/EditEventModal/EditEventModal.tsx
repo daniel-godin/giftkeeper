@@ -155,6 +155,7 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                     <FormPeopleSelector
                         people={people}
                         selectedPeopleIds={formData.people}
+                        disabled={isSubmitting}
                         onChange={handlePersonCheckboxChange}
                         allowCreateNewPerson={true}
                     />
