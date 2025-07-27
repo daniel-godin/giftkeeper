@@ -7,7 +7,7 @@ import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
-import { FormInput, FormPeopleSelector, FormTextArea } from '../../ui';
+import { FormInput, FormPeopleSelector, FormSubmitButton, FormTextArea } from '../../ui';
 import { useNavigate } from 'react-router';
 import { getEventsCollRef } from '../../../firebase/firestore';
 import { isValidEventDate } from '../../../utils';
@@ -211,7 +211,12 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                         {status}
                     </output>
 
-                    <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Adding New Event...</>) : (<>Add New Event</>)}</button>
+                    <FormSubmitButton
+                        text='Add New Event'
+                        isSubmitting={isSubmitting}
+                        submittingText='Adding New Event...'
+                        disabled={!formData.title.trim() || !formData.date || formData.people.length === 0}
+                    />
                 </form>
             </div>
         </BaseModal>
