@@ -105,9 +105,8 @@ export function Onboarding() {
                     onChange={handleInputChange}
                 />
 
-                <output>
-                    {status}
-                </output>
+                {/* Outputs Status Messages */}
+                <output>{status}</output>
         
                 <FormSubmitButton
                     text='Add Your First Person'

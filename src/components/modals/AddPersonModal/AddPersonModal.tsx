@@ -168,9 +168,8 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
                         />
                     )}
 
-                    <output>
-                        {status}
-                    </output>
+                    {/* Outputs Status Messages */}
+                    <output>{status}</output>
 
                     <FormSubmitButton
                         text='Add New Person'

@@ -207,9 +207,8 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                         />
                     )}
 
-                    <output>
-                        {status}
-                    </output>
+                    {/* Outputs Status Messages */}
+                    <output>{status}</output>
 
                     <FormSubmitButton
                         text='Add New Event'

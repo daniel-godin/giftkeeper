@@ -8,7 +8,7 @@ import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
 import { getGiftItemDocRef } from '../../../firebase/firestore';
 import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
-import { FormInput, FormSelect } from '../../ui';
+import { FormInput, FormSelect, FormSubmitButton } from '../../ui';
 import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
 
 interface EditGiftItemModalProps {
@@ -201,11 +201,15 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                         onChange={handleInputChange}
                     />
 
-                    <output>
-                        {status}
-                    </output>
+                    {/* Outputs Status Messages */}
+                    <output>{status}</output>
 
-                    <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Editing Gift Item...</>) : (<>Edit Gift Item</>)}</button>
+                    <FormSubmitButton
+                        text='Edit Gift Item'
+                        isSubmitting={isSubmitting}
+                        submittingText='Editing Gift Item...'
+                        disabled={!formData.name.trim() || !formData.personId || !formData.status}
+                    />
                 </form>
             </div>
         </BaseModal>

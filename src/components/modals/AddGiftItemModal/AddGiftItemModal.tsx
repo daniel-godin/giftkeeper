@@ -388,9 +388,8 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                         </>
                     )}
 
-                    <output>
-                        {status}
-                    </output>
+                    {/* Outputs Status Messages */}
+                    <output>{status}</output>
 
                     <FormSubmitButton
                         text='Add Gift Item'

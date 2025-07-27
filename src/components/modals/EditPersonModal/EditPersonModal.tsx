@@ -5,7 +5,7 @@ import { Person } from '../../../types/PersonType';
 import { DEFAULT_PERSON } from '../../../constants/defaultObjects';
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
-import { FormInput, FormTextArea } from '../../ui';
+import { FormInput, FormSubmitButton, FormTextArea } from '../../ui';
 import { getPersonDocRef } from '../../../firebase/firestore';
 import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
@@ -152,9 +152,15 @@ export function EditPersonModal({ isOpen, onClose, data } : EditPersonModalProps
                         onChange={handleInputChange}
                     />
 
-                    <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Updating Person...</>) : (<>Update Person</>)}</button>
+                    {/* Outputs Status Messages */}
+                    <output>{status}</output>
 
-                    {status && <span>{status}</span>}
+                    <FormSubmitButton
+                        text='Update Person'
+                        isSubmitting={isSubmitting}
+                        submittingText='Updating Person...'
+                        disabled={!formData.name.trim()}
+                    />
                 </form>
             </div>
         </BaseModal>

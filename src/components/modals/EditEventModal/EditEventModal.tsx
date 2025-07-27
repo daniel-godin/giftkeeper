@@ -181,7 +181,8 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                         onChange={handleInputChange}
                     />
 
-                    {status && <span>{status}</span>}
+                    {/* Outputs Status Messages */}
+                    <output>{status}</output>
 
                     <FormSubmitButton
                         text='Update Event'
