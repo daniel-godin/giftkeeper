@@ -11,6 +11,7 @@ import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager'
 import { DEFAULT_PERSON } from '../../../constants/defaultObjects';
 import { FormInput, FormTextArea } from '../../ui';
 import { useNavigate } from 'react-router';
+import { isValidBirthday } from '../../../utils';
 
 interface AddPersonModalProps {
     isOpen: boolean;
@@ -45,7 +46,11 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
 
         if (!authState.user) { return }; // Guard Clause
         if (!formData.name.trim()) { return }; // Form Validation / Guard Clause
-
+        if (formData.birthday && !isValidBirthday(formData.birthday)) { // Birthday Date Validation
+            setStatus('Invalid Birthday Date. Needs to be today or in the past'); 
+            return; 
+        }; 
+            
         setIsSubmitting(true);
         setStatus('Adding New Person...');
 
@@ -66,7 +71,6 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
 
             // If birthday has been added.  Create an event of type "birthday" for person.
             if (formData.birthday) {
-                setStatus('Creating Birthday Event...');
                 await syncBirthdayEvent(newDocRef.id, formData.name, formData.birthday, batch)
             }
 
