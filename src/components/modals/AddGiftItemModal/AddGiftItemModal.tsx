@@ -14,6 +14,7 @@ import { Person } from '../../../types/PersonType';
 import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
 import { useParams } from 'react-router';
 import { useEvents } from '../../../contexts/EventsContext';
+import { FormSubmitButton } from '../../ui';
 
 interface AddGiftItemModalProps {
     isOpen: boolean;
@@ -391,7 +392,12 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                         {status}
                     </output>
 
-                    <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Adding New Gift Item...</>) : (<>Add New Gift Item</>)}</button>
+                    <FormSubmitButton
+                        text='Add Gift Item'
+                        isSubmitting={isSubmitting}
+                        submittingText='Adding Gift Item...'
+                        disabled={!formData.name.trim() || !formData.personId || !formData.status}
+                    />
                 </form>
             </div>
         </BaseModal>
