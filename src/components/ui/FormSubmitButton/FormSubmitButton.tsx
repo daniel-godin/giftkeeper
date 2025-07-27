@@ -1,8 +1,28 @@
 import styles from './FormSubmitButton.module.css'
 
-export function FormSubmitButton() {
+interface FormSubmitButtonProps {
+    text: string;
+    isSubmitting?: boolean;
+    submittingText?: string;
+    disabled?: boolean;
+    buttonClassName?: string;
+}
+
+export function FormSubmitButton({
+    text,
+    isSubmitting = false,
+    submittingText,
+    disabled = false,
+    buttonClassName
+} : FormSubmitButtonProps) {
 
     return (
-        <>FormSubmitButton</>
+        <button
+            type='submit'
+            disabled={disabled || isSubmitting}
+            className={`${styles.submitButton} ${buttonClassName || ''}`}
+        >
+            {isSubmitting && submittingText ? submittingText : text}
+        </button>
     )
 }
