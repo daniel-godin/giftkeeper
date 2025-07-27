@@ -70,7 +70,7 @@ export function Onboarding() {
             setTimeout(() => {
                 navigate(`/people/${personDocRef.id}`)
             }, 150);
-            
+
         } catch (error) {
             console.error('Error Adding New Person. Error:', error);
             setStatus('Error Adding New Person');
@@ -112,7 +112,7 @@ export function Onboarding() {
                 <FormSubmitButton
                     text='Add Your First Person'
                     isSubmitting={isSubmitting}
-                    submittingText='Adding Your First Person'
+                    submittingText='Adding Person...'
                     disabled={!formData.name.trim()}
                 />
             </form>
