@@ -248,7 +248,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                         onChange={handleInputChange}
                     />
 
-                    {/* Select Person */}
+                    {/* Select Person  (Gift Recipient) */}
                     <label className={styles.label}>Select Gift Recipient: *
                         <select
                             name='person'
