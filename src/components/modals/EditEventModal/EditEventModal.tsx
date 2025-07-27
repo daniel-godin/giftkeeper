@@ -4,7 +4,7 @@ import { Event } from '../../../types/EventType';
 import { BaseModal } from '../BaseModal/BaseModal'
 import styles from './EditEventModal.module.css'
 import { X } from 'lucide-react';
-import { FormInput, FormPeopleSelector, FormTextArea } from '../../ui';
+import { FormInput, FormPeopleSelector, FormSubmitButton, FormTextArea } from '../../ui';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { getEventDocRef } from '../../../firebase/firestore';
 import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
@@ -181,9 +181,14 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                         onChange={handleInputChange}
                     />
 
-                    <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Updating Event...</>) : (<>Update Event</>)}</button>
-
                     {status && <span>{status}</span>}
+
+                    <FormSubmitButton
+                        text='Update Event'
+                        isSubmitting={isSubmitting}
+                        submittingText='Updating Event...'
+                        disabled={!formData.title.trim() || !formData.date || formData.people.length === 0}
+                    />
                 </form>
             </div>
         </BaseModal>
