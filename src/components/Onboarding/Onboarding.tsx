@@ -8,7 +8,7 @@ import { getPeopleCollRef } from '../../firebase/firestore';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
 import { useNavigate } from 'react-router';
 import { DEFAULT_PERSON } from '../../constants/defaultObjects';
-import { FormInput } from '../ui';
+import { FormInput, FormSubmitButton } from '../ui';
 import { isValidBirthday } from '../../utils';
 
 export function Onboarding() {
@@ -67,9 +67,10 @@ export function Onboarding() {
 
             await batch.commit();
 
-            // Do a setTimeout here???
-
-            navigate(`/people/${personDocRef.id}`)
+            setTimeout(() => {
+                navigate(`/people/${personDocRef.id}`)
+            }, 150);
+            
         } catch (error) {
             console.error('Error Adding New Person. Error:', error);
             setStatus('Error Adding New Person');
@@ -107,8 +108,13 @@ export function Onboarding() {
                 <output>
                     {status}
                 </output>
-                
-                <button className={styles.button} type='submit'>Add Your First Person</button>
+        
+                <FormSubmitButton
+                    text='Add Your First Person'
+                    isSubmitting={isSubmitting}
+                    submittingText='Adding Your First Person'
+                    disabled={!formData.name.trim()}
+                />
             </form>
         </section>
     )
