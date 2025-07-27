@@ -9,7 +9,7 @@ import { X } from 'lucide-react';
 import { getPeopleCollRef } from '../../../firebase/firestore';
 import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager';
 import { DEFAULT_PERSON } from '../../../constants/defaultObjects';
-import { FormInput, FormTextArea } from '../../ui';
+import { FormInput, FormSubmitButton, FormTextArea } from '../../ui';
 import { useNavigate } from 'react-router';
 import { isValidBirthday } from '../../../utils';
 
@@ -172,7 +172,12 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
                         {status}
                     </output>
 
-                    <button className={styles.submitButton} disabled={isSubmitting}>{isSubmitting ? (<>Adding New Person</>) : (<>Add New Person</>)}</button>
+                    <FormSubmitButton
+                        text='Add New Person'
+                        isSubmitting={isSubmitting}
+                        submittingText='Adding Person...'
+                        disabled={!formData.name.trim()}
+                    />
                 </form>
             </div>
         </BaseModal>
