@@ -10,6 +10,7 @@ import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 import { FormInput, FormSelect, FormSubmitButton } from '../../ui';
 import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
+import { sanitizeURL } from '../../../utils';
 
 interface EditGiftItemModalProps {
     isOpen: boolean;
@@ -87,7 +88,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                 // Status & Associations
                 status: formData.status,
                 eventId: formData.eventId,
-                url: validateURL(formData.url || ''),
+                url: sanitizeURL(formData.url || ''),
 
                 // // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
                 estimatedCost: formData.estimatedCost,
@@ -214,17 +215,4 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
             </div>
         </BaseModal>
     )
-}
-
-// Note:  This is very basic and quite permissive
-const validateURL = (url: string): string => {
-    if (!url) { return '' }; // Guard, if falsey, return empty string
-
-    try {
-        const urlToTest = url.startsWith('http') ? url : `http://${url}`;
-        new URL(urlToTest);
-        return urlToTest
-    } catch {
-        return ''; // Invalid URL
-    }
 }
