@@ -7,24 +7,17 @@ import { db } from '../../firebase/firebase';
 import { getPeopleCollRef } from '../../firebase/firestore';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
 import { useNavigate } from 'react-router';
+import { DEFAULT_PERSON } from '../../constants/defaultObjects';
+import { FormInput } from '../ui';
+import { isValidBirthday } from '../../utils';
 
 export function Onboarding() {
-
-    return (
-        <section className={styles.onboardingContainer}>
-            {/* Possibly conditional logic to add more items to Onboarding */}
-            <OnboardingPersonForm />
-        </section>
-    )
-}
-
-function OnboardingPersonForm() {
     const { authState } = useAuth();
     const { syncBirthdayEvent }= useBirthdayEventManager();
     const navigate = useNavigate();
 
     const [status, setStatus] = useState<string>('');
-    const [formData, setFormData] = useState<Person>({ name: '', birthday: '' });
+    const [formData, setFormData] = useState<Person>(DEFAULT_PERSON);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -38,84 +31,85 @@ function OnboardingPersonForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Guard Clauses:
-        if (!authState.user) { 
-            console.error('Cannot add new person without being logged in.');
-            setIsSubmitting(false);
+        if (!authState.user) { return }; // Auth Guard Clause
+        if (!formData.name.trim()) { // Form Validation
+            setStatus('Fill In All Required Fields');
             return;
-        }
-
-        if (!formData.name.trim()) {
-            setStatus('Name is required');
-            setIsSubmitting(false);
-            return;
-        }
+        };
+        if (formData.birthday && !isValidBirthday(formData.birthday)) { // Birthday Date Validation
+            setStatus('Invalid Birthday Date. Needs to be today or in the past'); 
+            return; 
+        }; 
 
         setIsSubmitting(true);
         setStatus('Adding New Person...');
 
         try {
             const batch = writeBatch(db);
-
-            const personRef = doc(getPeopleCollRef(authState.user.uid))
+            const personDocRef = doc(getPeopleCollRef(authState.user.uid))
 
             const personData: Person = {
-                id: personRef.id,
-                name: formData.name,
-                birthday: formData.birthday || '',
-
+                ...DEFAULT_PERSON,
+                ...formData,
+                
                 // Metadata
+                id: personDocRef.id,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             }
 
-            batch.set(personRef, personData);
+            batch.set(personDocRef, personData);
 
             if (formData.birthday) {
-                await syncBirthdayEvent(personRef.id, formData.name, formData.birthday, batch)
+                setStatus('Adding Birthday Event To Database...')
+                await syncBirthdayEvent(personDocRef.id, formData.name, formData.birthday, batch)
             }
 
             await batch.commit();
 
-            navigate(`/people/${personRef.id}`)
+            // Do a setTimeout here???
+
+            navigate(`/people/${personDocRef.id}`)
         } catch (error) {
             console.error('Error Adding New Person. Error:', error);
             setStatus('Error Adding New Person');
-        } finally {
             setIsSubmitting(false);
         }
     }
 
     return (
-        <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
-            <header className={styles.header}>Add Your First Person</header>
-            <label className={styles.label}>Name: *
-                <input
-                    className={styles.input}
+        <section className={styles.onboardingContainer}>
+            <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
+                <header className={styles.header}>Add Your First Person</header>
+
+                {/* Person Name: */}
+                <FormInput
+                    label='Name:'
                     type='text'
                     name='name'
                     required={true}
-                    value={formData.name}
                     disabled={isSubmitting}
+                    value={formData.name}
                     onChange={handleInputChange}
                 />
-            </label>
 
-            <label className={styles.label}>Birthdate (optional):
-                <input
-                    className={styles.input}
+                {/* Birthday: (optional, but encouraged) */}
+                <FormInput
+                    label='Birthday:'
                     type='date'
                     name='birthday'
                     required={false}
-                    value={formData.birthday}
                     disabled={isSubmitting}
+                    value={formData.birthday}
                     onChange={handleInputChange}
                 />
-            </label>
 
-            <button className={styles.button} type='submit'>Add Your First Person</button>
-
-            {status && ( status )}
-        </form>
+                <output>
+                    {status}
+                </output>
+                
+                <button className={styles.button} type='submit'>Add Your First Person</button>
+            </form>
+        </section>
     )
 }
