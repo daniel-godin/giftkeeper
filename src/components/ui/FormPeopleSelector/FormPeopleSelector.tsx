@@ -71,6 +71,7 @@ export function FormPeopleSelector({
         try {
             const newDocRef = doc(getPeopleCollRef(authState.user.uid));
             const newDocData: Person = {
+                ...DEFAULT_PERSON,
                 ...newPerson,
                 id: newDocRef.id,
                 createdAt: serverTimestamp(),
