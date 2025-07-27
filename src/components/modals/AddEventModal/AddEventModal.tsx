@@ -10,6 +10,7 @@ import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
 import { FormInput, FormPeopleSelector, FormTextArea } from '../../ui';
 import { useNavigate } from 'react-router';
 import { getEventsCollRef } from '../../../firebase/firestore';
+import { isValidEventDate } from '../../../utils';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -76,7 +77,13 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
         e.preventDefault();
 
         if (!authState.user) { return }; // Guard Clause
-        if (!formData.title.trim() || !formData.date || formData.people.length === 0) { return }; // Form Validation Guard Clause
+        if (!formData.title.trim() || !formData.date || formData.people.length === 0) { // Form Validation Guard Clause
+            setStatus('Please fill out all required fields.');
+            return }; 
+        if (formData.date && !isValidEventDate(formData.date)) { // Event Date Validation Check
+            setStatus('Invalid Event Date. Must Be Today Or In The Future')
+            return;
+        }
 
         setIsSubmitting(true);
         setStatus('Adding New Event...');
