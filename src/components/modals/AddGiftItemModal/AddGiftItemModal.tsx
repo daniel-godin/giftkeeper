@@ -11,10 +11,11 @@ import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 import { db } from '../../../firebase/firebase';
 import { Person } from '../../../types/PersonType';
-import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
+import { DEFAULT_GIFT_ITEM, DEFAULT_PERSON } from '../../../constants/defaultObjects';
 import { useParams } from 'react-router';
 import { useEvents } from '../../../contexts/EventsContext';
-import { FormSubmitButton } from '../../ui';
+import { FormInput, FormSelect, FormSubmitButton } from '../../ui';
+import { sanitizeURL } from '../../../utils';
 
 interface AddGiftItemModalProps {
     isOpen: boolean;
@@ -50,6 +51,13 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
         return [];
     }, [formData.status, eventId, formData.personId, events, upcomingEventsForPersonId])
+
+    const transformedEventOptions = useMemo(() =>
+        eventOptions.map(event => ({
+            optionLabel: event.title,
+            optionValue: event.id || ''
+        })), [eventOptions]
+    );
 
     useEffect(() => {
         if (isOpen) {
@@ -153,6 +161,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
                 // New Person Document Data
                 const personData: Person = {
+                    ...DEFAULT_PERSON,
                     id: finalPersonId,
                     name: formData.personName.trim(),
                     birthday: '',
@@ -169,6 +178,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
             const newDocRef = doc(getGiftItemsCollRef(authState.user.uid));
             const newDocumentData: GiftItem = {
+                ...DEFAULT_GIFT_ITEM,
                 id: newDocRef.id,
                 name: formData.name,
 
@@ -179,7 +189,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 // Status & Associations
                 status: formData.status,
                 eventId: formData.eventId,
-                url: validateURL(formData.url || ''),
+                url: sanitizeURL(formData.url || ''),
 
                 // // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
                 estimatedCost: formData.estimatedCost,
@@ -226,17 +236,17 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
-                    <label className={styles.label}>Gift Item Idea or Purchase: *
-                        <input
-                            className={styles.input}
-                            type='text'
-                            name='name'
-                            required={true}
-                            value={formData.name}
-                            disabled={isSubmitting}
-                            onChange={handleInputChange}
-                        />
-                    </label>
+
+                    {/* Person Name: */}
+                    <FormInput
+                        label='Gift Item Idea or Purchase::'
+                        type='text'
+                        name='name'
+                        required={true}
+                        disabled={isSubmitting}
+                        value={formData.name}
+                        onChange={handleInputChange}
+                    />
 
                     {/* Select Person */}
                     <label className={styles.label}>Select Gift Recipient: *
@@ -298,57 +308,32 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
                     {showOptionalFields && (
                         <>
-                            {/* Changing Status will change available fields: eventId (show/hide) & estimatedCost/purchasedCost. */}
-                            <label className={styles.label}>Gift Status:
-                                <select
-                                    name='status'
-                                    onChange={handleInputChange}
-                                    required={true}
-                                    value={formData.status}
-                                    disabled={isSubmitting}
-                                    className={styles.dropdownInput}
-                                >
-                                    <option
-                                        value='idea'
-                                        className={styles.option}
-                                    >
-                                        Idea
-                                    </option>
-
-                                    <option
-                                        value='purchased'
-                                        className={styles.option}
-                                    >
-                                        Purchased
-                                    </option>
-                                </select>
-                            </label>
+                            {/* Gift Status Select.  Changing Status will change available fields: eventId (show/hide) & estimatedCost/purchasedCost. */}
+                            <FormSelect
+                                label='Gift Status (idea/purchased):'
+                                options={[
+                                    { optionLabel: 'Idea', optionValue: 'idea' },
+                                    { optionLabel: 'Purchased', optionValue: 'purchased' }
+                                ]}
+                                name='status'
+                                required={true}
+                                disabled={isSubmitting}
+                                value={formData.status}
+                                onChange={handleInputChange}
+                            />
 
                             {/* Choose Event (Only if "status" === 'purchased') */}
-                            {formData.status === 'purchased' && (
-                                <label className={styles.label}>Choose Event For Purchased Gift:
-                                    <select
-                                        name='eventId'
-                                        onChange={handleInputChange}
-                                        required={false}
-                                        disabled={isSubmitting}
-                                        value={formData.eventId}
-                                        className={styles.dropdownInput}
-                                    >
-                                        <option
-                                            value=''
-                                            className={styles.option}
-                                        >Choose Event</option>
-
-                                        {eventOptions.map(event => (
-                                            <option
-                                                key={event.id}
-                                                value={event.id}
-                                                className={styles.option}
-                                            >{event.title}</option>
-                                        ))}
-                                    </select>
-                                </label>
+                            {formData.status === 'purchased' && formData.personId !== '' && (
+                                <FormSelect
+                                    label='Choose Event For Purchased Gift:'
+                                    options={transformedEventOptions}
+                                    name='eventId'
+                                    placeholder='Choose Event'
+                                    required={false}
+                                    disabled={isSubmitting}
+                                    value={formData.eventId}
+                                    onChange={handleInputChange}
+                                />
                             )}
 
                             {/* EstimatedCost or PurchasedCost (Changes depending on status === idea/purchased) */}
@@ -373,18 +358,17 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                                 />
                             </label>
 
-                            {/* URL Validation happens in handleSubmit, NOT in change handler */}
-                            <label className={styles.label}>URL:
-                                <input
-                                    className={styles.input}
-                                    type='text'
-                                    name='url'
-                                    required={false}
-                                    value={formData.url}
-                                    disabled={isSubmitting}
-                                    onChange={handleInputChange}
-                                />
-                            </label>
+
+                            {/* Gift Item URL.  URL Validation happens in handleSubmit, NOT in change handler */}
+                            <FormInput
+                                label='URL:'
+                                type='text'
+                                name='url'
+                                required={false}
+                                disabled={isSubmitting}
+                                value={formData.url}
+                                onChange={handleInputChange}
+                            />
                         </>
                     )}
 
@@ -401,17 +385,4 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
             </div>
         </BaseModal>
     )
-}
-
-// Note:  This is very basic and quite permissive
-const validateURL = (url: string): string => {
-    if (!url) { return '' }; // Guard, if falsey, return empty string
-
-    try {
-        const urlToTest = url.startsWith('http') ? url : `http://${url}`;
-        new URL(urlToTest);
-        return urlToTest
-    } catch {
-        return ''; // Invalid URL
-    }
 }
