@@ -1,9 +1,9 @@
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getGiftItemsCollRef } from '../../firebase/firestore';
-import { onSnapshot, query, where } from 'firebase/firestore';
+import { getGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
+import { deleteDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { getDaysUntilDate } from '../../utils';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
@@ -14,7 +14,7 @@ import { GiftItem } from '../../types/GiftType';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 import { EditPersonModal } from '../../components/modals/EditPersonModal/EditPersonModal';
 
@@ -25,6 +25,8 @@ export function PersonPage() {
     const { people, loading: peopleLoading } = usePeople();
     const { events, loading: eventsLoading } = useEvents();
     const upcomingEvents = useUpcomingEvents(personId);
+
+    const navigate = useNavigate();
 
     const [person, setPerson] = useState<Person>({ name: '' });
     const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
@@ -70,7 +72,30 @@ export function PersonPage() {
         });
 
         return () => unsubscribe();
-    }, [authState.user, personId])
+    }, [authState.user, personId]);
+
+    const handleDelete = async () => {
+
+        if (!authState.user) { return }; // Auth Guard Clause
+        if (!personId) { return }; // PersonID Guard Clause
+
+        console.log('handleDelete triggered');
+        console.log('Deleting Person...')
+
+        try {
+            const docRef = getPersonDocRef(authState.user?.uid, personId);
+            await deleteDoc(docRef);
+
+            console.log('Successfully deleted person');
+
+            setTimeout(() => {
+                navigate('/people');
+            }, 500)
+        } catch (error) {
+            console.error('Error Deleting Person. Error:', error);
+        }
+
+    }
 
     if (peopleLoading) {
         return <div>Loading Person...</div>
@@ -87,6 +112,18 @@ export function PersonPage() {
                 {person && person.name && (
                     <h3>{person.name} {person.relationship && (`(${person.relationship})`)}</h3>
                 )}
+
+                {/* Delete Button (Deletes Person) */}
+                <button
+                    type='button'
+                    onClick={handleDelete}
+                >
+                    <Trash2
+                        color='#dc3545'
+                    />
+                </button>
+
+
 
                 {/* Edit Button. Opens editEventModal */}
                 <button 
