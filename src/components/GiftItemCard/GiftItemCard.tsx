@@ -51,7 +51,7 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                 <span className={styles.giftItemCategory}>Person</span>
                 <span className={styles.giftItemDetail}>
                     <Link to={`/people/${item.personId}`} key={item.personId} className='unstyled-link'>
-                        {`${item.personName} `}
+                        {`${item.personName}`}
                     </Link>
                 </span>
             </div>
