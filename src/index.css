@@ -37,6 +37,12 @@ img {
     max-width: 100%; /* Prevents images from getting out of control */
 }
 
+.basic-flexbox {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
 .unstyled-link {
     text-decoration: none;
     color: inherit;
