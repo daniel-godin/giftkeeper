@@ -49,7 +49,11 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
             {/* Person Name */}
             <div className={styles.giftItemCardRow}>
                 <span className={styles.giftItemCategory}>Person</span>
-                <span className={styles.giftItemDetail}>{item.personName}</span>
+                <span className={styles.giftItemDetail}>
+                    <Link to={`/people/${item.personId}`} key={item.personId} className='unstyled-link'>
+                        {`${item.personName} `}
+                    </Link>
+                </span>
             </div>
 
             {/* Gift Item Name */}
