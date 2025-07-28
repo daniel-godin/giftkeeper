@@ -9,15 +9,29 @@
 
     background-color: white;
 
-    display: flex;
+    display: grid;
+    grid-template-columns: 125px 1fr 125px;
+    gap: 0.5rem;
     justify-content: space-between;
     align-items: center;
 }
 
 .eventPageHeader > a {
+    justify-self: start;
     display: flex;
     align-items: center;
     gap: 0.25rem;
+}
+
+.eventPageHeader > h3 {
+    justify-self: center;
+}
+
+.actionButtonsContainer {
+    justify-self: end;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
 }
 
 .editButton {

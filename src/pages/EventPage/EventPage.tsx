@@ -1,19 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 import styles from './EventPage.module.css'
-import { Link, useParams } from 'react-router';
-import { onSnapshot, query, where } from 'firebase/firestore';
+import { Link, useNavigate, useParams } from 'react-router';
+import { deleteDoc, onSnapshot, query, where } from 'firebase/firestore';
 import { useEvents } from '../../contexts/EventsContext';
 import { Event } from '../../types/EventType';
 import { GiftItem } from '../../types/GiftType';
 import { usePeople } from '../../contexts/PeopleContext';
 import { Person } from '../../types/PersonType';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
-import { getGiftItemsCollRef } from '../../firebase/firestore';
+import { getEventDocRef, getGiftItemsCollRef } from '../../firebase/firestore';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
 import { EditEventModal } from '../../components/modals/EditEventModal/EditEventModal';
 import { DEFAULT_EVENT } from '../../constants/defaultObjects';
@@ -25,6 +25,7 @@ export function EventPage() {
     const deviceType = useViewport();
     const { events, loading: eventsLoading } = useEvents();
     const { people, loading: peopleLoading } = usePeople();
+    const navigate = useNavigate();
 
     const [event, setEvent] = useState<Event>();
     const [associatedPeople, setAssociatedPeople] = useState<Person[]>([]);
@@ -84,6 +85,28 @@ export function EventPage() {
         }
     }, [giftItems, event?.budget])
 
+    const handleDelete = async () => {
+
+        if (!authState.user || !event || !eventId) { return }; // Auth Guard Clause
+
+        if (!window.confirm(`Are you sure you want to delete ${event.title}?`)) {
+            return;
+        }
+
+        try {
+            const docRef = getEventDocRef(authState.user.uid, eventId);
+            await deleteDoc(docRef);
+
+            console.log('Successfully deleted event');
+
+            setTimeout(() => {
+                navigate('/events');
+            }, 500)
+        } catch (error) {
+            console.error('Error Deleting Event. Error:', error);
+        }
+    }
+
     return (
         <section className={styles.eventPage}>
             <header className={styles.eventPageHeader}>
@@ -95,14 +118,28 @@ export function EventPage() {
                     <h3>{event.title}</h3>
                 )}
 
-                {/* Edit Button. Opens editEventModal */}
-                <button 
-                    type='button'
-                    className={styles.editButton}
-                    onClick={() => { setEditEventModalData(event || DEFAULT_EVENT); setIsEditEventModalOpen(true); }}
-                >
-                    <Pencil /> Edit
-                </button>
+                <div className={styles.actionButtonsContainer}>
+                    {/* Delete Button (Deletes Person) */}
+                    <button
+                        type='button'
+                        onClick={handleDelete}
+                        className='unstyled-button'
+                    >
+                        <Trash2
+                            color='#dc3545'
+                            size={26}
+                        />
+                    </button>
+
+                    {/* Edit Button. Opens editEventModal */}
+                    <button 
+                        type='button'
+                        className={styles.editButton}
+                        onClick={() => { setEditEventModalData(event || DEFAULT_EVENT); setIsEditEventModalOpen(true); }}
+                    >
+                        <Pencil /> Edit
+                    </button>
+                </div>
             </header>
 
             <div className={styles.quickStatsContainer}>
