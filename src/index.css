@@ -46,3 +46,21 @@ img {
     text-decoration: none;
     color: inherit;
 }
+
+.unstyled-button {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.unstyled-button:hover {
+    transform: scale(1.1);
+}
