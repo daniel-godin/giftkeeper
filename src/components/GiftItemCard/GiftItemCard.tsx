@@ -1,4 +1,4 @@
-import { Check, ExternalLink, Lightbulb } from 'lucide-react';
+import { Check, ExternalLink, Lightbulb, Pencil, Trash2 } from 'lucide-react';
 import { GiftItem } from '../../types/GiftType'
 import styles from './GiftItemCard.module.css'
 import { capitalizeFirst } from '../../utils/stringUtils';
@@ -7,15 +7,42 @@ import { useState } from 'react';
 import { EditGiftItemModal } from '../modals/EditGiftItemModal/EditGiftItemModal';
 import { useEvents } from '../../contexts/EventsContext';
 import { Link } from 'react-router';
+import { useAuth } from '../../contexts/AuthContext';
+import { getGiftItemDocRef } from '../../firebase/firestore';
+import { deleteDoc } from 'firebase/firestore';
 
 interface GiftItemCardProps {
     item: GiftItem;
 }
 
 export function GiftItemCard({ item } : GiftItemCardProps) {
+    const { authState } = useAuth();
     const { events } = useEvents();
 
     const [isEditGiftItemModalOpen, setIsEditGiftItemModalOpen] = useState<boolean>(false);
+
+    const handleEditableItem = () => {
+        setIsEditGiftItemModalOpen(true);
+    } 
+
+    const handleDelete = async (giftItem: GiftItem) => {
+        if (!authState.user) { return }; // Auth Guard Clause
+        if (!giftItem || !giftItem.id) { return }; // Data Guard Clause
+
+        if (!window.confirm(`Are you sure you want to delete ${giftItem.name}?`)) {
+            return;
+        }
+
+        try {
+            const docRef = getGiftItemDocRef(authState.user.uid, giftItem.id);
+            await deleteDoc(docRef);
+
+            console.log('Successfully deleted gift item');
+
+        } catch (error) {
+            console.error('Error Deleting Gift Item. Error:', error);
+        }
+    }
 
     return (
         <div key={item.id} className={styles.giftItemCard}>
@@ -79,7 +106,29 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                         </a>
                                 )}
                 </span>
-                <button type='button' className={styles.actionsButton} onClick={() => setIsEditGiftItemModalOpen(true)}>Edit Item</button>
+
+                {/* Action Buttons: */}
+                <div className='basic-flexbox'>
+                    {/* Delete Button -- Deletes Gift Item */}
+                    <button 
+                        type='button'
+                        className='unstyled-button'
+                        onClick={() => handleDelete(item) }
+                    >
+                        <Trash2
+                            color='#dc3545'
+                        />
+                    </button>
+
+                    {/* Edit Button -- Opens "EditGiftItemModal" */}
+                    <button 
+                        type='button'
+                        className='unstyled-button'
+                        onClick={() => handleEditableItem() }
+                    >
+                        <Pencil />
+                    </button>
+                </div>
             </div>
             
             {/* Edit Modal */}
