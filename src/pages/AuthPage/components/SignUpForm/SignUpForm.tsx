@@ -4,7 +4,6 @@ import { FormEvent, useState } from 'react';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { auth, db } from '../../../../firebase/firebase';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { getUserCollRef } from '../../../../firebase/firestore';
 
 interface SignUpFormData {
     email: string;

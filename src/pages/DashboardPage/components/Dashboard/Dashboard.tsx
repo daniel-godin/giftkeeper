@@ -1,4 +1,4 @@
-import { CalendarFold, ListTodo, UsersRound } from 'lucide-react';
+import { CalendarFold, UsersRound } from 'lucide-react';
 import { useEvents } from '../../../../contexts/EventsContext';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import styles from './Dashboard.module.css'
@@ -12,9 +12,9 @@ export function Dashboard () {
     const upcomingEvents = useUpcomingEvents();
 
     // Need to make "seconds" Type-safe later.
-    const recent = {
-        'people': people.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
-    }
+    // const recent = {
+    //     'people': people.sort((a, b) => (b.updatedAt?.seconds || 0) - (a.updatedAt?.seconds || 0)).slice(0, 5),
+    // }
 
     return (
         <div className={styles.dashboard}>
@@ -47,9 +47,9 @@ export function Dashboard () {
                         <>
                             <p className={styles.numberOfItems}>({people.length} people)</p>
                             <div className={styles.recentFiveContainer}>
-                                {recent.people.map((person) => (
+                                {/* {recent.people.map((person) => (
                                     <p key={person.id} className={styles.item}>{person.name}</p>
-                                ))}
+                                ))} */}
                             </div>
                             <Link to='/people' className={styles.link}>View All People</Link>
                         </>

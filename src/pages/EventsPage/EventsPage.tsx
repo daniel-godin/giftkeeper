@@ -9,7 +9,7 @@ export function EventsPage () {
     // IMPORTANT NOTE:
     // Currently *ONLY* displaying "upcomingEvents".  Need a way to display *ALL* events later.
 
-    const { events, loading: loadingEvents } = useEvents();
+    const { loading: loadingEvents } = useEvents();
     const upcomingEvents = useUpcomingEvents();
 
     const [isAddNewEventModalOpen, setIsAddNewEventModalOpen] = useState<boolean>(false);

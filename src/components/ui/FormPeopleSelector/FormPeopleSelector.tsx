@@ -47,7 +47,7 @@ export function FormPeopleSelector({
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
+        const { value } = e.target;
         setNewPerson(prev => ({
             ...prev,
             name: value

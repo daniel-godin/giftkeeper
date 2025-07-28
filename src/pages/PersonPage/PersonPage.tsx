@@ -23,7 +23,7 @@ export function PersonPage() {
     const { personId } = useParams();
     const deviceType = useViewport();
     const { people, loading: peopleLoading } = usePeople();
-    const { events, loading: eventsLoading } = useEvents();
+    const { loading: eventsLoading } = useEvents();
     const upcomingEvents = useUpcomingEvents(personId);
 
     const navigate = useNavigate();

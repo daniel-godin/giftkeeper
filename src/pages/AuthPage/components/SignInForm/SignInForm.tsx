@@ -15,7 +15,7 @@ interface SignInFormData {
     password: string;
 }
 
-export function SignInForm ({ authMode, setAuthMode } : SignInFormProps) {
+export function SignInForm ({ setAuthMode } : SignInFormProps) {
     const navigate = useNavigate();
 
     const [status, setStatus] = useState<string>('');
