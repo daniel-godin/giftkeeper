@@ -79,8 +79,9 @@ export function PersonPage() {
         if (!authState.user) { return }; // Auth Guard Clause
         if (!personId) { return }; // PersonID Guard Clause
 
-        console.log('handleDelete triggered');
-        console.log('Deleting Person...')
+        if (!window.confirm(`Are you sure you want to delete ${person.name}?`)) {
+            return;
+        }
 
         try {
             const docRef = getPersonDocRef(authState.user?.uid, personId);
@@ -113,26 +114,28 @@ export function PersonPage() {
                     <h3>{person.name} {person.relationship && (`(${person.relationship})`)}</h3>
                 )}
 
-                {/* Delete Button (Deletes Person) */}
-                <button
-                    type='button'
-                    onClick={handleDelete}
-                >
-                    <Trash2
-                        color='#dc3545'
-                    />
-                </button>
+                <div className={styles.actionButtonsContainer}>
+                    {/* Delete Button (Deletes Person) */}
+                    <button
+                        type='button'
+                        onClick={handleDelete}
+                        className='unstyled-button'
+                    >
+                        <Trash2
+                            color='#dc3545'
+                            size={26}
+                        />
+                    </button>
 
-
-
-                {/* Edit Button. Opens editEventModal */}
-                <button 
-                    type='button'
-                    className={styles.editButton}
-                    onClick={() => { setEditPersonModalData(person || DEFAULT_PERSON); setIsEditPersonModalOpen(true); }}
-                >
-                    <Pencil /> Edit
-                </button>
+                    {/* Edit Button. Opens editEventModal */}
+                    <button 
+                        type='button'
+                        className={styles.editButton}
+                        onClick={() => { setEditPersonModalData(person || DEFAULT_PERSON); setIsEditPersonModalOpen(true); }}
+                    >
+                        <Pencil /> Edit
+                    </button>
+                </div>
             </header>
 
             <div className={styles.personDataContainer}>
