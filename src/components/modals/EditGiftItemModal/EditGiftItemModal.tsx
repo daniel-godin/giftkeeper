@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { GiftItem } from '../../../types/GiftType';
+import { GiftItem, GiftStatus } from '../../../types/GiftType';
 import styles from './EditGiftItemModal.module.css'
 import { BaseModal } from '../BaseModal/BaseModal';
 import { X } from 'lucide-react';
@@ -53,6 +53,22 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
             ...prev,
             [name]: value
         }))
+    }
+
+    // Handle Status Change -- Special Changes Happen Depending On Status
+    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newStatus = e.target.value as GiftStatus;
+
+        switch (newStatus) {
+            case 'idea': // "Ideas" cannot be assigned an event.
+                setFormData(prev => ({ ...prev, status: newStatus, 'eventId': '' }));
+                break; 
+            case 'purchased': 
+                setFormData(prev => ({ ...prev, status: newStatus }));
+                break;
+            default: 
+                console.warn('Unknown status:', newStatus);
+        }
     }
 
     const handleCostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -152,7 +168,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                         required={true}
                         disabled={isSubmitting}
                         value={formData.status}
-                        onChange={handleInputChange}
+                        onChange={handleStatusChange}
                     />
 
                     {/* Choose Event (Only if "status" === 'purchased') */}
