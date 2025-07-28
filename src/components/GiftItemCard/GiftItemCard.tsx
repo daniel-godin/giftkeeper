@@ -6,6 +6,7 @@ import { formatCurrency } from '../../utils/currencyUtils';
 import { useState } from 'react';
 import { EditGiftItemModal } from '../modals/EditGiftItemModal/EditGiftItemModal';
 import { useEvents } from '../../contexts/EventsContext';
+import { Link } from 'react-router';
 
 interface GiftItemCardProps {
     item: GiftItem;
@@ -46,7 +47,9 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                 <span className={styles.giftItemCategory}>Event</span>
                 <span className={styles.giftItemDetail}>
                     {item.eventId ? (
-                        <>{events.find(event => event.id === item.eventId)?.title || 'Event Not Found'}</>
+                        <Link to={`/events/${item.eventId}`} className='unstyled-link'>
+                            {events.find(event => event.id === item.eventId)?.title || 'Event Not Found'}
+                        </Link>
                     ) : (
                         <>--</>
                     )}
