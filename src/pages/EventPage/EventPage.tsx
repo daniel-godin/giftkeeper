@@ -119,7 +119,7 @@ export function EventPage() {
                 )}
 
                 <div className={styles.actionButtonsContainer}>
-                    {/* Delete Button (Deletes Person) */}
+                    {/* Delete Button (Deletes Event) */}
                     <button
                         type='button'
                         onClick={handleDelete}
