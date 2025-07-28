@@ -4,7 +4,6 @@ export { EditableTitle } from './EditableTitle/EditableTitle';
 
 // Buttons
 export { QuickAddButton } from './QuickAddButton/QuickAddButton';
-export { DeleteButton } from './DeleteButton/DeleteButton';
 
 // Form Components:
 export { FormInput } from './FormInput/FormInput';
