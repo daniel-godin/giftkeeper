@@ -1,4 +1,4 @@
-import { Check, ExternalLink, Lightbulb } from 'lucide-react';
+import { Check, ExternalLink, Lightbulb, Pencil, Trash2 } from 'lucide-react';
 import { GiftItem } from '../../types/GiftType'
 import styles from './GiftItemsTable.module.css'
 import { capitalizeFirst } from '../../utils/stringUtils';
@@ -7,12 +7,16 @@ import { useState } from 'react';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { DEFAULT_GIFT_ITEM } from '../../constants/defaultObjects';
 import { useEvents } from '../../contexts/EventsContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { getGiftItemDocRef } from '../../firebase/firestore';
+import { deleteDoc } from 'firebase/firestore';
 
 interface GiftItemsTableProps {
     data: GiftItem[];
 }
 
 export function GiftItemsTable({ data } : GiftItemsTableProps) {
+    const { authState } = useAuth();
     const { events } = useEvents();
 
     const [isEditGiftItemModalOpen, setIsEditGiftItemModalOpen] = useState<boolean>(false);
@@ -22,6 +26,25 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
         setGiftItemBeingEdited(item);
         setIsEditGiftItemModalOpen(true);
     } 
+
+    const handleDelete = async (giftItem: GiftItem) => {
+        if (!authState.user) { return }; // Auth Guard Clause
+        if (!giftItem || !giftItem.id) { return }; // Data Guard Clause
+
+        if (!window.confirm(`Are you sure you want to delete ${giftItem.name}?`)) {
+            return;
+        }
+
+        try {
+            const docRef = getGiftItemDocRef(authState.user.uid, giftItem.id);
+            await deleteDoc(docRef);
+
+            console.log('Successfully deleted gift item');
+
+        } catch (error) {
+            console.error('Error Deleting Gift Item. Error:', error);
+        }
+    }
 
     // Return Nothing If No Data in Data Array
     if (data.length === 0) { return (<div>No Gift Items Found.</div>) }
@@ -33,7 +56,6 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                     <tr className={`${styles.tableHeadRow} ${styles.tableRow}`}>
                         <th scope='col' className={styles.tableCell}>PERSON</th>
                         <th scope='col' className={styles.tableCell}>GIFT ITEM</th>
-                        {/* <th scope='col' className={styles.tableCell}>LINK</th> */}
                         <th scope='col' className={styles.tableCell}>STATUS</th>
                         <th scope='col' className={styles.tableCell}>EVENT</th>
                         <th scope='col' className={styles.tableCell}>COST</th> 
@@ -94,11 +116,29 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                                 </>
                             )}
 
-                            {/* Edit Gift Item: */}
+                            {/* Action Buttons: */}
                             <td className={styles.tableCell}>
-                                <button type='button' className={styles.actionsButton} onClick={() => handleEditableItem(item)}>
-                                    Edit Item
-                                </button>
+                                <div className='basic-flexbox'>
+                                    {/* Delete Button -- Deletes Gift Item */}
+                                    <button 
+                                        type='button'
+                                        className='unstyled-button'
+                                        onClick={() => handleDelete(item) }
+                                    >
+                                        <Trash2
+                                            color='#dc3545'
+                                        />
+                                    </button>
+
+                                    {/* Edit Button -- Opens "EditGiftItemModal" */}
+                                    <button 
+                                        type='button'
+                                        className='unstyled-button'
+                                        onClick={() => handleEditableItem(item) }
+                                    >
+                                        <Pencil />
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     ))}
