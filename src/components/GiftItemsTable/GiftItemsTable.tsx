@@ -66,7 +66,11 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                 <tbody className={styles.tableBody}>
                     {data.map(item => (
                         <tr key={item.id} className={styles.tableRow}>
-                            <td className={styles.tableCell}>{item.personName}</td>
+                            <td className={styles.tableCell}>
+                                <Link to={`/people/${item.personId}`} key={item.personId} className='unstyled-link'>
+                                    {`${item.personName}`}
+                                </Link>
+                            </td>
 
                             {/* Item Name & Conditional URL Link: */}
                             <td className={`${styles.tableCell} ${styles.nameAndURL}`}>
