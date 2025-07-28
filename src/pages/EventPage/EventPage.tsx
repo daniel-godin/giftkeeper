@@ -7,7 +7,7 @@ import { Event } from '../../types/EventType';
 import { GiftItem } from '../../types/GiftType';
 import { usePeople } from '../../contexts/PeopleContext';
 import { Person } from '../../types/PersonType';
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Key, Pencil, Trash2 } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
@@ -159,8 +159,11 @@ export function EventPage() {
                             <header className={styles.statCardHeader}>Participants</header>
                             <div className={styles.statNumber}>{event.people.length}</div>
                             <div className={styles.statLabel}>
-                                {/* TODO:  Make these link to their respective PersonPage */}
-                                {associatedPeople.map(person => person.name).join(', ')}
+                                {associatedPeople.map(person => (
+                                    <Link to={`/people/${person.id}`} key={person.id} className='unstyled-link'>
+                                        {`${person.name} `}
+                                    </Link>
+                                ))}
                             </div>
                         </>
                     )}
