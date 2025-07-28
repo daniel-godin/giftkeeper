@@ -95,7 +95,6 @@ export function PersonPage() {
         } catch (error) {
             console.error('Error Deleting Person. Error:', error);
         }
-
     }
 
     if (peopleLoading) {
