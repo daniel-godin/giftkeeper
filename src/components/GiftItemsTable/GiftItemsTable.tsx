@@ -10,6 +10,7 @@ import { useEvents } from '../../contexts/EventsContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { getGiftItemDocRef } from '../../firebase/firestore';
 import { deleteDoc } from 'firebase/firestore';
+import { Link } from 'react-router';
 
 interface GiftItemsTableProps {
     data: GiftItem[];
@@ -103,15 +104,19 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                             {item.status === 'purchased' && (
                                 <>
                                     <td className={`${styles.tableCell}`}><span className={styles.giftItemDetailPurchased}><Check size={20}/> {capitalizeFirst(item.status)}</span></td>
+
                                     {/* Event Data: */}
                                     {item.eventId ? (
                                         <td className={styles.tableCell}>
                                             {/* TODO:  Possibly useMemo this later. */}
-                                            {events.find(event => event.id === item.eventId)?.title || 'Event Not Found'}
+                                            <Link to={`/events/${item.eventId}`} className='unstyled-link'>
+                                                {events.find(event => event.id === item.eventId)?.title || 'Event Not Found'}
+                                            </Link>
                                         </td>
                                     ) : (
                                         <td className={styles.tableCell}>--</td>
                                     )}
+                                    
                                     <td className={styles.tableCell}>{formatCurrency(item.purchasedCost || 0)}</td>
                                 </>
                             )}
