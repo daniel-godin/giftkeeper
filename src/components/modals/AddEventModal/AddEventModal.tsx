@@ -8,7 +8,7 @@ import { X } from 'lucide-react';
 import { usePeople } from '../../../contexts/PeopleContext';
 import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
 import { FormInput, FormPeopleSelector, FormSubmitButton, FormTextArea } from '../../ui';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { getEventsCollRef } from '../../../firebase/firestore';
 import { isValidEventDate } from '../../../utils';
 
@@ -21,6 +21,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
     const { authState } = useAuth();
     const { people } = usePeople();
     const navigate = useNavigate();
+    const { personId } = useParams(); // For auto-filling on PersonPage
 
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
@@ -30,7 +31,22 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
 
     useEffect(() => {
         if (isOpen) {
-            resetModal(); // Resets to default empty modal.
+            let initialFormData: Event = { ...DEFAULT_EVENT };
+
+            if (personId) {
+                const person = people.find(p => p.id === personId);
+                if (person) {
+                    initialFormData = {
+                        ...initialFormData,
+                        people: [personId]
+                    }
+                }
+            }
+
+            setFormData(initialFormData);
+            setStatus('');
+            setIsSubmitting(false);
+            setShowOptionalFields(false);
         }
     }, [isOpen]);
 
