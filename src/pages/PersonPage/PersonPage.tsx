@@ -186,7 +186,6 @@ export function PersonPage() {
                         )}
                     </div>
                 </div>
-
             </div>
 
             <div className={styles.giftItems}>
