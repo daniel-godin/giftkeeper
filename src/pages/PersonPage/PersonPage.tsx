@@ -14,9 +14,10 @@ import { GiftItem } from '../../types/GiftType';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Pencil, Plus, Trash2 } from 'lucide-react';
 import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 import { EditPersonModal } from '../../components/modals/EditPersonModal/EditPersonModal';
+import { AddEventModal } from '../../components/modals/AddEventModal/AddEventModal';
 
 export function PersonPage() {
     const { authState } = useAuth();
@@ -34,6 +35,9 @@ export function PersonPage() {
     // State For EditPersonModal:
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
     const [editPersonModalData, setEditPersonModalData] = useState<Person>(DEFAULT_PERSON);
+
+    // State for AddEventModal:
+    const [isAddEventModalOpen, setIsAddEventModalOpen] = useState<boolean>(false);
 
     const giftIdeasCount = useMemo(() => {
         return giftItems.filter(item => item.status === 'idea').length;
@@ -162,7 +166,10 @@ export function PersonPage() {
 
                 <div className={styles.sectionContainer}>
                     <header className={styles.sectionHeader}>
-                        Upcoming Dates
+                        <h4>Upcoming Dates</h4>
+                        <button type='button' className='unstyled-button' onClick={() => setIsAddEventModalOpen(true)}>
+                            <Plus />
+                        </button>
                     </header>
                     <div className={styles.sectionData}>
                         {eventsLoading ? (
@@ -213,6 +220,11 @@ export function PersonPage() {
                 isOpen={isEditPersonModalOpen}
                 onClose={() => setIsEditPersonModalOpen(false)}
                 data={editPersonModalData}
+            />
+
+            <AddEventModal
+                isOpen={isAddEventModalOpen}
+                onClose={() => setIsAddEventModalOpen(false)}
             />
         </section>
     )
