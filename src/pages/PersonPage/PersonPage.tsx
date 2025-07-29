@@ -172,7 +172,14 @@ export function PersonPage() {
                         ) : (
                             upcomingEvents.map((event) => (
                                 <div key={event.id} className={styles.eventContainer}>
-                                    <span><strong>{event.title}</strong> - {event.date}</span>
+                                    <span>
+                                        <strong>
+                                            <Link to={`/events/${event.id}`} key={event.id} className='unstyled-link'>
+                                                {event.title}
+                                            </Link>
+                                        </strong>
+                                         - {event.date}
+                                    </span>
                                     <span>{getDaysUntilDate(event.date)} days</span>
                                 </div>
                             ))
