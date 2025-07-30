@@ -1,6 +1,7 @@
 import { Event } from "../types/EventType";
 import { GiftItem } from "../types/GiftType";
 import { Person } from "../types/PersonType";
+import { UserProfile } from "../types/UserType";
 
 export const DEFAULT_PERSON: Person = {
     id: '',
@@ -32,4 +33,9 @@ export const DEFAULT_EVENT: Event = {
     recurring: false,
     budget: 0,
     notes: '',
+}
+
+export const DEFAULT_USER_PROFILE: UserProfile = {
+    id: '',
+    theme: 'light',
 }
