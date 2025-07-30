@@ -5,7 +5,7 @@ interface FormInputProps {
     label?: string;
     labelClassName?: string;
 
-    type?: 'text' | 'email' | 'number' | 'date';
+    type: 'text' | 'email' | 'number' | 'date' | 'password';
     name?: string;
     id?: string;
     placeholder?: string;
