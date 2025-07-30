@@ -2,6 +2,7 @@ import { FormEvent, useState } from 'react';
 import styles from './PasswordResetForm.module.css'
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../../../firebase/firebase';
+import { FormInput, FormSubmitButton } from '../../../../components/ui';
 
 interface PasswordResetFormData {
     email: string;
@@ -47,20 +48,26 @@ export function PasswordResetForm() {
     return (
         <form className={styles.passwordResetForm} onSubmit={handleSubmit}>
             <h2 className={styles.formHeader}>Reset Password</h2>
-            <label className={styles.label}>Email:
-                <input
-                    type='email'
-                    name='email'
-                    value={formData.email}
-                    disabled={isSubmitting}
-                    onChange={handleInputChange}
-                    className={styles.input}
-                />
-            </label>
 
-            <button type='submit' className={styles.button} disabled={isSubmitting}>Reset Password</button>
+            {/* Reset Password Email: */}
+            <FormInput
+                label='Email:'
+                type='email'
+                name='email'
+                required={true}
+                disabled={isSubmitting}
+                value={formData.email}
+                onChange={handleInputChange}
+            />
 
-            {status && (<p className={styles.statusText}>{status}</p>)}
+            <output>{status}</output>
+
+            <FormSubmitButton
+                text='Reset Password'
+                isSubmitting={isSubmitting}
+                submittingText='Resetting Password (check your email)...'
+                disabled={!formData.email.trim()}
+            />
         </form>
     )
 }
