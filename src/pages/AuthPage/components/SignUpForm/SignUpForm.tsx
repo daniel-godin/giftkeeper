@@ -94,7 +94,7 @@ export function SignUpForm () {
 
             {/* Sign Up Password: (note: no confirming password input. Use email verify.) */}
             <FormInput
-                label='Password:'
+                label='Password: (8+ characters)'
                 type='password'
                 name='password'
                 required={true}
