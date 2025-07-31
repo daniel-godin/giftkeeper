@@ -5,15 +5,21 @@ import { CalendarFold, Gift, UsersRound } from 'lucide-react'
 import { AddGiftItemModal } from '../../../../components/modals/AddGiftItemModal/AddGiftItemModal';
 import { AddEventModal } from '../../../../components/modals/AddEventModal/AddEventModal';
 import { AddPersonModal } from '../../../../components/modals/AddPersonModal/AddPersonModal';
-import { Link } from 'react-router';
 import { StatCard } from './components/StatCard/StatCard';
+import { useEvents } from '../../../../contexts/EventsContext';
+import { usePeople } from '../../../../contexts/PeopleContext';
 
 export function DashboardHeader () {
+    const { events } = useEvents();
+    const { people } = usePeople();
 
     // Modal States (boolean) -- Triggered By QuickActionButtons
     const [isAddGiftItemModalOpen, setIsAddGiftItemModalOpen] = useState<boolean>(false);
     const [isAddEventModalOpen, setIsAddEventModalOpen] = useState<boolean>(false);
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
+
+    // TODO: Create a useMemo to save all the stats for the overviewStats section.
+    // POSSIBLY:  Move this to parent component, might need these same stats in EventTimeline
 
     return (
         <header className={styles.dashboardHeader}>
@@ -49,7 +55,7 @@ export function DashboardHeader () {
                 <StatCard
                     to='/events'
                     title='EVENTS'
-                    totalCount={8}
+                    totalCount={events.length}
                     breakdownStats={[{count: 5, label: 'upcoming'}]}
                 />
 
@@ -66,12 +72,13 @@ export function DashboardHeader () {
                 <StatCard
                     to='/people'
                     title='PEOPLE'
-                    totalCount={15}
+                    totalCount={people.length}
                     breakdownStats={[{count: 12, label: 'birthdays'}]}
                 />
             </div>
 
             {/* Alerts:  Add an X to "close" this warning message box*/}
+            {/* TODO:  CREATE THE SMART ALERTS SECTION -- WILL NEED MORE LOGIC */}
             {/* <div className={styles.alertsContainer}>
                 Christmas is in 5 days and you need to purchase gifts for 4 people. Time to act!
             </div> */}
