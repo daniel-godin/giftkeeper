@@ -5,6 +5,8 @@ import { CalendarFold, Gift, UsersRound } from 'lucide-react'
 import { AddGiftItemModal } from '../../../../components/modals/AddGiftItemModal/AddGiftItemModal';
 import { AddEventModal } from '../../../../components/modals/AddEventModal/AddEventModal';
 import { AddPersonModal } from '../../../../components/modals/AddPersonModal/AddPersonModal';
+import { Link } from 'react-router';
+import { StatCard } from './components/StatCard/StatCard';
 
 export function DashboardHeader () {
 
@@ -43,10 +45,30 @@ export function DashboardHeader () {
             </div>
 
 
-            <div className={styles.overviewStatsContainer}>
-                <button className={styles.statButton}>Events</button>
-                <button className={styles.statButton}>Gifts</button>
-                <button className={styles.statButton}>People</button>
+            <div className={styles.statsOverview}>
+                <StatCard
+                    to='/events'
+                    title='EVENTS'
+                    totalCount={8}
+                    breakdownStats={[{count: 5, label: 'upcoming'}]}
+                />
+
+                <StatCard
+                    to='/giftItems'
+                    title='GIFTS'
+                    totalCount={30}
+                    breakdownStats={[
+                        {count: 23, label: 'ideas'},
+                        {count: 7, label: 'bought'}
+                    ]}
+                />
+
+                <StatCard
+                    to='/people'
+                    title='PEOPLE'
+                    totalCount={15}
+                    breakdownStats={[{count: 12, label: 'birthdays'}]}
+                />
             </div>
 
             {/* Alerts:  Add an X to "close" this warning message box*/}
