@@ -8,6 +8,7 @@ export interface Person {
     birthday?: string;
 
     // Optional Data
+    nickname?: string;
     notes?: string;
     relationship?: string;
 

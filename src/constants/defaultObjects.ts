@@ -7,6 +7,7 @@ export const DEFAULT_PERSON: Person = {
     id: '',
     name: '',
     birthday: '',
+    nickname: '',
     notes: '',
     relationship: '',
 }
