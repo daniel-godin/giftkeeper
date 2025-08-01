@@ -109,7 +109,8 @@ export function EditPersonModal({ isOpen, onClose, data } : EditPersonModalProps
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
-                    {/* Event Title: */}
+
+                    {/* Person Name: */}
                     <FormInput
                         label='Name:'
                         type='text'
@@ -117,6 +118,17 @@ export function EditPersonModal({ isOpen, onClose, data } : EditPersonModalProps
                         required={true}
                         disabled={isSubmitting}
                         value={formData.name}
+                        onChange={handleInputChange}
+                    />
+
+                    {/* Person Nickname: */}
+                    <FormInput
+                        label='Nickname (eg. Mom):'
+                        type='text'
+                        name='nickname'
+                        required={false}
+                        disabled={isSubmitting}
+                        value={formData.nickname}
                         onChange={handleInputChange}
                     />
 
