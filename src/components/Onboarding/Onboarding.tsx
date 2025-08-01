@@ -66,11 +66,6 @@ export function Onboarding() {
             }
 
             await batch.commit();
-
-            setTimeout(() => {
-                navigate(`/people/${personDocRef.id}`)
-            }, 150);
-
         } catch (error) {
             console.error('Error Adding New Person. Error:', error);
             setStatus('Error Adding New Person');
