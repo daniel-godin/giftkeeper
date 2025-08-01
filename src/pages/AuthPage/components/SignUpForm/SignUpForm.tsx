@@ -109,7 +109,7 @@ export function SignUpForm () {
                 text='Sign Up'
                 isSubmitting={isSubmitting}
                 submittingText='Signing Up...'
-                disabled={!formData.email.trim() || !formData.password.trim()}
+                disabled={!formData.email.trim() || !formData.password.trim() || formData.password.length < 8}
             />
         </form>
     )
