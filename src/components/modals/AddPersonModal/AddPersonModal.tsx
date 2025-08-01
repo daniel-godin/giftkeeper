@@ -121,6 +121,17 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
                         onChange={handleInputChange}
                     />
 
+                    {/* Person Nickname: */}
+                    <FormInput
+                        label='Nickname (eg. Mom):'
+                        type='text'
+                        name='nickname'
+                        required={false}
+                        disabled={isSubmitting}
+                        value={formData.nickname}
+                        onChange={handleInputChange}
+                    />
+
                     {/* Birthday: (optional, but encouraged) */}
                     <FormInput
                         label='Birthday:'
