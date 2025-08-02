@@ -9,11 +9,13 @@ import { StatCard } from './components/StatCard/StatCard';
 import { useEvents } from '../../../../contexts/EventsContext';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
+import { usePeopleWithBirthdays } from '../../../../hooks/usePeopleWithBirthdays';
 
 export function DashboardHeader () {
     const { events } = useEvents();
     const { people } = usePeople();
     const upcomingEvents = useUpcomingEvents();
+    const peopleWithBirthdays = usePeopleWithBirthdays();
 
     // Modal States (boolean) -- Triggered By QuickActionButtons
     const [isAddGiftItemModalOpen, setIsAddGiftItemModalOpen] = useState<boolean>(false);
@@ -22,6 +24,8 @@ export function DashboardHeader () {
 
     // TODO: Create a useMemo to save all the stats for the overviewStats section.
     // POSSIBLY:  Move this to parent component, might need these same stats in EventTimeline
+
+
 
     return (
         <header className={styles.dashboardHeader}>
@@ -77,7 +81,7 @@ export function DashboardHeader () {
                     to='/people'
                     title='PEOPLE'
                     totalCount={people.length}
-                    breakdownStats={[{count: 12, label: 'birthdays'}]}
+                    breakdownStats={[{count: peopleWithBirthdays.length, label: 'birthdays'}]}
                 />
             </div>
 
