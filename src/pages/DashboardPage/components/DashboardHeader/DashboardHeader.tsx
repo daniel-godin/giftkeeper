@@ -8,10 +8,12 @@ import { AddPersonModal } from '../../../../components/modals/AddPersonModal/Add
 import { StatCard } from './components/StatCard/StatCard';
 import { useEvents } from '../../../../contexts/EventsContext';
 import { usePeople } from '../../../../contexts/PeopleContext';
+import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
 
 export function DashboardHeader () {
     const { events } = useEvents();
     const { people } = usePeople();
+    const upcomingEvents = useUpcomingEvents();
 
     // Modal States (boolean) -- Triggered By QuickActionButtons
     const [isAddGiftItemModalOpen, setIsAddGiftItemModalOpen] = useState<boolean>(false);
@@ -56,7 +58,9 @@ export function DashboardHeader () {
                     to='/events'
                     title='EVENTS'
                     totalCount={events.length}
-                    breakdownStats={[{count: 5, label: 'upcoming'}]}
+                    breakdownStats={[
+                        {count: upcomingEvents.length, label: 'upcoming'}
+                    ]}
                 />
 
                 <StatCard
