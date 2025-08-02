@@ -29,9 +29,6 @@ export function DashboardHeader () {
     const [isAddEventModalOpen, setIsAddEventModalOpen] = useState<boolean>(false);
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
 
-    // TODO: Create a useMemo to save all the stats for the overviewStats section.
-    // POSSIBLY:  Move this to parent component, might need these same stats in EventTimeline
-
     useEffect(() => {
         const getGiftItemsStats = async () => {
             if (!authState.user) { return }; // Guard/Optimization Clause
@@ -43,8 +40,6 @@ export function DashboardHeader () {
             const total = await getCountFromServer(totalQuery);
             const ideas = await getCountFromServer(ideasQuery);
             const purchased = await getCountFromServer(purchasedQuery);
-
-            // console.log(total.data().count, ideas, purchased);
 
             setGiftItemsStats(prev => ({
                 ...prev,
