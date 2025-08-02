@@ -6,7 +6,6 @@ import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { db } from '../../firebase/firebase';
 import { getPeopleCollRef } from '../../firebase/firestore';
 import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
-import { useNavigate } from 'react-router';
 import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 import { FormInput, FormSubmitButton } from '../ui';
 import { isValidBirthday } from '../../utils';
@@ -14,7 +13,6 @@ import { isValidBirthday } from '../../utils';
 export function Onboarding() {
     const { authState } = useAuth();
     const { syncBirthdayEvent }= useBirthdayEventManager();
-    const navigate = useNavigate();
 
     const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Person>(DEFAULT_PERSON);

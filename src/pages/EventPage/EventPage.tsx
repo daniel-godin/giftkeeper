@@ -7,7 +7,7 @@ import { Event } from '../../types/EventType';
 import { GiftItem } from '../../types/GiftType';
 import { usePeople } from '../../contexts/PeopleContext';
 import { Person } from '../../types/PersonType';
-import { ArrowLeft, Key, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
