@@ -10,10 +10,6 @@ export function DashboardPage () {
             <DashboardHeader />
 
             <EventTimeline />
-
-            {/* <div className={styles.mainContent}>
-                <Dashboard />
-            </div>  */}
         </section>
     )
 }
