@@ -13,47 +13,22 @@ import { usePeopleWithBirthdays } from '../../../../hooks/usePeopleWithBirthdays
 import { getCountFromServer, query, where } from 'firebase/firestore';
 import { getGiftItemsCollRef } from '../../../../firebase/firestore';
 import { useAuth } from '../../../../contexts/AuthContext';
+import { useGiftItems } from '../../../../contexts/GiftItemsContext';
+import { useGiftStats } from '../../../../hooks/useGiftStats';
 
 export function DashboardHeader () {
     const { authState } = useAuth();
     const { events } = useEvents();
     const { people } = usePeople();
+    // const { giftItems } = useGiftItems();
     const upcomingEvents = useUpcomingEvents();
     const peopleWithBirthdays = usePeopleWithBirthdays();
-
-    // Stats States
-    const [giftItemsStats, setGiftItemsStats] = useState({ total: 0, ideas: 0, purchased: 0 });
+    const giftStats = useGiftStats();
 
     // Modal States (boolean) -- Triggered By QuickActionButtons
     const [isAddGiftItemModalOpen, setIsAddGiftItemModalOpen] = useState<boolean>(false);
     const [isAddEventModalOpen, setIsAddEventModalOpen] = useState<boolean>(false);
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
-
-    useEffect(() => {
-        const getGiftItemsStats = async () => {
-            if (!authState.user) { return }; // Guard/Optimization Clause
-
-            const totalQuery = query(getGiftItemsCollRef(authState.user.uid));
-            const ideasQuery = query(getGiftItemsCollRef(authState.user.uid), where('status', '==', 'idea'));
-            const purchasedQuery = query(getGiftItemsCollRef(authState.user.uid), where('status', '==', 'purchased'));
-
-            const total = await getCountFromServer(totalQuery);
-            const ideas = await getCountFromServer(ideasQuery);
-            const purchased = await getCountFromServer(purchasedQuery);
-
-            setGiftItemsStats(prev => ({
-                ...prev,
-                total: total.data().count,
-                ideas: ideas.data().count,
-                purchased: purchased.data().count
-            }))
-
-        }
-
-        getGiftItemsStats()
-    }, []);
-
-
 
     return (
         <header className={styles.dashboardHeader}>
@@ -98,10 +73,10 @@ export function DashboardHeader () {
                 <StatCard
                     to='/giftItems'
                     title='GIFTS'
-                    totalCount={giftItemsStats.total}
+                    totalCount={giftStats.total}
                     breakdownStats={[
-                        {count: giftItemsStats.ideas, label: 'ideas'},
-                        {count: giftItemsStats.purchased, label: 'bought'}
+                        {count: giftStats.ideas, label: 'ideas'},
+                        {count: giftStats.purchased, label: 'bought'}
                     ]}
                 />
 
