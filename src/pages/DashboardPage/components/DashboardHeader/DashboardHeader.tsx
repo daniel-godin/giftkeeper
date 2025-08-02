@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import styles from './DashboardHeader.module.css'
 import { QuickActionButton } from './components/QuickActionButton/QuickActionButton'
 import { CalendarFold, Gift, UsersRound } from 'lucide-react'
@@ -10,17 +10,11 @@ import { useEvents } from '../../../../contexts/EventsContext';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
 import { usePeopleWithBirthdays } from '../../../../hooks/usePeopleWithBirthdays';
-import { getCountFromServer, query, where } from 'firebase/firestore';
-import { getGiftItemsCollRef } from '../../../../firebase/firestore';
-import { useAuth } from '../../../../contexts/AuthContext';
-import { useGiftItems } from '../../../../contexts/GiftItemsContext';
 import { useGiftStats } from '../../../../hooks/useGiftStats';
 
 export function DashboardHeader () {
-    const { authState } = useAuth();
     const { events } = useEvents();
     const { people } = usePeople();
-    // const { giftItems } = useGiftItems();
     const upcomingEvents = useUpcomingEvents();
     const peopleWithBirthdays = usePeopleWithBirthdays();
     const giftStats = useGiftStats();
