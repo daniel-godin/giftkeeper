@@ -29,12 +29,4 @@ export function useGiftStats() : GiftItemsStats {
 
         return stats
     }, [giftItems])
-
-
-
-
-
-
-
-
 }
