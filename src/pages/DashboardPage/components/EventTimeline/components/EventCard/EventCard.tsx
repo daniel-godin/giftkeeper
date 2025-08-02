@@ -2,19 +2,13 @@ import { Link } from 'react-router';
 import { Event } from '../../../../../../types/EventType';
 import { getDaysUntilDate } from '../../../../../../utils';
 import styles from './EventCard.module.css'
-import { usePeople } from '../../../../../../contexts/PeopleContext';
+import { getPersonNameFromId } from '../../../../../../utils/peopleUtils';
 
 interface EventCardProps {
     data: Event;
 }
 
 export function EventCard({ data }: EventCardProps) {
-    const { people } = usePeople();
-
-    const getPersonName = (personId: string) => {
-        const person = people.find(p => p.id === personId);
-        return person?.nickname || person?.name || 'Unknown';
-    }
 
     return (
         <div className={styles.eventCard}>
@@ -33,7 +27,7 @@ export function EventCard({ data }: EventCardProps) {
                 <div className={styles.peopleList}>
                     {data.people.map(personId => (
                         <div key={personId} className={styles.personTag}>
-                            {getPersonName(personId)}
+                            {getPersonNameFromId(personId)}
                         </div>
                     ))}
                 </div>
