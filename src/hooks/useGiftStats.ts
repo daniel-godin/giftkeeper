@@ -10,7 +10,11 @@ interface GiftItemsStats {
     total: number;
     ideas: number;
     purchased: number;
-    // Open for more later.
+}
+
+interface FilterOptions {
+    personId?: string;
+    eventId?: string;
 }
 
 export function useGiftStats() : GiftItemsStats {
