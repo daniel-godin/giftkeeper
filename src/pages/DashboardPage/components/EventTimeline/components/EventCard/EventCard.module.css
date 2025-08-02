@@ -18,6 +18,26 @@
     gap: 1rem;
 }
 
+.urgent {
+    border-color: #e53e3e;
+    background: linear-gradient(135deg, #fed7d7 0%, #f7fafc 100%);
+}
+
+.warning {
+    border-color: #f6ad55;
+    background: linear-gradient(135deg, #fef5e7 0%, #f7fafc 100%);
+}
+
+.calm {
+    border-color: #48bb78;
+    background: linear-gradient(135deg, #f0fff4 0%, #f7fafc 100%);
+}
+
+/* .calm {
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    border-color: #42a5f5;
+} */
+
 .eventCardHeader {
     display: flex;
     justify-content: space-between;

@@ -3,15 +3,26 @@ import { Event } from '../../../../../../types/EventType';
 import { getDaysUntilDate } from '../../../../../../utils';
 import styles from './EventCard.module.css'
 import { getPersonNameFromId } from '../../../../../../utils/peopleUtils';
+import { useMemo } from 'react';
 
 interface EventCardProps {
     data: Event;
 }
 
 export function EventCard({ data }: EventCardProps) {
+    
+    // Dynamic coloring depending on how soon the event is.
+    const urgencyLevel = useMemo(() => {
+        const daysUntil = getDaysUntilDate(data.date);
+
+        if (daysUntil <= 7) { return 'urgent' };
+        if (daysUntil <= 21) { return 'warning' };
+        // if (daysUntil <= 60) { return 'caution' };
+        return 'calm'
+    }, [data.date])
 
     return (
-        <div className={styles.eventCard}>
+        <div className={`${styles.eventCard} ${styles[urgencyLevel]}`}>
             <header className={styles.eventCardHeader}>
                 <div className={styles.titleAndDate}>
                     <h4 className={styles.eventTitle}>{data.title}</h4>
