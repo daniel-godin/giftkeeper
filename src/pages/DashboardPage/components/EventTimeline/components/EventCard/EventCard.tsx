@@ -17,8 +17,7 @@ export function EventCard({ data }: EventCardProps) {
 
         if (daysUntil <= 7) { return 'urgent' };
         if (daysUntil <= 21) { return 'warning' };
-        // if (daysUntil <= 60) { return 'caution' };
-        return 'calm'
+        return 'good'
     }, [data.date])
 
     return (
@@ -28,7 +27,7 @@ export function EventCard({ data }: EventCardProps) {
                     <h4 className={styles.eventTitle}>{data.title}</h4>
                     <p className={styles.eventDate}>{data.date}</p>
                 </div>
-                <div className={styles.countdownBadge}>
+                <div className={`${styles.countdownBadge} ${styles[urgencyLevel]}`}>
                     <span>{getDaysUntilDate(data.date)} days</span>
                 </div>
             </header>
@@ -72,7 +71,7 @@ export function EventCard({ data }: EventCardProps) {
                         max={data.budget}
                     />
                 </div>
-                <Link className={`unstyled-link ${styles.actionButton}`} to={`/events/${data.id}`}>
+                <Link className={`unstyled-link ${styles.actionButton} ${styles[urgencyLevel]}`} to={`/events/${data.id}`}>
                     Go To Event
                 </Link>
             </div>
