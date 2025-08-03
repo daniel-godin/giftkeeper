@@ -4,12 +4,15 @@ import { getDaysUntilDate } from '../../../../../../utils';
 import styles from './EventCard.module.css'
 import { getPersonNameFromId } from '../../../../../../utils/peopleUtils';
 import { useMemo } from 'react';
+import { useGiftItems } from '../../../../../../contexts/GiftItemsContext';
+import { formatCurrency } from '../../../../../../utils/currencyUtils';
 
 interface EventCardProps {
     data: Event;
 }
 
 export function EventCard({ data }: EventCardProps) {
+    const { giftItems } = useGiftItems();
     
     // Dynamic coloring depending on how soon the event is.
     const urgencyLevel = useMemo(() => {
@@ -18,7 +21,24 @@ export function EventCard({ data }: EventCardProps) {
         if (daysUntil <= 7) { return 'urgent' };
         if (daysUntil <= 21) { return 'warning' };
         return 'good'
-    }, [data.date])
+    }, [data.date]);
+
+    const eventStats = useMemo(() => {
+        const giftsForThisEvent = giftItems.filter(item => item.eventId === data.id);
+        const purchasedAmount = giftsForThisEvent.reduce((total, item) => {
+            return total + (item.purchasedCost || 0);
+        }, 0)
+
+        const returnObject = {
+            giftsForThisEvent,
+            numberOfPeople: data.people.length,
+            numberOfGifts: giftsForThisEvent.length,
+            budget: data.budget || 0,
+            purchasedAmount: purchasedAmount
+        }
+
+        return returnObject;
+    }, [data, giftItems]);
 
     return (
         <div className={`${styles.eventCard} ${styles[urgencyLevel]}`}>
@@ -46,31 +66,44 @@ export function EventCard({ data }: EventCardProps) {
             <div className={styles.eventStats}>
                 <div className={styles.progressContainer}>
                     <header className={styles.progressHeader}>
-                        <p>Gifts Purchased</p>
-                        <p>0/4 people</p>
+                        <p>Gifts Purchased For Event:</p>
+                        <p>{eventStats.numberOfGifts}</p>
                     </header>
 
-                    <progress
-                        className={styles.progressBar}
-                        value={0}
-                        max={data.budget}
-                    />
+                    <header className={styles.progressHeader}>
+                        <p>Number of People:</p>
+                        <p>{eventStats.numberOfPeople}</p>
+                    </header>
+
+                    {/* <div className={`${styles.customProgressBar} ${styles[urgencyLevel]}`}>
+                        <div 
+                            className={styles.progressFill}
+                            style={{ width: `${(eventStats.numberOfGifts / eventStats.numberOfPeople) * 100}%` }}
+                        />
+                    </div> */}
                 </div>
 
                 <div className={styles.divider}></div>
 
-                <div className={styles.progressContainer}>
-                    <header className={styles.progressHeader}>
-                        <p>Event Budget</p>
-                        <p>$0 / $400</p>
-                    </header>
+                    <div className={styles.progressContainer}>
+                        <header className={styles.progressHeader}>
+                            <p>Event Budget</p>
 
-                    <progress
-                        className={styles.progressBar}
-                        value={0}
-                        max={data.budget}
-                    />
-                </div>
+                            {data.budget && data.budget > 0 ? (
+                                <p>{formatCurrency(eventStats.purchasedAmount)} / {formatCurrency(eventStats.budget)}</p>
+                            ): (
+                                <p>No budget set</p>
+                            )}
+                        </header>
+
+                        <div className={`${styles.customProgressBar} ${styles[urgencyLevel]}`}>
+                            <div 
+                                className={styles.progressFill}
+                                style={{ width: `${eventStats.budget > 0 ? (eventStats.purchasedAmount / eventStats.budget) * 100 : 0}%` }}
+                            />
+                        </div>
+                    </div>
+
                 <Link className={`unstyled-link ${styles.actionButton} ${styles[urgencyLevel]}`} to={`/events/${data.id}`}>
                     Go To Event
                 </Link>

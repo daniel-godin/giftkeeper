@@ -136,6 +136,43 @@
     width: 100%;
 }
 
+.progressBar.urgent {
+    fill: #e53e3e;
+}
+
+.progressBar.warning {
+    background: #f6ad55;
+}
+
+.progressBar.good {
+    background: #48bb78;
+}
+
+.customProgressBar {
+    width: 100%;
+    height: 8px;
+    background-color: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progressFill {
+    height: 100%;
+    transition: width 0.3s ease;
+    border-radius: 4px;
+}
+
+.customProgressBar.urgent .progressFill {
+    background-color: #e53e3e;
+}
+
+.customProgressBar.warning .progressFill {
+    background-color: #f6ad55;
+}
+
+.customProgressBar.good .progressFill {
+    background-color: #48bb78;
+}
 
 .divider {
     border: 1px solid lightgray;
