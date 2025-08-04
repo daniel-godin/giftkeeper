@@ -29,9 +29,14 @@ export function EventCard({ data }: EventCardProps) {
             return total + (item.purchasedCost || 0);
         }, 0)
 
+        const peopleWithPurchasedGifts = new Set(
+            giftsForThisEvent.map(item => item.personId)
+        )
+
         const returnObject = {
             giftsForThisEvent,
             numberOfPeople: data.people.length,
+            peopleWithGifts: peopleWithPurchasedGifts.size,
             numberOfGifts: giftsForThisEvent.length,
             budget: data.budget || 0,
             purchasedAmount: purchasedAmount
@@ -66,43 +71,40 @@ export function EventCard({ data }: EventCardProps) {
             <div className={styles.eventStats}>
                 <div className={styles.progressContainer}>
                     <header className={styles.progressHeader}>
-                        <p>Gifts Purchased For Event:</p>
-                        <p>{eventStats.numberOfGifts}</p>
+                        <p>People With Gifts Purchased:</p>
+                        <p>{eventStats.peopleWithGifts}/{eventStats.numberOfPeople}</p>
                     </header>
 
-                    <header className={styles.progressHeader}>
-                        <p>Number of People:</p>
-                        <p>{eventStats.numberOfPeople}</p>
-                    </header>
-
-                    {/* <div className={`${styles.customProgressBar} ${styles[urgencyLevel]}`}>
+                    {/* Custom Progress Bar:  PeopleWithGifts / NumberOfPeople */}
+                    <div className={`${styles.customProgressBar} ${styles[urgencyLevel]}`}>
                         <div 
                             className={styles.progressFill}
-                            style={{ width: `${(eventStats.numberOfGifts / eventStats.numberOfPeople) * 100}%` }}
+                            style={{ width: `${eventStats.numberOfPeople > 0 ? (eventStats.peopleWithGifts / eventStats.numberOfPeople) * 100 : 0}%` }}
                         />
-                    </div> */}
+                    </div>
                 </div>
 
                 <div className={styles.divider}></div>
 
-                    <div className={styles.progressContainer}>
-                        <header className={styles.progressHeader}>
-                            <p>Event Budget</p>
+                <div className={styles.progressContainer}>
+                    <header className={styles.progressHeader}>
+                        <p>Event Budget</p>
 
-                            {data.budget && data.budget > 0 ? (
-                                <p>{formatCurrency(eventStats.purchasedAmount)} / {formatCurrency(eventStats.budget)}</p>
-                            ): (
-                                <p>No budget set</p>
-                            )}
-                        </header>
+                        {data.budget && data.budget > 0 ? (
+                            <p>{formatCurrency(eventStats.purchasedAmount)} / {formatCurrency(eventStats.budget)}</p>
+                        ): (
+                            <p>No budget set</p>
+                        )}
+                    </header>
 
-                        <div className={`${styles.customProgressBar} ${styles[urgencyLevel]}`}>
-                            <div 
-                                className={styles.progressFill}
-                                style={{ width: `${eventStats.budget > 0 ? (eventStats.purchasedAmount / eventStats.budget) * 100 : 0}%` }}
-                            />
-                        </div>
+                    {/* Custom Progress Bar:  TotalPurchasedAmountOfGiftItems / EventBudget */}
+                    <div className={`${styles.customProgressBar} ${styles[urgencyLevel]}`}>
+                        <div 
+                            className={styles.progressFill}
+                            style={{ width: `${eventStats.budget > 0 ? (eventStats.purchasedAmount / eventStats.budget) * 100 : 0}%` }}
+                        />
                     </div>
+                </div>
 
                 <Link className={`unstyled-link ${styles.actionButton} ${styles[urgencyLevel]}`} to={`/events/${data.id}`}>
                     Go To Event
