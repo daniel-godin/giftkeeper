@@ -1,16 +1,15 @@
 import { Link, useNavigate, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getGiftItemsCollRef, getPersonDocRef } from '../../firebase/firestore';
-import { deleteDoc, onSnapshot, query, where } from 'firebase/firestore';
+import { getPersonDocRef } from '../../firebase/firestore';
+import { deleteDoc } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { getDaysUntilDate } from '../../utils';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 import { useEvents } from '../../contexts/EventsContext';
 import { usePeople } from '../../contexts/PeopleContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
-import { GiftItem } from '../../types/GiftType';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
@@ -18,6 +17,7 @@ import { ArrowLeft, Pencil, Plus, Trash2 } from 'lucide-react';
 import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 import { EditPersonModal } from '../../components/modals/EditPersonModal/EditPersonModal';
 import { AddEventModal } from '../../components/modals/AddEventModal/AddEventModal';
+import { useGiftItems } from '../../contexts/GiftItemsContext';
 
 export function PersonPage() {
     const { authState } = useAuth();
@@ -26,65 +26,30 @@ export function PersonPage() {
     const { people, loading: peopleLoading } = usePeople();
     const { loading: eventsLoading } = useEvents();
     const upcomingEvents = useUpcomingEvents(personId);
-
+    const { giftItems } = useGiftItems();
     const navigate = useNavigate();
 
-    const [person, setPerson] = useState<Person>({ name: '' });
-    const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
-
-    // State For EditPersonModal:
+    // State For Modals:
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
     const [editPersonModalData, setEditPersonModalData] = useState<Person>(DEFAULT_PERSON);
-
-    // State for AddEventModal:
     const [isAddEventModalOpen, setIsAddEventModalOpen] = useState<boolean>(false);
+    
+    // Gift Items Array for PersonId
+    const filteredGiftItems = useMemo(() => {
+        return giftItems.filter(item => item.personId === personId);
+    }, [personId, giftItems]);
 
-    const giftIdeasCount = useMemo(() => {
-        return giftItems.filter(item => item.status === 'idea').length;
-    }, [giftItems])
-
-    // Grab data for personId from people data context array.  Don't duplicate Firestore listener.
-    useEffect(() => {
-        if (!personId || !people) { return }; // Guard Clause
-
-        const fetchPersonData = async () => {
-            const personData = people.find(person => person.id === personId);
-            if (!personData) { return }; // Guard Clause -- If no person found exit out.
-            // TODO:  Display some kind of message to user in UI that no person found with that ID.
-            setPerson(personData);
-        }
-
-        fetchPersonData();
-    }, [personId, people, authState.user?.uid]);
-
-    // Firestore Listener For Gift Items For Specific Person
-    useEffect(() => {
-        if (!authState.user || !personId) { return }; // Guard
-
-        const collRef = getGiftItemsCollRef(authState.user.uid);
-        const q = query(collRef, where('personId', '==', personId));
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const items = snapshot.docs.map(doc => {
-                const data = doc.data() as GiftItem;
-                return data
-            });
-
-            setGiftItems(items);
-        }, (error) => {
-            console.error('Error listening to gift items. Error:', error);
-        });
-
-        return () => unsubscribe();
-    }, [authState.user, personId]);
+    // Person Data for PersonId
+    const person = useMemo(() => {
+        return people.find(p => p.id === personId) || { ...DEFAULT_PERSON }; // Return empty "person" if .find() can't find the personId.
+    }, [personId, people])
 
     const handleDelete = async () => {
-
         if (!authState.user) { return }; // Auth Guard Clause
         if (!personId) { return }; // PersonID Guard Clause
 
         if (!window.confirm(`Are you sure you want to delete ${person.name}?`)) {
-            return;
+            return; // Confirm Window
         }
 
         try {
@@ -159,8 +124,8 @@ export function PersonPage() {
                     </div>
 
                     <div className={styles.statCard}>
-                        <div className={styles.statNumber}>{giftIdeasCount}</div>
-                        <div className={styles.statLabel}>Gift Ideas</div>
+                        <div className={styles.statNumber}>{filteredGiftItems.length}</div>
+                        <div className={styles.statLabel}>Gift Items</div>
                     </div>
                 </div>
 
@@ -205,7 +170,7 @@ export function PersonPage() {
 
                 {deviceType === 'mobile' && (
                     <>
-                        {giftItems.map((item) => (
+                        {filteredGiftItems.map((item) => (
                             <GiftItemCard
                                 key={item.id}
                                 item={item}
@@ -213,7 +178,7 @@ export function PersonPage() {
                         ))}
                     </>
                 )}
-                {deviceType === 'desktop' && ( <GiftItemsTable data={giftItems} /> )}         
+                {deviceType === 'desktop' && ( <GiftItemsTable data={filteredGiftItems} /> )}         
             </div>
 
             <EditPersonModal
