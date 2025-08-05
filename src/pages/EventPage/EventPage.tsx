@@ -1,80 +1,64 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './EventPage.module.css'
 import { Link, useNavigate, useParams } from 'react-router';
-import { deleteDoc, onSnapshot, query, where } from 'firebase/firestore';
+import { deleteDoc } from 'firebase/firestore';
 import { useEvents } from '../../contexts/EventsContext';
 import { Event } from '../../types/EventType';
-import { GiftItem } from '../../types/GiftType';
 import { usePeople } from '../../contexts/PeopleContext';
-import { Person } from '../../types/PersonType';
 import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
 import { getDaysUntilDate } from '../../utils';
 import { formatCurrency } from '../../utils/currencyUtils';
 import { GiftItemCard } from '../../components/GiftItemCard/GiftItemCard';
 import { useViewport } from '../../contexts/ViewportContext';
 import { GiftItemsTable } from '../../components/GiftItemsTable/GiftItemsTable';
-import { getEventDocRef, getGiftItemsCollRef } from '../../firebase/firestore';
+import { getEventDocRef } from '../../firebase/firestore';
 import { QuickAddButton } from '../../components/ui/QuickAddButton/QuickAddButton';
 import { EditEventModal } from '../../components/modals/EditEventModal/EditEventModal';
 import { DEFAULT_EVENT } from '../../constants/defaultObjects';
 import { useAuth } from '../../contexts/AuthContext';
+import { useGiftItems } from '../../contexts/GiftItemsContext';
 
 export function EventPage() {
     const { authState } = useAuth();
     const { eventId } = useParams();
     const deviceType = useViewport();
-    const { events, loading: eventsLoading } = useEvents();
-    const { people, loading: peopleLoading } = usePeople();
+    const { events } = useEvents();
+    const { people  } = usePeople();
+    const { giftItems, loading: giftItemsLoading } = useGiftItems();
     const navigate = useNavigate();
-
-    const [event, setEvent] = useState<Event>();
-    const [associatedPeople, setAssociatedPeople] = useState<Person[]>([]);
-    const [giftItemsLoading, setGiftItemsLoading] = useState<boolean>(false);
-    const [giftItems, setGiftItems] = useState<GiftItem[]>([]);
 
     // State For EditEventModal:
     const [isEditEventModalOpen, setIsEditEventModalOpen] = useState<boolean>(false);
     const [editEventModalData, setEditEventModalData] = useState<Event>(DEFAULT_EVENT);
 
-    // Fetch Data For UI (event details)
-    useEffect(() => {
-        // Guard Clause -- Wait For Data Contexts To Load
-        if (!authState.user || !eventId || eventsLoading || peopleLoading) { return };
+    // Event Details for EventId:
+    const event = useMemo(() => {
+        return events.find(event => event.id === eventId);
+    }, [eventId, events]);
 
-        // Find Event In Events Context
-        const eventDetails = events.find(event => event.id === eventId);
-        if (!eventDetails) { return }; // If no event found, cancel.  TODO:  Possibly set up a redirect or alternate display for user.
+    // Participant Details For EventId
+    const participantNames = useMemo(() => {
+        if (!event || !event.people) { return [] }; // Guard/Optimization Clause
 
-        // Get People Associated With Event (event.people array) [array of peopleId's]
-        const peopleDetails = people.filter(person => eventDetails.people.includes(person.id || ''))
+        const filteredPeople = people.filter(p => event.people.includes(p.id || ''));
+        return filteredPeople.map(person => {
+            return {
+                id: person.id || '',
+                name: person.nickname || person.name || 'Unknown'
+            }
+        })
+    }, [event?.people, people])
 
-        setEvent(eventDetails);
-        setAssociatedPeople(peopleDetails);
-
-        setGiftItemsLoading(true);
-
-        const q = query(getGiftItemsCollRef(authState.user.uid), where('eventId', '==', eventId))
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const items = snapshot.docs.map(doc => {
-                const data = doc.data() as GiftItem;
-                return data;
-            });
-
-            setGiftItems(items);
-            setGiftItemsLoading(false);
-        }, (error) => {
-            console.error('Error listening to gift items. Error:', error);
-            setGiftItemsLoading(false);
-        });
-
-        return () => unsubscribe();
-    }, [authState.user, eventId, events, people])
+    // Gift Items Array for EventId
+    const filteredGiftItems = useMemo(() => {
+        return giftItems.filter(item => item.eventId === eventId);
+    }, [eventId, giftItems]);
 
     // Budget Calculations: Event Budget, Total of Purchased Items, Difference Between Those Two.
     const budgetCalculations = useMemo(() => {
-        if (!giftItems || !event || !event.budget) { return }; // Guard Clause
+        if (!filteredGiftItems || filteredGiftItems.length === 0 || !event || !event.budget) { return }; // Guard/Optimization Clause
 
-        const totalPurchased = giftItems.reduce((sum, item) => {
+        const totalPurchased = filteredGiftItems.reduce((sum, item) => {
             return sum + (item.purchasedCost || 0);
         }, 0)
 
@@ -83,7 +67,7 @@ export function EventPage() {
             totalPurchased: totalPurchased,
             budgetLeft: event.budget - totalPurchased
         }
-    }, [giftItems, event?.budget])
+    }, [filteredGiftItems, event?.budget])
 
     const handleDelete = async () => {
 
@@ -159,11 +143,12 @@ export function EventPage() {
                             <header className={styles.statCardHeader}>Participants</header>
                             <div className={styles.statNumber}>{event.people.length}</div>
                             <div className={styles.statLabel}>
-                                {associatedPeople.map(person => (
+                                {participantNames.map(person => (
                                     <Link to={`/people/${person.id}`} key={person.id} className='unstyled-link'>
                                         {`${person.name} `}
                                     </Link>
                                 ))}
+
                             </div>
                         </>
                     )}
@@ -210,7 +195,7 @@ export function EventPage() {
                         {deviceType === 'mobile' && (
                             <div className={styles.giftItemList}>
                                 {/* Map through associated gift items */}
-                                {giftItems.map((item) => (
+                                {filteredGiftItems.map((item) => (
                                     <GiftItemCard
                                         key={item.id}
                                         item={item}
@@ -221,7 +206,7 @@ export function EventPage() {
 
                         {deviceType === 'desktop' && (
                             <GiftItemsTable
-                                data={giftItems}
+                                data={filteredGiftItems}
                             />
                         )}
 
