@@ -82,12 +82,6 @@ export function DashboardHeader () {
                 />
             </div>
 
-            {/* Alerts:  Add an X to "close" this warning message box*/}
-            {/* TODO:  CREATE THE SMART ALERTS SECTION -- WILL NEED MORE LOGIC */}
-            {/* <div className={styles.alertsContainer}>
-                Christmas is in 5 days and you need to purchase gifts for 4 people. Time to act!
-            </div> */}
-
             {/* Modals */}
             <AddGiftItemModal isOpen={isAddGiftItemModalOpen} onClose={() => setIsAddGiftItemModalOpen(false)} />
             <AddEventModal isOpen={isAddEventModalOpen} onClose={() => setIsAddEventModalOpen(false)} />
