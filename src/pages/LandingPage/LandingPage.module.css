@@ -1,13 +1,32 @@
-.landingPageContainer {
-    margin: 0;
-    padding: 0;
+:root {
+    /* colors, styles, sizing */
+}
 
+.landingPage {
     height: 100%;
     width: 100%;
 
-    display: grid;
-    place-content: center;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.navBar {
+    padding: 1rem;
+    background-color: white;
+
+    position: sticky;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+
+/* Hero Section */
+.heroSection {
+    min-height: 100dvh;
+    background-color: #f8fafc;
 }
 
 .tempLandingPageWelcomeContainer {
