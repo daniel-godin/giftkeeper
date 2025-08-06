@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import styles from './LandingPage.module.css'
-import { Circle } from 'lucide-react'
 import { AppMockup } from './components/AppMockup/AppMockup'
+import { CheckCircle2 } from 'lucide-react'
 
 export function LandingPage () {
     return (
@@ -9,7 +9,7 @@ export function LandingPage () {
             {/* Landing Page Nav Bar (Top of Screen) */}
             <nav className={styles.navBar}>
                 <h1 className={styles.giftKeeperLogo}>GiftKeeper</h1>
-                <Link className={styles.ctaButton} to={'/dashboard'}>Get Started</Link>
+                <Link className={`unstyled-link ${styles.ctaButton}`} to={'/dashboard'}>Dashboard</Link>
             </nav>
 
 
@@ -19,11 +19,21 @@ export function LandingPage () {
                     <h2>Stop Stressing About Gifts Forever</h2>
                     <p>Stop stressing about what to buy. Capture gift ideas the moment you hear them, track prices, set budgets, and always have the perfect present ready.</p>
                     <div className={styles.actionButtons}>
-                        <Link className={styles.ctaButton} to={'/dashboard'}>Try Gift Keeper Free</Link>
-                        <Link to={'/'}>Learn More</Link>
+                        <Link className={`unstyled-link ${styles.ctaButton}`} to={'/dashboard'}>Try Gift Keeper Free</Link>
+                        <Link className={`unstyled-link ${styles.secondaryCTAButton}`} to={'/'}>Learn More</Link>
                     </div>
-                    <Circle /><Circle /><Circle />
-                    <p><strong>Join thoughtful gift-givers</strong> who never forget special moments</p>
+
+                    <div className={styles.socialProof}>
+                        <div className={styles.avatars}>
+                            <div className={styles.avatar}>🎁</div>
+                            <div className={styles.avatar}>🎂</div>
+                            <div className={styles.avatar}>💝</div>
+                        </div>
+                        <div className={styles.socialProofText}>
+                            <strong>Join thoughtful gift-givers</strong>
+                            <p>who never forget special moments</p>
+                        </div>
+                    </div>
                 </header>
 
                 {/* "AppMockup" Image */}
@@ -46,15 +56,26 @@ export function LandingPage () {
                         <h3>Capture Ideas When They Happen</h3>
                         <p>Someone mentions they need new headphones? Save it instantly. See a perfect gift while browsing? Add the link. Never forget another brilliant gift idea.</p>
                         <ul className={styles.featureList}>
-                            <li className={styles.featureListItem}>Save gift ideas with photos and links</li>
-                            <li className={styles.featureListItem}>Mark items as purchased or just ideas</li>
-                            <li className={styles.featureListItem}>Track estimated vs actual costs</li>
-                            <li className={styles.featureListItem}>Quick add from your phone</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} /> Save gift ideas with photos and links</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} /> Mark items as purchased or just ideas</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} /> Track estimated vs actual costs</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} /> Quick add from your phone</li>
                         </ul>
                     </header>
 
                     <div className={styles.featuresVisual}>
-
+                        <div className={`${styles.mockupCard} ${styles.mockupCardIdea}`}>
+                            <strong>Wireless Headphones</strong> - Mike<br />
+                            <small>💡 Idea • Est. $150 • "Mentioned wanting AirPods Pro"</small>
+                        </div>
+                        <div className={`${styles.mockupCard} ${styles.mockupCardPurchased}`}>
+                            <strong>Yoga Mat</strong> - Sarah<br />
+                            <small>✅ Purchased • $85 • For her birthday</small>
+                        </div>
+                        <div className={`${styles.mockupCard} ${styles.mockupCardPending}`}>
+                            <strong>Garden Tools Set</strong> - Mom<br />
+                            <small>💡 Idea • Est. $120 • "Saw her eyeing these at store"</small>
+                        </div>
                     </div>
                 </div>
 
@@ -64,15 +85,35 @@ export function LandingPage () {
                         <h3>Never Blow Your Budget Again</h3>
                         <p>Set a Christmas budget of $800? Track every gift idea and purchase. See exactly how much you have left for each person before you overspend.</p>
                         <ul className={styles.featureList}>
-                            <li className={styles.featureListItem}>Set total budgets for holidays and birthdays</li>
-                            <li className={styles.featureListItem}>See spending progress in real-time</li>
-                            <li className={styles.featureListItem}>Track multiple people per event</li>
-                            <li className={styles.featureListItem}>Get alerts before you go over budget</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />Set total budgets for holidays and birthdays</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />See spending progress in real-time</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />Track multiple people per event</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />Get alerts before you go over budget</li>
                         </ul>
                     </header>
 
                     <div className={styles.featuresVisual}>
-
+                        <div className={styles.budgetCard}>
+                            <div className={styles.budgetCardHeader}>
+                                <div>
+                                    <strong>Christmas 2024</strong><br />
+                                    <small>Budget: $800 • Spent: $320 • 4 people</small>
+                                </div>
+                                <div className={styles.budgetRemaining}>$480 left</div>
+                            </div>
+                            <div className={styles.progressBarContainer}>
+                                <div className={styles.progressBarFill}></div>
+                            </div>
+                        </div>
+                        <div className={styles.budgetCard}>
+                            <div className={styles.budgetCardHeader}>
+                                <div>
+                                    <strong>Mom's Birthday</strong><br />
+                                    <small>Budget: $150 • 3 gift ideas saved</small>
+                                </div>
+                                <div className={styles.budgetCountdown}>12 days</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -82,15 +123,29 @@ export function LandingPage () {
                         <h3>Keep Everyone's Details Handy</h3>
                         <p>Remember that Mike loves tech gadgets and his birthday is in July? Store these details so you always have context for your gift ideas.</p>
                         <ul className={styles.featureList}>
-                            <li className={styles.featureListItem}>Birthday countdowns and reminders</li>
-                            <li className={styles.featureListItem}>Notes about interests and preferences</li>
-                            <li className={styles.featureListItem}>Relationship context for gift appropriateness</li>
-                            <li className={styles.featureListItem}>See all their gift ideas in one place</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />Birthday countdowns and reminders</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />Notes about interests and preferences</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />Relationship context for gift appropriateness</li>
+                            <li className={styles.featureListItem}><CheckCircle2 size={16} color={'green'} />See all their gift ideas in one place</li>
                         </ul>
                     </header>
 
                     <div className={styles.featuresVisual}>
-
+                        <div className={`${styles.personCard} ${styles.personCardTech}`}>
+                            <strong>Mike Johnson</strong> - Best Friend<br />
+                            <small>Birthday: July 8 • Loves tech, cooking, board games</small>
+                            <div className={styles.personCardFooter}>3 gift ideas saved • $285 total estimated</div>
+                        </div>
+                        <div className={`${styles.personCard} ${styles.personCardYoga}`}>
+                            <strong>Sarah Chen</strong> - Sister<br />
+                            <small>Birthday: March 15 • Loves yoga, coffee, reading</small>
+                            <div className={styles.personCardFooter}>2 gift ideas saved • 1 purchased for birthday</div>
+                        </div>
+                        <div className={`${styles.personCard} ${styles.personCardGardening}`}>
+                            <strong>Mom</strong> - Mother<br />
+                            <small>Birthday: Dec 3 • Loves gardening, wine, art</small>
+                            <div className={styles.personCardFooter}>4 gift ideas saved • Christmas & birthday</div>
+                        </div>
                     </div>
                 </div>
 
@@ -103,17 +158,17 @@ export function LandingPage () {
                 </div>
 
                 <header className={styles.ctaHeader}>
-                    <h3>Never Run Out of Gift Ideas Again</h3>
+                    <h2>Never Run Out of Gift Ideas Again</h2>
                     <p>Join Gift Keeper today and turn gift-giving from a source of stress into something you actually enjoy.</p>
-                    <div className={styles.ctaButtons}>
+                    <div className={styles.actionButtons}>
                         <Link className={styles.ctaButton} to={'/dashboard'}>Try Gift Keeper Free</Link>
-                        <Link to={'/'}>See Features</Link>
+                        <Link className={`unstyled-link ${styles.secondaryCTAButton}`} to={'/'}>See Features</Link>
                     </div>
 
                     <ul className={styles.trustIndicators}>
-                        <li className={styles.trustIndicator}>Free to start</li>
-                        <li className={styles.trustIndicator}>No credit card required</li>
-                        <li className={styles.trustIndicator}>Setup in under 2 minutes</li>
+                        <li className={styles.trustIndicator}><CheckCircle2 size={14} color={'green'} />Free to start</li>
+                        <li className={styles.trustIndicator}><CheckCircle2 size={14} color={'green'} />No credit card required</li>
+                        <li className={styles.trustIndicator}><CheckCircle2 size={14} color={'green'} />Setup in under 2 minutes</li>
                     </ul>
                 </header>
             </footer>
