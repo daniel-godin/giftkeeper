@@ -10,23 +10,53 @@
     flex-direction: column;
 }
 
+.section {
+    padding: 1rem;
+    min-height: 90dvh;
+}
+
+.ctaButton {
+    padding: 0.875rem 1.75rem;
+
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.ctaButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* Nav Bar */
 .navBar {
     padding: 1rem;
     background-color: white;
 
     position: sticky;
+    top: 0;
+    left: 0;
+    right: 0;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-
-
 /* Hero Section */
 .heroSection {
-    min-height: 100dvh;
     background-color: #f8fafc;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
 }
 
 .tempLandingPageWelcomeContainer {
@@ -44,4 +74,47 @@
     position: fixed;
     top: 50px;
     right: 50px;
+}
+
+/* "Features" Section */
+.featuresSection {
+
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+}
+
+.featuresShowcase {
+
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.featuresVisual {
+    padding: 1rem;
+    background-color: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+
+}
+
+
+/* Call-To-Action (CTA) Footer Section */
+.cta {
+    padding: 1rem;
+
+    min-height: 50dvh;
+
+    background-color: #f8fafc;
+
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
