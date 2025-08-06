@@ -16,7 +16,7 @@ export function LandingPage () {
             {/* Header/Hero Section */}
             <section className={`${styles.section} ${styles.heroSection}`}>
                 <header className={styles.sectionHeader}>
-                    <h2>Stop Stressing About Gifts Forever</h2>
+                    <h2>Stop Stressing About <strong className={styles.purpleFade}>Gifts Forever</strong></h2>
                     <p>Stop stressing about what to buy. Capture gift ideas the moment you hear them, track prices, set budgets, and always have the perfect present ready.</p>
                     <div className={styles.actionButtons}>
                         <Link className={`unstyled-link ${styles.ctaButton}`} to={'/dashboard'}>Try Gift Keeper Free</Link>
