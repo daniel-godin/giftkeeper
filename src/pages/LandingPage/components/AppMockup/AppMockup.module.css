@@ -1,0 +1,100 @@
+/* App Mockup */
+.appMockup {
+    position: relative;
+    perspective: 1000px;
+}
+
+.appScreen {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    overflow: hidden;
+    transform: rotateY(-5deg) rotateX(5deg);
+    transition: transform 0.5s ease;
+}
+
+.appScreen:hover {
+    transform: rotateY(0deg) rotateX(0deg);
+}
+
+.appHeader {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.appNav {
+    display: flex;
+    gap: 1rem;
+}
+
+.navItem {
+    padding: 0.5rem 1rem;
+    background: rgba(255,255,255,0.2);
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.appContent {
+    padding: 1.5rem;
+    height: 400px;
+    overflow: hidden;
+}
+
+.dashboardCard {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.cardTitle {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.statGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.statItem {
+    text-align: center;
+    padding: 1rem;
+    background: white;
+    border-radius: 8px;
+}
+
+.statNumber {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.statLabel {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.eventItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: white;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    border-left: 4px solid #667eea;
+}
