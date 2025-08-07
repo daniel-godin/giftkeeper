@@ -129,6 +129,20 @@ export function PersonPage() {
                     </div>
                 </div>
 
+                {/* "Notes" Section -- Only Render If Notes Aren't Empty */}
+                {person.notes && (
+                    <div className={styles.sectionContainer}>
+                        <header className={styles.sectionHeader}>
+                            <h4>Notes</h4>
+                        </header>
+
+                        <div className={styles.notes}>
+                            {person.notes}
+                        </div>
+
+                    </div>
+                )}
+
                 <div className={styles.sectionContainer}>
                     <header className={styles.sectionHeader}>
                         <h4>Upcoming Dates</h4>

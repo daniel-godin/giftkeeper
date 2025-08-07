@@ -172,6 +172,10 @@
     gap: 0.5rem;
 }
 
+.notes {
+    padding: 1rem;
+}
+
 .giftItems {
     grid-column-end: 3;
 }
