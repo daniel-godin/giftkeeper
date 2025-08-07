@@ -95,15 +95,6 @@ h3 {
     z-index: 1000; /* To stay above even the appMockup */
 }
 
-.giftKeeperLogo {
-    font-size: 1.5rem;
-    font-weight: 700;
-
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    background-clip: text;
-    color: transparent;
-}
-
 /* Hero Section */
 .heroSection {
     padding-top: 5rem; /* To account for navBar "position:fixed" */

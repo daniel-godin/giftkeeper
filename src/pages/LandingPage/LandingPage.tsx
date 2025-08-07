@@ -2,13 +2,14 @@ import { Link } from 'react-router'
 import styles from './LandingPage.module.css'
 import { AppMockup } from './components/AppMockup/AppMockup'
 import { CheckCircle2 } from 'lucide-react'
+import { Logo } from '../../components/ui/Logo/Logo'
 
 export function LandingPage () {
     return (
         <main className={styles.landingPage}>
             {/* Landing Page Nav Bar (Top of Screen) */}
             <nav className={styles.navBar}>
-                <h1 className={styles.giftKeeperLogo}>GiftKeeper</h1>
+                <Logo />
                 <Link className={`unstyled-link ${styles.ctaButton}`} to={'/dashboard'}>Dashboard</Link>
             </nav>
 
