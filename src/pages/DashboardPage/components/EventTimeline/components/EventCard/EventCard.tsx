@@ -2,10 +2,10 @@ import { Link } from 'react-router';
 import { Event } from '../../../../../../types/EventType';
 import { getDaysUntilDate } from '../../../../../../utils';
 import styles from './EventCard.module.css'
-import { getPersonNameFromId } from '../../../../../../utils/peopleUtils';
 import { useMemo } from 'react';
 import { useGiftItems } from '../../../../../../contexts/GiftItemsContext';
 import { formatCurrency } from '../../../../../../utils/currencyUtils';
+import { usePeople } from '../../../../../../contexts/PeopleContext';
 
 interface EventCardProps {
     data: Event;
@@ -13,6 +13,7 @@ interface EventCardProps {
 
 export function EventCard({ data }: EventCardProps) {
     const { giftItems } = useGiftItems();
+    const { people } = usePeople();
     
     // Dynamic coloring depending on how soon the event is.
     const urgencyLevel = useMemo(() => {
@@ -44,6 +45,11 @@ export function EventCard({ data }: EventCardProps) {
 
         return returnObject;
     }, [data, giftItems]);
+
+    const getPersonNameFromId = (personId: string): string => {
+        const person = people.find(p => p.id === personId);
+        return person?.nickname || person?.name || 'Unknown';
+    }
 
     return (
         <div className={`${styles.eventCard} ${styles[urgencyLevel]}`}>
