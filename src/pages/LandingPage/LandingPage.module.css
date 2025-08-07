@@ -1,28 +1,384 @@
-.landingPageContainer {
-    margin: 0;
-    padding: 0;
+:root {
+    /* colors, styles, sizing */
+}
 
+.landingPage {
     height: 100%;
     width: 100%;
 
-    display: grid;
-    place-content: center;
-    place-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
-.tempLandingPageWelcomeContainer {
-    margin: 0;
-    padding: 1rem;
+.section {
+    padding: 2rem;
+    /* min-height: 85dvh; */
+}
 
-    border: 1px solid black;
-    border-radius: .5rem;
+.ctaButton {
+    padding: 0.875rem 1.75rem;
+
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+}
+
+.ctaButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.secondaryCTAButton {
+    background: white;
+    color: #667eea;
+    padding: 0.875rem 1.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.secondaryCTAButton:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.purpleFade {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    background-clip: text;
+    color: transparent;
+}
+
+/* Header Text For Each Section */
+h2 {
+    font-size: 3rem;
+    font-weight: 800;
+    text-align: center;
+}
+
+h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.subHeaderText {
+    color: #64748b;
+    font-size: 1.25rem;
+}
+
+/* Nav Bar */
+.navBar {
+    padding: 0.5rem 2rem;
+    background-color: white;
+    opacity: 0.95;
+
+    position: fixed;
+    top: 0;
+    width: 100%;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    z-index: 1000; /* To stay above even the appMockup */
+}
+
+.giftKeeperLogo {
+    font-size: 1.5rem;
+    font-weight: 700;
+
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    background-clip: text;
+    color: transparent;
+}
+
+/* Hero Section */
+.heroSection {
+    padding-top: 5rem; /* To account for navBar "position:fixed" */
+
+    background-color: #f8fafc;
+
+    min-height: 85dvh;
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    align-items: center;
+}
+
+@media (max-width: 768px) {
+    .heroSection {
+        grid-template-columns: 1fr;
+    }
+}
+
+.sectionHeader {
 
     display: flex;
     flex-direction: column;
+    gap: 2rem;
+
 }
 
-.dashboardLink {
-    position: fixed;
-    top: 50px;
-    right: 50px;
+.actionButtons {
+
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.socialProof {
+
+    display: flex;
+    gap: 2rem;
+}
+
+.avatars {
+    
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+
+    color: white;
+    
+    margin-left: -10px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+
+    border: 3px solid white;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-weight: bold;
+}
+
+.avatar:first-child {
+    margin-left: 0;
+}
+
+/* "Features" Section */
+.featuresSection {
+    padding-top: 5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+
+    scroll-margin-top: 5rem; /* For clicking the "learn more" buttons */
+}
+
+.featuresHeader {
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+}
+
+.featuresShowcase {
+
+
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .featuresShowcase {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+.featuresShowcaseHeader {
+
+
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.featureList {
+    list-style: none;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.featureListItem {
+
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+}
+
+.featuresVisual {
+    padding: 1rem;
+    background-color: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+
+    transition: transform 0.3s ease;
+}
+
+.featuresVisual:hover {
+    transform: translateY(-5px);
+}
+
+.mockupCard {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.mockupCardIdea {
+    border-left: 4px solid #667eea;
+}
+
+.mockupCardPurchased {
+    border-left: 4px solid #48bb78;
+}
+
+.mockupCardPending {
+    border-left: 4px solid #f6ad55;
+}
+
+.budgetCard {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.budgetCardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.budgetRemaining {
+    color: #48bb78;
+    font-weight: bold;
+}
+
+.budgetCountdown {
+    color: #667eea;
+    font-weight: bold;
+}
+
+.progressBarContainer {
+    background: #e2e8f0;
+    height: 8px;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+}
+
+.progressBarFill {
+    background: #48bb78;
+    height: 8px;
+    width: 40%;
+    border-radius: 4px;
+}
+
+.personCard {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.personCardTech {
+    border-left: 4px solid #667eea;
+}
+
+.personCardYoga {
+    border-left: 4px solid #48bb78;
+}
+
+.personCardGardening {
+    border-left: 4px solid #f6ad55;
+}
+
+.personCardFooter {
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+
+/* Call-To-Action (CTA) Footer Section */
+.cta {
+    padding: 1rem;
+    padding-top: 5rem;
+
+    min-height: 50dvh;
+
+    background-color: #f8fafc;
+
+    display: flex;
+    gap: 1rem;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.ctaBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    color: #667eea;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.ctaHeader {
+
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.trustIndicators {
+    list-style: none;
+
+    display: flex;
+    flex-wrap: none;
+    gap: 1rem;
+}
+
+.trustIndicator {
+
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0.25rem;
 }
