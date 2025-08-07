@@ -139,7 +139,6 @@ export function PersonPage() {
                         <div className={styles.notes}>
                             {person.notes}
                         </div>
-
                     </div>
                 )}
 
