@@ -79,7 +79,6 @@ export function SignUpForm () {
 
     return (
         <form className={styles.signUpForm} onSubmit={handleSubmit}>
-            <h2 className={styles.formHeader}>Sign Up</h2>
 
             {/* Sign Up Email: */}
             <FormInput
@@ -111,6 +110,7 @@ export function SignUpForm () {
                 submittingText='Signing Up...'
                 disabled={!formData.email.trim() || !formData.password.trim() || formData.password.length < 8}
             />
+            
         </form>
     )
 }

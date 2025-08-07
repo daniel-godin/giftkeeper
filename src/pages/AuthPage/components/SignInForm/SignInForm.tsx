@@ -3,20 +3,14 @@ import styles from './SignInForm.module.css'
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../../firebase/firebase';
 import { useNavigate } from 'react-router';
-import { AuthMode } from '../../AuthPage';
 import { FormInput, FormSubmitButton } from '../../../../components/ui';
-
-interface SignInFormProps {
-    authMode: AuthMode;
-    setAuthMode: (mode: AuthMode) => void;
-}
 
 interface SignInFormData {
     email: string;
     password: string;
 }
 
-export function SignInForm ({ setAuthMode } : SignInFormProps) {
+export function SignInForm () {
     const navigate = useNavigate();
 
     const [status, setStatus] = useState<string>('');
@@ -54,7 +48,6 @@ export function SignInForm ({ setAuthMode } : SignInFormProps) {
 
     return (
         <form className={styles.signInForm} onSubmit={handleSubmit}>
-            <h2 className={styles.formHeader}>Sign In</h2>
 
             {/* Sign In Email: */}
             <FormInput
@@ -86,8 +79,6 @@ export function SignInForm ({ setAuthMode } : SignInFormProps) {
                 submittingText='Signing In...'
                 disabled={!formData.email.trim() || !formData.password.trim()}
             />
-
-            <button type='button' className={styles.forgotPasswordButton} onClick={() => setAuthMode('password_reset')}>Forgot Password?</button>
         </form>
     )
 }
