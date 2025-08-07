@@ -179,6 +179,20 @@ export function EventPage() {
                 </div>
             </div>
 
+            {/* "Notes" Section -- Only Render If Notes Aren't Empty */}
+            {event && event.notes && (
+                <div className={styles.sectionContainer}>
+                    <header className={styles.sectionHeader}>
+                        <h4>Notes</h4>
+                    </header>
+
+                    <div className={styles.notes}>
+                        {event.notes}
+                    </div>
+
+                </div>
+            )}
+
             <div className={styles.giftTrackerContainer}>
                 {giftItemsLoading ? (
                     <div>Loading Gift Items...</div>

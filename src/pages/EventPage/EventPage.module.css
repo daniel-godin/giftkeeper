@@ -88,6 +88,33 @@
     font-size: 1rem;
 }
 
+.sectionContainer {
+    border-radius: 7.5px;
+
+    background-color: white;
+}
+
+.sectionHeader {
+    padding: 1rem;
+
+    background-color: #007bff;
+    color: white;
+
+    border-top-right-radius: 7.5px;
+    border-top-left-radius: 7.5px;
+
+    font-size: 1.1rem;
+    font-weight: bold;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notes {
+    padding: 1rem;
+}
+
 /* Gift Tracker Section.  Might Pull this into it's own component at some point, along with it's own CSS Module */
 /* Defaults: Mobile */
 .giftTrackerContainer {
