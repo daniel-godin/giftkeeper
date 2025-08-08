@@ -12,6 +12,7 @@
     "test:watch": "vitest --watch"
   },
   "dependencies": {
+    "@sentry/react": "^10.3.0",
     "firebase": "^11.6.1",
     "lucide-react": "^0.507.0",
     "react": "^19.0.0",
