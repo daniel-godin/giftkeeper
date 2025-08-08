@@ -13,7 +13,6 @@ export function LandingPage () {
                 <Link className={`unstyled-link ${styles.ctaButton}`} to={'/dashboard'}>Dashboard</Link>
             </nav>
 
-
             {/* Header/Hero Section */}
             <section className={`${styles.section} ${styles.heroSection}`}>
                 <header className={styles.sectionHeader}>
