@@ -7,7 +7,13 @@ export const centsToDollars = (cents: number): number => {
 }
 
 // For Display Purposes - Returns Formatted String With USD ($) Sign Before
+// Note:  Always returns with cents as well (example: "$1,015.00"), even if ".00"
 export const formatCurrency = (cents: number): string => {
-    if (cents === 0 || !cents) { return `$0.00` };
-    return `$${(cents / 100).toFixed(2)}`;
+    const formatter = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    })
+    const convertToDollars = cents / 100;
+    const formatted = formatter.format(convertToDollars);
+    return formatted;
 }
