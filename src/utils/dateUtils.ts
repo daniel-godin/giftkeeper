@@ -1,19 +1,27 @@
-export const getDaysUntilDate = (date: string) => {
-    // date string should be either 'yyyy-mm-dd' or '1900-mm-dd' 1900 being default/fake year.
-
-    const formattedDate = new Date(date);
-    const today = new Date();
-    const currentYear = today.getFullYear();
-
-    // Always use current year for countdown, regardless of stored year
-    const nextBirthday = new Date(currentYear, formattedDate.getMonth(), formattedDate.getDate());
-
-    if (nextBirthday < today) {
-        nextBirthday.setFullYear(currentYear + 1);
+// Date string input "YYYY-MM-DD"
+export const getDaysUntilDate = (date: string): number => {
+    // Check format first
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        throw new Error(`Invalid date format: ${date}. Expected YYYY-MM-DD`);
     }
 
-    const diffTime = nextBirthday.getTime() - today.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    // Format both date string & today's date
+    const [year, month, day] = date.split('-').map(Number); // Because "YYYY-MM-DD" returns midnight timestamp of UTC. (year, month -1, day) {month is zero indez} returns locale timezone.
+    let formattedDate = new Date(year, month - 1, day);
+    let today = new Date();
+
+    // Check if date is actually valid (catches things like Feb 31st)
+    if (formattedDate.getFullYear() !== year || formattedDate.getMonth() !== month - 1 || formattedDate.getDate() !== day) {
+        throw new Error(`Invalid date: ${date}`);
+    }
+
+    // Set both dates to midnight for equality purposes
+    formattedDate.setHours(0, 0, 0, 0);
+    today.setHours(0, 0, 0, 0);
+
+    // Get difference between dates in milliseconds, then convert to days
+    const diffTime = formattedDate.getTime() - today.getTime();
+    return Number(Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
 }
 
 // Checks if birthday Date is today or in the past.
