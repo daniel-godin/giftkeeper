@@ -1,11 +1,11 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { Toast } from "../types/ToastTypes";
 import * as Sentry from '@sentry/react';
-
+import { DEFAULT_TOAST } from "../constants/defaultObjects";
 
 interface ToastContextType {
     toasts: Toast[];
-    addToast: (message: string, type: Toast['type'], error?: Error, title?: string, duration?: number) => void;
+    addToast: (params: Omit<Toast, 'id'>) => void;
     removeToast: (id: string) => void;
 }
 
@@ -19,15 +19,17 @@ export const useToast = () => {
 
 export function ToastProvider({ children } : { children: React.ReactNode }) {
     const [toasts, setToasts] = useState<Toast[]>([]);
-
-    useEffect(() => {
-        console.log('toasts:', toasts);
-    }, [toasts])
     
+    const addToast = ({
+        message, 
+        type, 
+        error, 
+        title,
+        duration = 5000
+    } : Omit<Toast, 'id'>) => {
 
-    const addToast = (message: string, type: Toast['type'], error?: Error, title?: string, duration = 5000) => {
         const id = crypto.randomUUID();
-        const newToast: Toast = { id, type, message, title, duration };
+        const newToast: Toast = { ...DEFAULT_TOAST, id, type, message, title, duration };
 
         setToasts(prev => [...prev, newToast]);
 
@@ -38,7 +40,7 @@ export function ToastProvider({ children } : { children: React.ReactNode }) {
             }, duration)
         }
 
-        // Log errors in Sentry?
+        // Log errors in Sentry
         if (type === 'error' && error) {
             Sentry.captureException(error);
         }
