@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../../firebase/firebase';
 import { useNavigate } from 'react-router';
 import { FormInput, FormSubmitButton } from '../../../../components/ui';
+import { useToast } from '../../../../contexts/ToastContext';
 
 interface SignInFormData {
     email: string;
@@ -12,8 +13,8 @@ interface SignInFormData {
 
 export function SignInForm () {
     const navigate = useNavigate();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<SignInFormData>({email: '', password: ''});
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -30,19 +31,46 @@ export function SignInForm () {
         e.preventDefault();
 
         setIsSubmitting(true);
-        setStatus('Signing in...');
-
         try {
             await signInWithEmailAndPassword(auth, formData.email, formData.password);
-            setStatus('Successfully Signed In. Redirecting You...');
-            setTimeout(() => {
-                navigate('/dashboard');
-                setIsSubmitting(false);
-            }, 1000)
+
+            addToast(
+                'Successfully signed in. Redirecting you to your dashboard...',
+                'success',
+            )
+            setTimeout(() => { navigate('/dashboard'); }, 1000);
         } catch (error) {
-            console.error('Error Signing In. Error:', error);
+
+            interface FirebaseError extends Error {
+                code?: string;
+            }
+            
+            let firebaseError = error as FirebaseError;
+
+            let toastMessage = 'Error signing in.  Please try again.';
+
+            switch (firebaseError.code) {
+                case 'auth/invalid-credential':
+                    toastMessage = 'Invalid email or password.'
+                    break
+                case 'auth/user-disabled':
+                    toastMessage = 'This account has been disabled. Contact support.'
+                    break
+                case 'auth/too-many-requests':
+                    toastMessage = 'Too many failed attempts. Please try again in a few minutes.'
+                    break
+                case 'auth/network-request-failed':
+                    toastMessage = 'Connection error. Please check your internet and try again.'
+                    break
+            }
+
+            addToast(
+                toastMessage, 
+                'error', 
+                error as Error
+            )
+        } finally {
             setIsSubmitting(false);
-            setStatus('Error Signing In');
         }
     }
 
@@ -70,8 +98,6 @@ export function SignInForm () {
                 value={formData.password}
                 onChange={handleInputChange}
             />
-
-            <output>{status}</output>
 
             <FormSubmitButton
                 text='Sign In'
