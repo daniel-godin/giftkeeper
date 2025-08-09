@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Toast } from "../types/ToastTypes";
+import * as Sentry from '@sentry/react';
 
 
 interface ToastContextType {
     toasts: Toast[];
-    addToast: (message: string, type: Toast['type'], title?: string, duration?: number) => void;
+    addToast: (message: string, type: Toast['type'], error?: Error, title?: string, duration?: number) => void;
     removeToast: (id: string) => void;
 }
 
@@ -24,17 +25,22 @@ export function ToastProvider({ children } : { children: React.ReactNode }) {
     }, [toasts])
     
 
-    const addToast = (message: string, type: Toast['type'], title?: string, duration = 5000) => {
+    const addToast = (message: string, type: Toast['type'], error?: Error, title?: string, duration = 5000) => {
         const id = crypto.randomUUID();
         const newToast: Toast = { id, type, message, title, duration };
 
-        setToasts(prev => [...prev, newToast])
+        setToasts(prev => [...prev, newToast]);
 
         // Auto-dismiss
         if (duration > 0) {
             setTimeout(() => {
                 removeToast(id);
             }, duration)
+        }
+
+        // Log errors in Sentry?
+        if (type === 'error' && error) {
+            Sentry.captureException(error);
         }
     }
 
