@@ -1,0 +1,40 @@
+/* Mobile Styling */
+@media (max-width: 768px) {
+    .toastContainer {
+        position: fixed;
+        bottom: 100px;
+        left: 50%;
+        transform: translateX(-50%); /* Centers horizontally on mobile */
+
+        max-width: 90dvw;
+        height: auto;
+
+        z-index: 9999; /* Make sure it's above everything else */
+        pointer-events: none;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
+
+
+/* Toast Container For Desktop: */
+@media (min-width: 768px) {
+    .toastContainer {
+        position: fixed;
+        top: 100px;
+        right: 100px;
+        transform: none;
+
+        max-width: 500px;
+        height: auto;
+
+        z-index: 9999; /* Make sure it's above everything else */
+        pointer-events: none;
+
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}
