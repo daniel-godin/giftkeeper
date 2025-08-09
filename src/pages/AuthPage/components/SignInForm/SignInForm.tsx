@@ -34,17 +34,18 @@ export function SignInForm () {
         try {
             await signInWithEmailAndPassword(auth, formData.email, formData.password);
 
-            addToast(
-                'Successfully signed in. Redirecting you to your dashboard...',
-                'success',
-            )
+            addToast({
+                type: 'success',
+                title: 'Success!',
+                message: "Successfully logged in. Redirecting you now."
+            })
             setTimeout(() => { navigate('/dashboard'); }, 1000);
         } catch (error) {
 
             interface FirebaseError extends Error {
                 code?: string;
             }
-            
+
             let firebaseError = error as FirebaseError;
 
             let toastMessage = 'Error signing in.  Please try again.';
@@ -64,11 +65,12 @@ export function SignInForm () {
                     break
             }
 
-            addToast(
-                toastMessage, 
-                'error', 
-                error as Error
-            )
+            addToast({
+                type: 'error',
+                title: 'Failure To Sign In',
+                message: toastMessage,
+                error: error as Error,
+            })
         } finally {
             setIsSubmitting(false);
         }
