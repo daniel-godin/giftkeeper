@@ -21,10 +21,10 @@ export function ToastProvider({ children } : { children: React.ReactNode }) {
     const [toasts, setToasts] = useState<Toast[]>([]);
     
     const addToast = ({
-        message, 
-        type, 
-        error, 
+        type,
         title,
+        message, 
+        error, 
         duration = 5000
     } : Omit<Toast, 'id'>) => {
 
