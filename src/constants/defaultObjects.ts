@@ -1,6 +1,7 @@
 import { Event } from "../types/EventType";
 import { GiftItem } from "../types/GiftType";
 import { Person } from "../types/PersonType";
+import { Toast } from "../types/ToastTypes";
 import { UserProfile } from "../types/UserType";
 
 export const DEFAULT_PERSON: Person = {
@@ -39,4 +40,13 @@ export const DEFAULT_EVENT: Event = {
 export const DEFAULT_USER_PROFILE: UserProfile = {
     id: '',
     theme: 'light',
+}
+
+export const DEFAULT_TOAST: Toast = {
+    id: '',
+    type: 'info',
+    title: '',
+    message: '',
+    error: undefined,
+    duration: 5000 // Default is 5 seconds, saved in ms.
 }
