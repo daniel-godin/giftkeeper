@@ -5,6 +5,7 @@ import { App } from './App'
 import { AuthProvider } from './contexts/AuthContext'
 import * as Sentry from "@sentry/react"
 import { ToastProvider } from './contexts/ToastContext'
+import { ToastContainer } from './components/ui/Toast/ToastContainer'
 
 Sentry.init({
     dsn: "https://b3386d5a4a301b84469386a7b01be48c@o4509810252906496.ingest.us.sentry.io/4509810256510976",
@@ -20,6 +21,7 @@ createRoot(rootElement).render(
         <AuthProvider>
             <ToastProvider>
                 <App />
+                <ToastContainer />
             </ToastProvider>
         </AuthProvider>
     </StrictMode>,
