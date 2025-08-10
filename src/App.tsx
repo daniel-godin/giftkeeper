@@ -10,31 +10,34 @@ import { EventsPage } from "./pages/EventsPage/EventsPage";
 import { PersonPage } from "./pages/PersonPage/PersonPage";
 import { EventPage } from "./pages/EventPage/EventPage";
 import { DataProvider } from "./contexts/DataProvider";
+import { ErrorBoundary } from "./components/ErrorBoundary/ErrorBoundary";
 
 export function App() {
     return (
-        <BrowserRouter>
-            <Routes>
-                {/* Basic Redirect Route */}
-                <Route path="*" element={<LandingPage />} />
+        <ErrorBoundary>
+            <BrowserRouter>
+                <Routes>
+                    {/* Basic Redirect Route */}
+                    <Route path="*" element={<LandingPage />} />
 
-                {/* Public Routes */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/auth" element={<AuthPage />} />
+                    {/* Public Routes */}
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/auth" element={<AuthPage />} />
 
-                {/* Protected Routes */}
-                <Route path="/" element={<ProtectedRoute />}>
-                    <Route path="dashboard" element={<DashboardPage />} />
-                    <Route path="profile" element={<ProfilePage />} />
+                    {/* Protected Routes */}
+                    <Route path="/" element={<ProtectedRoute />}>
+                        <Route path="dashboard" element={<DashboardPage />} />
+                        <Route path="profile" element={<ProfilePage />} />
 
-                    <Route path="people" element={<PeoplePage />} />
-                    <Route path="people/:personId" element={<PersonPage />} />
+                        <Route path="people" element={<PeoplePage />} />
+                        <Route path="people/:personId" element={<PersonPage />} />
 
-                    <Route path="events" element={<EventsPage />} />
-                    <Route path="events/:eventId" element={<EventPage />} />
-                </Route>
-            </Routes>
-        </BrowserRouter>
+                        <Route path="events" element={<EventsPage />} />
+                        <Route path="events/:eventId" element={<EventPage />} />
+                    </Route>
+                </Routes>
+            </BrowserRouter>
+        </ErrorBoundary>
     )
 }
 
