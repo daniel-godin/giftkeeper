@@ -37,7 +37,8 @@ export function SignInForm () {
             addToast({
                 type: 'success',
                 title: 'Success!',
-                message: "Successfully logged in. Redirecting you now."
+                message: "Successfully logged in. Redirecting you now.",
+                duration: 3000
             })
             setTimeout(() => { navigate('/dashboard'); }, 1000);
         } catch (error) {
