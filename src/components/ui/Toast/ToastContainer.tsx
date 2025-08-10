@@ -1,20 +1,15 @@
 import { createPortal } from 'react-dom';
 import { useToast } from '../../../contexts/ToastContext'
 import styles from './ToastContainer.module.css'
-
-interface ToastContainerProps {
-
-}
+import { Toast } from './Toast';
 
 export function ToastContainer() {
-    const { toasts, addToast, removeToast } = useToast();
+    const { toasts } = useToast();
 
     return createPortal (
         <div className={styles.toastContainer}>
             {toasts.map(toast => (
-                <div key={toast.id} className={styles.toast}>
-                    <p>{toast.message}</p>
-                </div>
+                <Toast key={toast.id} toast={toast} />
             ))}
         </div>,
         document.getElementById('toast-root') || document.body

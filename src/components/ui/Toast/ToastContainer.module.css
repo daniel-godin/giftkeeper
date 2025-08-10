@@ -10,7 +10,6 @@
         height: auto;
 
         z-index: 9999; /* Make sure it's above everything else */
-        pointer-events: none;
 
         display: flex;
         flex-direction: column;
@@ -23,15 +22,14 @@
 @media (min-width: 768px) {
     .toastContainer {
         position: fixed;
-        top: 100px;
-        right: 100px;
+        top: 85px;
+        right: 10px;
         transform: none;
 
         max-width: 500px;
         height: auto;
 
         z-index: 9999; /* Make sure it's above everything else */
-        pointer-events: none;
 
         display: flex;
         flex-direction: column;

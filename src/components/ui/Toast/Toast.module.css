@@ -1,0 +1,110 @@
+/* Toast Animations */
+
+/* Slide in from right with subtle bounce */
+@keyframes slideInBounce {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(-8px);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(4px);
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Slide out to right */
+@keyframes slideOut {
+    0% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.toast {
+    background-color: white;
+    padding: 0.5rem 1rem;
+
+    /* No height set, height will grow as needed for message length */
+    /* Mobile First Design:  100% width of screen minus 32px, Desktop will be 400px width  */
+    width: calc(100dvw - 32px);
+
+    border-left: 4px solid;
+    border-radius: 7.5px;
+
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
+    display: grid;
+    grid-template-columns: 30px 1fr 30px;
+    gap: 1rem;
+    align-items: start;
+
+    animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform-origin: right center;
+}
+
+.toast:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.toast.closing {
+    animation: slideOut 0.3s ease-in-out forwards;
+}
+
+@media (min-width: 768px) {
+    .toast {
+        width: 400px;
+    }
+}
+
+.toast.success {
+    border-left-color: #10b981;
+}
+
+.toast.error {
+    border-left-color: #ef4444;
+}
+
+.toast.warning {
+    border-left-color: #f59e0b;
+}
+
+.toast.info {
+    border-left-color: #3b82f6;
+}
+
+.titleAndMessage {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.25rem;
+    min-height: 0;
+}
+
+.toastTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.toastMessage {
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.closeToastButton {
+    justify-self: end;
+}
