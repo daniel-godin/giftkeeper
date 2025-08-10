@@ -5,6 +5,7 @@ import { auth } from '../../../../firebase/firebase';
 import { useNavigate } from 'react-router';
 import { FormInput, FormSubmitButton } from '../../../../components/ui';
 import { useToast } from '../../../../contexts/ToastContext';
+import { devError } from '../../../../utils/logger';
 
 interface SignInFormData {
     email: string;
@@ -38,10 +39,11 @@ export function SignInForm () {
                 type: 'success',
                 title: 'Success!',
                 message: "Successfully logged in. Redirecting you now.",
-                duration: 3000
+                duration: 2000
             })
             setTimeout(() => { navigate('/dashboard'); }, 1000);
         } catch (error) {
+            devError('Error signing in. Error:', error);
 
             interface FirebaseError extends Error {
                 code?: string;
@@ -79,7 +81,7 @@ export function SignInForm () {
 
     return (
         <form className={styles.signInForm} onSubmit={handleSubmit}>
-            
+
             {/* Sign In Email: */}
             <FormInput
                 label='Email:'

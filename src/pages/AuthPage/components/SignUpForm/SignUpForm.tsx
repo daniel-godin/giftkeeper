@@ -6,6 +6,8 @@ import { auth, db } from '../../../../firebase/firebase';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { FormInput, FormSubmitButton } from '../../../../components/ui';
 import { DEFAULT_USER_PROFILE } from '../../../../constants/defaultObjects';
+import { useToast } from '../../../../contexts/ToastContext';
+import { devError } from '../../../../utils/logger';
 
 interface SignUpFormData {
     email: string;
@@ -14,8 +16,8 @@ interface SignUpFormData {
 
 export function SignUpForm () {
     const navigate = useNavigate();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<SignUpFormData>({ email: '', password: '' });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -32,12 +34,15 @@ export function SignUpForm () {
         e.preventDefault();
 
         if (!formData.email || !formData.password) { return }; // Guard Clause
-        if (formData.password.length < 8) { 
-            setStatus('Password must be at least 8+ characters'); 
+        if (formData.password.length < 8) {
+            addToast({
+                type: 'warning',
+                title: 'Password Issue',
+                message: 'Password must be at least 8+ characters long'
+            })
             return;
         };
 
-        setStatus('Signing Up...');
         setIsSubmitting(true);
 
         try {
@@ -56,23 +61,31 @@ export function SignUpForm () {
 
             await setDoc(newUserDocRef, newUserData);
 
-            setStatus('Check Email To Verify Your Email.  Redirecting you to dashboard...');
+            addToast({
+                type: 'success',
+                title: 'Successfully Signed Up',
+                message: 'Email verification sent.  Please verify your email.  Redirecting you to your dashboard',
+            })
             
             setTimeout(() => {
                 navigate('/dashboard');
             }, 1000)
         } catch (error: any) {
-            console.error('Error Creating Account. Error:', error);
+            devError('Error Creating Account. Error:', error);
 
             let errorMessage = 'Error creating account. Please try again.';
              
-            if (error.code === 'auth/email-already-in-use') {
-                errorMessage = 'This email is already registered';
-            } else if (error.code == 'auth/invalid-email') {
+            if (error.code === 'auth/invalid-email') {
                 errorMessage = 'Please enter a valid email';
             }
 
-            setStatus(errorMessage);
+            addToast({
+                type: 'error',
+                title: "Error Signing Up",
+                message: errorMessage,
+                error: error as Error
+            })
+
             setIsSubmitting(false);
         }
     }
@@ -101,8 +114,6 @@ export function SignUpForm () {
                 value={formData.password}
                 onChange={handleInputChange}
             />
-
-            <output>{status}</output>
 
             <FormSubmitButton
                 text='Sign Up'
