@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./firebaseConfig";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
 import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import { devLog } from "../utils/logger";
 // import { getStorage, connectStorageEmulator } from "firebase/storage";
 // import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
@@ -17,7 +18,7 @@ const useEmulators = import.meta.env.VITE_USE_FIREBASE_EMULATORS === 'true';
 
 // Connect to emulators if the flag is set
 if (useEmulators) {
-    console.log('Using Firebase Emulators');
+    devLog('Using Firebase Emulators');
     connectAuthEmulator(auth, "http://127.0.0.1:9099")
     connectFirestoreEmulator(db, '127.0.0.1', 8080)
     // connectStorageEmulator(storage, "127.0.0.1", 9199);
