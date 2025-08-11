@@ -3,11 +3,12 @@ import { Event } from "../types/EventType";
 import { useAuth } from "./AuthContext";
 import { getEventsCollRef } from "../firebase/firestore";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
+import { useToast } from "./ToastContext";
+import { devError } from "../utils/logger";
 
 interface EventsState {
     events: Event[];
     loading: boolean;
-    error?: string;
 }
 
 const EventsContext = createContext<EventsState | undefined>(undefined);
@@ -23,6 +24,7 @@ export const useEvents = () => {
 
 export function EventsProvider({ children } : { children: React.ReactNode }) {
     const { authState } = useAuth();
+    const { addToast } = useToast();
 
     const [eventsState, setEventsState] = useState<EventsState>({
         events: [],
@@ -50,8 +52,17 @@ export function EventsProvider({ children } : { children: React.ReactNode }) {
                 events: data,
                 loading: false
             })
+
         }, (error) => {
-            console.error('Error fetching events. Error:', error);
+            devError('Error fetching events. Error:', error);
+
+            addToast({
+                type: 'error',
+                title: 'Error',
+                message: 'Unable to load your events.  Please check your connection and try again.',
+                error: error as Error
+            });
+
             setEventsState({
                 events: [],
                 loading: false
