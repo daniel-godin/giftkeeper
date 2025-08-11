@@ -10,6 +10,8 @@ import { Link } from 'react-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { getGiftItemDocRef } from '../../firebase/firestore';
 import { deleteDoc } from 'firebase/firestore';
+import { useToast } from '../../contexts/ToastContext';
+import { devError } from '../../utils/logger';
 
 interface GiftItemCardProps {
     item: GiftItem;
@@ -18,6 +20,7 @@ interface GiftItemCardProps {
 export function GiftItemCard({ item } : GiftItemCardProps) {
     const { authState } = useAuth();
     const { events } = useEvents();
+    const { addToast } = useToast();
 
     const [isEditGiftItemModalOpen, setIsEditGiftItemModalOpen] = useState<boolean>(false);
 
@@ -37,15 +40,25 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
             const docRef = getGiftItemDocRef(authState.user.uid, giftItem.id);
             await deleteDoc(docRef);
 
-            console.log('Successfully deleted gift item');
+            addToast({
+                type: 'success',
+                title: 'Successfully Deleted Gift Item',
+                message: `You have successfully deleted ${giftItem.name}.`
+            })
 
         } catch (error) {
-            console.error('Error Deleting Gift Item. Error:', error);
+            devError('Error Deleting Gift Item. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error!',
+                message: `Error deleting ${giftItem.name}. Please try again.`,
+                error: error as Error
+            })
         }
     }
 
     return (
-        <div key={item.id} className={styles.giftItemCard}>
+        <div className={styles.giftItemCard}>
             {/* Person Name */}
             <div className={styles.giftItemCardRow}>
                 <span className={styles.giftItemCategory}>Person</span>
@@ -93,7 +106,10 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                     {item.status === 'idea' && (<>Estimated Cost</>)}
                     {item.status === 'purchased' && (<>Purchased Cost</>)}
                 </span>
-                <span className={styles.giftItemDetail}>{formatCurrency(item.purchasedCost || 0)}</span>
+                <span className={styles.giftItemDetail}>
+                    {item.status === 'idea' && formatCurrency(item.estimatedCost || 0)}
+                    {item.status === 'purchased' && formatCurrency(item.purchasedCost || 0)}
+                </span>
             </div>
 
             {/* URL & Edit Button */}
@@ -102,6 +118,7 @@ export function GiftItemCard({ item } : GiftItemCardProps) {
                     {item.url && (
                         <a
                             href={item.url}
+                            rel='noopener noreferrer'
                             target='_blank'
                             // className='unstyled-link'
                             title='View Item Online'
