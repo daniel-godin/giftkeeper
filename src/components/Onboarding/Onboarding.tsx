@@ -9,12 +9,14 @@ import { useBirthdayEventManager } from '../../hooks/useBirthdayEventManager';
 import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 import { FormInput, FormSubmitButton } from '../ui';
 import { isValidBirthday } from '../../utils';
+import { useToast } from '../../contexts/ToastContext';
+import { devError } from '../../utils/logger';
 
 export function Onboarding() {
     const { authState } = useAuth();
     const { syncBirthdayEvent }= useBirthdayEventManager();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Person>(DEFAULT_PERSON);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -31,16 +33,23 @@ export function Onboarding() {
 
         if (!authState.user) { return }; // Auth Guard Clause
         if (!formData.name.trim()) { // Form Validation
-            setStatus('Fill In All Required Fields');
+            addToast({
+                type: 'warning',
+                title: 'Warning!',
+                message: 'Fill in all required fields.'
+            });
             return;
         };
         if (formData.birthday && !isValidBirthday(formData.birthday)) { // Birthday Date Validation
-            setStatus('Invalid Birthday Date. Needs to be today or in the past'); 
+            addToast({
+                type: 'warning',
+                title: 'Warning!',
+                message: 'Invalid birthday date.  Needs to be today or in the past.'
+            });
             return; 
         }; 
 
         setIsSubmitting(true);
-        setStatus('Adding New Person...');
 
         try {
             const batch = writeBatch(db);
@@ -59,14 +68,29 @@ export function Onboarding() {
             batch.set(personDocRef, personData);
 
             if (formData.birthday) {
-                setStatus('Adding Birthday Event To Database...')
                 await syncBirthdayEvent(personDocRef.id, formData.name, formData.birthday, batch)
             }
 
             await batch.commit();
+
+            let toastMessage = `Successfully added ${personData.name}.`;
+            if (formData.birthday) { toastMessage = `Successfully created ${personData.name} & created their birthday event!` };
+            addToast({
+                type: 'success',
+                title: 'Success!',
+                message: toastMessage
+            });
+
+            setIsSubmitting(false);
         } catch (error) {
-            console.error('Error Adding New Person. Error:', error);
-            setStatus('Error Adding New Person');
+            devError('Error Adding New Person. Error:', error)
+            addToast({
+                type: 'error',
+                title: 'Error!',
+                message: `Error adding new person.  Please try again.`,
+                error: error as Error
+            });
+
             setIsSubmitting(false);
         }
     }
@@ -97,9 +121,6 @@ export function Onboarding() {
                     value={formData.birthday}
                     onChange={handleInputChange}
                 />
-
-                {/* Outputs Status Messages */}
-                <output>{status}</output>
         
                 <FormSubmitButton
                     text='Add Your First Person'
@@ -107,6 +128,7 @@ export function Onboarding() {
                     submittingText='Adding Person...'
                     disabled={!formData.name.trim()}
                 />
+                
             </form>
         </section>
     )
