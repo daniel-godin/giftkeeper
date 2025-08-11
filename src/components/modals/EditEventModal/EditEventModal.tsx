@@ -9,6 +9,8 @@ import { usePeople } from '../../../contexts/PeopleContext';
 import { getEventDocRef } from '../../../firebase/firestore';
 import { serverTimestamp, UpdateData, updateDoc } from 'firebase/firestore';
 import { DEFAULT_EVENT } from '../../../constants/defaultObjects';
+import { useToast } from '../../../contexts/ToastContext';
+import { devError } from '../../../utils/logger';
 
 interface EditEventModalProps {
     isOpen: boolean;
@@ -19,15 +21,14 @@ interface EditEventModalProps {
 export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) {
     const { authState } = useAuth();
     const { people } = usePeople();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     // Makes sure state is cleared and then populated with appropriate data.
     useEffect(() => {
         if (isOpen) {
-            setStatus('');
             setFormData({
                 ...DEFAULT_EVENT,
                 ...data
@@ -80,9 +81,16 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
 
         if (!authState.user) { return }; // Guard Clause
         if (!data || !data.id) { return };
+        if (!formData.title.trim() || !formData.date || formData.people.length === 0) {
+            addToast({
+                type: 'warning',
+                title: 'Missing Fields',
+                message: 'Please fill out all required fields.'
+            })
+            return;
+        }
 
         setIsSubmitting(true);
-        setStatus('Updating Event...');
 
         try {
             const eventDocRef = getEventDocRef(authState.user.uid, data.id);
@@ -94,7 +102,13 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                 updatedAt: serverTimestamp()
             }
 
-            updateDoc(eventDocRef, eventDocumentData);
+            await updateDoc(eventDocRef, eventDocumentData);
+
+            addToast({
+                type: 'success',
+                title: 'Successfully Updated',
+                message: `Successfully updated ${formData.title} event.`
+            })
 
             setTimeout(() => {
                 onClose();
@@ -102,15 +116,21 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
             }, 500);
 
         } catch (error) {
-            console.error('Error Updating Event. Error:', error);
-            setStatus('Error Updating Event. Try Again.');
+            devError('Error Updating Event. Error:', error)
+
+            addToast({
+                type: 'error',
+                title: 'Error Updating Event',
+                message: `Error updating ${formData.title} event, please try again.`,
+                error: error as Error
+            })
+
             setIsSubmitting(false);
         }
     }
 
     // Resets All State In Modal
     const resetModal = () => {
-        setStatus('');
         setFormData(DEFAULT_EVENT);
         setIsSubmitting(false);
     }
@@ -126,6 +146,7 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
+
                     {/* Event Title: */}
                     <FormInput
                         label='Event Title:'
@@ -181,15 +202,13 @@ export function EditEventModal({ isOpen, onClose, data } : EditEventModalProps) 
                         onChange={handleInputChange}
                     />
 
-                    {/* Outputs Status Messages */}
-                    <output>{status}</output>
-
                     <FormSubmitButton
                         text='Update Event'
                         isSubmitting={isSubmitting}
                         submittingText='Updating Event...'
                         disabled={!formData.title.trim() || !formData.date || formData.people.length === 0}
                     />
+
                 </form>
             </div>
         </BaseModal>

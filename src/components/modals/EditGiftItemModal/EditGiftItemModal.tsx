@@ -11,6 +11,8 @@ import { Event } from '../../../types/EventType';
 import { FormInput, FormSelect, FormSubmitButton } from '../../ui';
 import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
 import { sanitizeURL } from '../../../utils';
+import { useToast } from '../../../contexts/ToastContext';
+import { devError } from '../../../utils/logger';
 
 interface EditGiftItemModalProps {
     isOpen: boolean;
@@ -20,8 +22,8 @@ interface EditGiftItemModalProps {
 
 export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalProps) {
     const { authState } = useAuth();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<GiftItem>(DEFAULT_GIFT_ITEM);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -94,7 +96,6 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
         if (!data || !data.id) { return }; // Guard Clause
 
         setIsSubmitting(true);
-        setStatus('Updating Gift Item...');
 
         try {
             const giftItemDocRef = getGiftItemDocRef(authState.user.uid, data.id);
@@ -116,22 +117,31 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
 
             await updateDoc(giftItemDocRef, giftItemDocumentData);
 
+            addToast({
+                type: 'success',
+                title: 'Success!',
+                message: `Successfully updated ${formData.name}`
+            })
+
             setTimeout(() => {
                 onClose();
                 resetModal();
             }, 500);
 
         } catch (error) {
-            console.error('Error Updating Gift Item. Error:', error);
-            setStatus('Error Updating Gift Item. Try Again.');
+            devError('Error Updating Gift Item. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error',
+                message: `Error updating ${formData.name}`,
+                error: error as Error
+            })
             setIsSubmitting(false);
         }
     }
 
     // Resets All State In Modal
     const resetModal = () => {
-        setStatus('');
-        // setFormData(defaultFormValues);
         setIsSubmitting(false);
     }
 
@@ -146,6 +156,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
+
                     {/* Gift Item Name/Title: */}
                     <FormInput
                         label='Gift Item Idea or Purchase:'
@@ -218,15 +229,13 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                         onChange={handleInputChange}
                     />
 
-                    {/* Outputs Status Messages */}
-                    <output>{status}</output>
-
                     <FormSubmitButton
                         text='Edit Gift Item'
                         isSubmitting={isSubmitting}
                         submittingText='Editing Gift Item...'
-                        disabled={!formData.name.trim() || !formData.personId || !formData.status}
+                        disabled={!formData.name.trim() || !formData.status}
                     />
+
                 </form>
             </div>
         </BaseModal>
