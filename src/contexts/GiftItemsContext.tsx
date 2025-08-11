@@ -3,11 +3,12 @@ import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { getGiftItemsCollRef } from "../firebase/firestore";
 import { useAuth } from "./AuthContext";
 import { GiftItem } from "../types/GiftType";
+import { useToast } from "./ToastContext";
+import { devError } from "../utils/logger";
 
 interface GiftItemsState {
     giftItems: GiftItem[];
     loading: boolean;
-    error?: string;
 }
 
 const GiftItemsContext = createContext<GiftItemsState | undefined>(undefined);
@@ -23,6 +24,7 @@ export const useGiftItems = () => {
 
 export function GiftItemsProvider({ children } : { children: React.ReactNode }) {
     const { authState } = useAuth();
+    const { addToast } = useToast();
 
     const [giftItemsState, setGiftItemsState] = useState<GiftItemsState>({
         giftItems: [],
@@ -51,7 +53,14 @@ export function GiftItemsProvider({ children } : { children: React.ReactNode }) 
                 loading: false
             })
         }, (error) => {
-            console.error('Error fetching gift items. Error:', error);
+            devError('Error fetching gift items. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error',
+                message: 'Unable to fetch gift items.  Please check your connection and try again.',
+                error: error as Error
+            })
+            
             setGiftItemsState({
                 giftItems: [],
                 loading: false

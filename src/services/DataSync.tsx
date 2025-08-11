@@ -5,6 +5,8 @@ import { usePeople } from "../contexts/PeopleContext";
 import { useBirthdayEventManager } from "../hooks/useBirthdayEventManager";
 import { writeBatch } from "firebase/firestore";
 import { db } from "../firebase/firebase";
+import { devError, devLog } from "../utils/logger";
+import * as Sentry from '@sentry/react'
 
 export function DataSync({ children } : { children: React.ReactNode }) {
     const { authState } = useAuth();
@@ -26,7 +28,7 @@ export function DataSync({ children } : { children: React.ReactNode }) {
             try {
                 const batch = writeBatch(db);
 
-                console.log('Birthday sync started for', people.length, 'people');
+                devLog('Birthday sync started for', people.length, 'people');
 
                 // Loop through all people, only check birthday sync if a birthday is in the data.
                 for (const person of people) {
@@ -37,17 +39,18 @@ export function DataSync({ children } : { children: React.ReactNode }) {
 
                 await batch.commit();
 
-                console.log('Birthday sync completed successfully');
+                devLog('Birthday sync completed successfully')
 
                 localStorage.setItem('lastBirthdayEventCheck', today);
             } catch (error) {
-                console.error('Error in checkAndSyncBirthdays. Error:', error);
+                devError('Error in checkAndSyncBirthdays. Error:', error);
+                Sentry.captureException(error as Error)
             } 
         }
 
         checkAndSyncBirthdays();
 
-    }, [authState.user?.uid, people.length, eventsLoading]); 
+    }, [authState.user?.uid, people, eventsLoading]); 
 
     return (
         <>

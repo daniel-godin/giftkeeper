@@ -3,11 +3,12 @@ import { Person } from "../types/PersonType";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { getPeopleCollRef } from "../firebase/firestore";
 import { useAuth } from "./AuthContext";
+import { useToast } from "./ToastContext";
+import { devError } from "../utils/logger";
 
 interface PeopleState {
     people: Person[];
     loading: boolean;
-    error?: string;
 }
 
 const PeopleContext = createContext<PeopleState | undefined>(undefined);
@@ -23,6 +24,7 @@ export const usePeople = () => {
 
 export function PeopleProvider({ children } : { children: React.ReactNode }) {
     const { authState } = useAuth();
+    const { addToast } = useToast();
 
     const [peopleState, setPeopleState] = useState<PeopleState>({
         people: [],
@@ -51,7 +53,13 @@ export function PeopleProvider({ children } : { children: React.ReactNode }) {
                 loading: false
             })
         }, (error) => {
-            console.error('Error fetching people. Error:', error);
+            devError('Error fetching people. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error',
+                message: 'Unable to load people.  Please check your connection and try again.',
+                error: error as Error
+            });
             setPeopleState({
                 people: [],
                 loading: false

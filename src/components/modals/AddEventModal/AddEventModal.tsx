@@ -11,6 +11,8 @@ import { FormInput, FormPeopleSelector, FormSubmitButton, FormTextArea } from '.
 import { useNavigate, useParams } from 'react-router';
 import { getEventsCollRef } from '../../../firebase/firestore';
 import { isValidEventDate } from '../../../utils';
+import { useToast } from '../../../contexts/ToastContext';
+import { devError } from '../../../utils/logger';
 
 interface AddEventModalProps {
     isOpen: boolean;
@@ -22,11 +24,10 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
     const { people } = usePeople();
     const navigate = useNavigate();
     const { personId } = useParams(); // For auto-filling on PersonPage
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Event>(DEFAULT_EVENT);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
     const [showOptionalFields, setShowOptionalFields] = useState<boolean>(false);
 
     useEffect(() => {
@@ -44,11 +45,10 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
             }
 
             setFormData(initialFormData);
-            setStatus('');
             setIsSubmitting(false);
             setShowOptionalFields(false);
         }
-    }, [isOpen]);
+    }, [isOpen, personId]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -94,15 +94,23 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
 
         if (!authState.user) { return }; // Guard Clause
         if (!formData.title.trim() || !formData.date || formData.people.length === 0) { // Form Validation Guard Clause
-            setStatus('Please fill out all required fields.');
-            return }; 
+            addToast({
+                type: 'warning',
+                title: 'Missing Fields',
+                message: 'Please fill out all required fields.'
+            })
+            return 
+        }; 
         if (formData.date && !isValidEventDate(formData.date)) { // Event Date Validation Check
-            setStatus('Invalid Event Date. Must Be Today Or In The Future')
+            addToast({
+                type: 'warning',
+                title: 'Invalid Date',
+                message: 'Invalid date. Please try again.'
+            })
             return;
         }
 
         setIsSubmitting(true);
-        setStatus('Adding New Event...');
 
         try {
             const newDocRef = doc(getEventsCollRef(authState.user.uid));
@@ -118,7 +126,11 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
 
             await setDoc(newDocRef, newDocumentData);
 
-            setStatus('New Event Added!!');
+            addToast({
+                type: 'success',
+                title: 'Success!',
+                message: 'Successfully added event. Redirecting you now.'
+            })
 
             setTimeout(() => {
                 onClose();
@@ -127,14 +139,18 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
             }, 500);
 
         } catch (error) {
-            console.error('Error Adding New Event. Error:', error);
-            setStatus('Error Adding New Event');
+            devError('Error Adding New Event. Error:', error)
+            addToast({
+                type: 'error',
+                title: 'Error Adding Event',
+                message: 'Error adding event, please try again.',
+                error: error as Error
+            })
             setIsSubmitting(false);
         }
     }
 
     const resetModal = () => {
-        setStatus('');
         setFormData(DEFAULT_EVENT);
         setIsSubmitting(false);
         setShowOptionalFields(false);
@@ -151,6 +167,7 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                 </header>
 
                 <form className={styles.form} onSubmit={handleSubmit} autoComplete='off'>
+
                     {/* Event Title: */}
                     <FormInput
                         label='Event Title:'
@@ -223,15 +240,13 @@ export function AddEventModal({ isOpen, onClose } : AddEventModalProps) {
                         />
                     )}
 
-                    {/* Outputs Status Messages */}
-                    <output>{status}</output>
-
                     <FormSubmitButton
                         text='Add New Event'
                         isSubmitting={isSubmitting}
                         submittingText='Adding New Event...'
                         disabled={!formData.title.trim() || !formData.date || formData.people.length === 0}
                     />
+
                 </form>
             </div>
         </BaseModal>

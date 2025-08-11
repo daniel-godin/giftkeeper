@@ -3,14 +3,16 @@ import styles from './PasswordResetForm.module.css'
 import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../../../../firebase/firebase';
 import { FormInput, FormSubmitButton } from '../../../../components/ui';
+import { useToast } from '../../../../contexts/ToastContext';
+import { devError } from '../../../../utils/logger';
 
 interface PasswordResetFormData {
     email: string;
 }
 
 export function PasswordResetForm() {
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<PasswordResetFormData>({ email: '' });
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -28,26 +30,36 @@ export function PasswordResetForm() {
 
         if (!formData.email) { return }; // Guard Clause
 
-        setStatus('Resetting Password...');
         setIsSubmitting(true);
         try {
             await sendPasswordResetEmail(auth, formData.email);
 
-            setStatus('Email Sent.  Check your email to reset your password.')
+            addToast({
+                type: 'success',
+                title: 'Password Reset',
+                message: 'Password reset, please check your email.'
+            })
 
-            setTimeout(() => { // 30s Timeout to prevent abuse.
-                setIsSubmitting(false)
-            }, 30000) 
         } catch (error) {
-            console.error('Error sending password reset email. Error:', error);
-            setStatus('Error sending password reset email. Please try again.');
-            setIsSubmitting(false);
+            devError('Error sending password reset email. Error:', error)
+
+            addToast({
+                type: 'error',
+                title: 'Error Resetting Password',
+                message: 'There was an error resetting your password. Please try again.',
+                error: error as Error,
+                duration: 10000
+            })
+
+        } finally {
+            setTimeout(() => { // 10s Timeout to prevent abuse.
+                setIsSubmitting(false)
+            }, 10000);
         }
     }
 
     return (
         <form className={styles.passwordResetForm} onSubmit={handleSubmit}>
-            <h2 className={styles.formHeader}>Reset Password</h2>
 
             {/* Reset Password Email: */}
             <FormInput
@@ -60,14 +72,13 @@ export function PasswordResetForm() {
                 onChange={handleInputChange}
             />
 
-            <output>{status}</output>
-
             <FormSubmitButton
                 text='Reset Password'
                 isSubmitting={isSubmitting}
                 submittingText='Resetting Password (check your email)...'
                 disabled={!formData.email.trim()}
             />
+
         </form>
     )
 }

@@ -12,6 +12,8 @@ import { DEFAULT_PERSON } from '../../../constants/defaultObjects';
 import { FormInput, FormSubmitButton, FormTextArea } from '../../ui';
 import { useNavigate } from 'react-router';
 import { isValidBirthday } from '../../../utils';
+import { useToast } from '../../../contexts/ToastContext';
+import { devError } from '../../../utils/logger';
 
 interface AddPersonModalProps {
     isOpen: boolean;
@@ -22,11 +24,10 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
     const { authState } = useAuth();
     const { syncBirthdayEvent } = useBirthdayEventManager();
     const navigate = useNavigate();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Person>(DEFAULT_PERSON);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
     const [showOptionalFields, setShowOptionalFields] = useState<boolean>(false);
 
     useEffect(() => {
@@ -47,12 +48,15 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
         if (!authState.user) { return }; // Guard Clause
         if (!formData.name.trim()) { return }; // Form Validation / Guard Clause
         if (formData.birthday && !isValidBirthday(formData.birthday)) { // Birthday Date Validation
-            setStatus('Invalid Birthday Date. Needs to be today or in the past'); 
+            addToast({
+                type: 'warning',
+                title: 'Warning',
+                message: 'Invalid birthday date.  Needs to be today or in the past'
+            })
             return; 
         }; 
             
         setIsSubmitting(true);
-        setStatus('Adding New Person...');
 
         try {
             const batch = writeBatch(db);
@@ -76,7 +80,14 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
 
             await batch.commit();
 
-            setStatus('New Person Added!!');
+            let toastMessage = 'New person added.'
+            if (formData.birthday) { toastMessage = 'New person & birthday event added.'}
+
+            addToast({
+                type: 'success',
+                title: 'Success!',
+                message: toastMessage
+            })
 
             setTimeout(() => {
                 onClose();
@@ -85,14 +96,20 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
             }, 500);
 
         } catch (error) {
-            console.error('Error Adding New Person. Error:', error);
-            setStatus('Error Adding New Person');
+            devError('Error Adding New Person. Error:', error);
+
+            addToast({
+                type: 'error',
+                title: 'Error',
+                message: 'Error adding new person.',
+                error: error as Error
+            })
+
             setIsSubmitting(false);
         }
     }
 
     const resetModal = () => {
-        setStatus('');
         setFormData(DEFAULT_PERSON);
         setIsSubmitting(false);
         setShowOptionalFields(false);
@@ -179,15 +196,13 @@ export function AddPersonModal({ isOpen, onClose } : AddPersonModalProps) {
                         />
                     )}
 
-                    {/* Outputs Status Messages */}
-                    <output>{status}</output>
-
                     <FormSubmitButton
                         text='Add New Person'
                         isSubmitting={isSubmitting}
                         submittingText='Adding Person...'
                         disabled={!formData.name.trim()}
                     />
+
                 </form>
             </div>
         </BaseModal>

@@ -18,6 +18,8 @@ import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 import { EditPersonModal } from '../../components/modals/EditPersonModal/EditPersonModal';
 import { AddEventModal } from '../../components/modals/AddEventModal/AddEventModal';
 import { useGiftItems } from '../../contexts/GiftItemsContext';
+import { useToast } from '../../contexts/ToastContext';
+import { devError, devLog } from '../../utils/logger';
 
 export function PersonPage() {
     const { authState } = useAuth();
@@ -28,6 +30,7 @@ export function PersonPage() {
     const upcomingEvents = useUpcomingEvents(personId);
     const { giftItems } = useGiftItems();
     const navigate = useNavigate();
+    const { addToast } = useToast();
 
     // State For Modals:
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
@@ -56,13 +59,24 @@ export function PersonPage() {
             const docRef = getPersonDocRef(authState.user?.uid, personId);
             await deleteDoc(docRef);
 
-            console.log('Successfully deleted person');
+            devLog(`Successfully deleted person with personId: ${personId}.`)
+            addToast({
+                type: 'success',
+                title: 'Successfully Deleted',
+                message: `You have successfully deleted ${person.name}.`
+            })
 
             setTimeout(() => {
                 navigate('/people');
             }, 500)
         } catch (error) {
-            console.error('Error Deleting Person. Error:', error);
+            devError('Error Deleting Person. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error!',
+                message: `Unable to delete ${person.name}. Please try again.`,
+                error: error as Error
+            })
         }
     }
 
