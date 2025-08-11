@@ -1,6 +1,7 @@
 import { onAuthStateChanged, User } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../firebase/firebase";
+import { devError } from "../utils/logger";
 
 interface AuthState {
     user: User | null;
@@ -46,7 +47,8 @@ export function AuthProvider({ children } : { children: React.ReactNode }) {
                     }))
                 }
             } catch (error) {
-                console.error('Error With Auth State', error);
+                devError('Error With Auth State', error)
+
                 setAuthState({
                     user: null,
                     loading: false,
