@@ -16,6 +16,8 @@ import { useParams } from 'react-router';
 import { useEvents } from '../../../contexts/EventsContext';
 import { FormInput, FormSelect, FormSubmitButton } from '../../ui';
 import { sanitizeURL } from '../../../utils';
+import { useToast } from '../../../contexts/ToastContext';
+import { devError } from '../../../utils/logger';
 
 interface AddGiftItemModalProps {
     isOpen: boolean;
@@ -27,8 +29,8 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
     const { people } = usePeople();
     const { events } = useEvents();
     const { personId, eventId } = useParams();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<GiftItem>(DEFAULT_GIFT_ITEM);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -59,6 +61,20 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
         })), [eventOptions]
     );
 
+    // Transforms People to a <FormSelect> format
+    const transformedPeopleOptions = useMemo(() => {
+        const options = [
+            { optionLabel: '---', optionValue: '' }, // Blank Option
+            ...people.map(person => ({
+                optionLabel: person.name,
+                optionValue: person.id || ''
+            })),
+            { optionLabel: '+ Create New Person', optionValue: 'createNewPerson' } // Special option
+        ]
+
+        return options;
+    }, [people]);
+
     useEffect(() => {
         if (isOpen) {
             let initialFormData = { ...DEFAULT_GIFT_ITEM };
@@ -85,7 +101,6 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
             }
 
             setFormData(initialFormData);
-            setStatus('');
             setIsSubmitting(false);
             setShowCreateNewPerson(false);
             setShowOptionalFields(!!eventId); // Open optional fields if on EventPage, otherwise closed.
@@ -108,6 +123,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
             setFormData(prev => ({
                 ...prev,
                 personId: 'createNewPerson', // Temporary Marker.  Will be set in handleSubmit
+                personName: ''
             }))
             return;
         }
@@ -147,7 +163,6 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
         if (!formData.name.trim() || !formData.personName) { return }; // Form Validation Guard Clause
 
         setIsSubmitting(true);
-        setStatus('Adding New Gift Item...');
 
         try {
             const batch = writeBatch(db); // Using Batch for a possible GiftItem + New Person combo.
@@ -204,21 +219,34 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
 
             await batch.commit();
 
+            let toastMessage = 'Successfully added a new gift item.'
+            if (showCreateNewPerson) { toastMessage = 'Successfully added a new gift item & new person.'}
+
+            addToast({
+                type: 'success',
+                title: 'Success!',
+                message: toastMessage
+            })
+
             setTimeout(() => {
                 resetModal(); // Reset Form After Successful batch.commit();
                 onClose();
             }, 500);
 
         } catch (error) {
-            console.error('Error Adding New Item. Error:', error);
-            setStatus('Error Adding New Gift Item. Try Again.');
+            devError('Error Adding New Item. Error:', error)
+            addToast({
+                type: 'error',
+                title: 'Error!',
+                message: 'Error adding new gift item.  Please try again.',
+                error: error as Error
+            })
             setIsSubmitting(false);
         }
     }
 
     // Resets All State In Modal
     const resetModal = () => {
-        setStatus('');
         setFormData(DEFAULT_GIFT_ITEM);
         setIsSubmitting(false);
         setShowCreateNewPerson(false);
@@ -249,50 +277,28 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                     />
 
                     {/* Select Person  (Gift Recipient) */}
-                    <label className={styles.label}>Select Gift Recipient: *
-                        <select
-                            name='person'
-                            onChange={handlePersonDropdownInputChange}
-                            required={true}
-                            value={formData.personId}
-                            disabled={isSubmitting}
-                            className={styles.dropdownInput}
-                        >
-                            <option
-                                value=''
-                                className={styles.option}
-                            >---</option>
-
-                            {people.map(person => (
-                                <option
-                                    key={person.id}
-                                    value={person.id}
-                                    className={styles.option}
-                                >{person.name}</option>
-                            ))}
-
-                            <option
-                                value='createNewPerson'
-                                className={styles.option}
-                            >+ Create New Person</option>
-
-                        </select>
-                    </label>
+                    <FormSelect
+                        label='Select Gift Recipient:'
+                        options={transformedPeopleOptions}
+                        name='person'
+                        required={true}
+                        disabled={isSubmitting}
+                        value={formData.personId}
+                        onChange={handlePersonDropdownInputChange}
+                    />
 
                     {/* Create New Person -- For Now... Just Name, Skip Birthdate -- Maybe Automatically Go To Person URL After Creation? */}
                     {/* Conditionally Rendered ONLY when --- Create New Person is selected */}
                     {showCreateNewPerson && (
-                        <label className={styles.label}>Create New Person:
-                            <input
-                                className={styles.input}
-                                type='text'
-                                name='personName'
-                                required={true}
-                                value={formData.personName}
-                                disabled={isSubmitting}
-                                onChange={handleInputChange}
-                            />
-                        </label>
+                        <FormInput
+                            label='Create New Person:'
+                            type='text'
+                            name='personName'
+                            required={true}
+                            value={formData.personName}
+                            disabled={isSubmitting}
+                            onChange={handleInputChange}
+                        />
                     )}
 
                     {/* Show/Hide Optional Input Fields Toggle */}
@@ -372,15 +378,13 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                         </>
                     )}
 
-                    {/* Outputs Status Messages */}
-                    <output>{status}</output>
-
                     <FormSubmitButton
                         text='Add Gift Item'
                         isSubmitting={isSubmitting}
                         submittingText='Adding Gift Item...'
                         disabled={!formData.name.trim() || !formData.personId || !formData.status}
                     />
+
                 </form>
             </div>
         </BaseModal>
