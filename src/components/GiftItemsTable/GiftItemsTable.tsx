@@ -11,6 +11,8 @@ import { useAuth } from '../../contexts/AuthContext';
 import { getGiftItemDocRef } from '../../firebase/firestore';
 import { deleteDoc } from 'firebase/firestore';
 import { Link } from 'react-router';
+import { useToast } from '../../contexts/ToastContext';
+import { devError } from '../../utils/logger';
 
 interface GiftItemsTableProps {
     data: GiftItem[];
@@ -19,6 +21,7 @@ interface GiftItemsTableProps {
 export function GiftItemsTable({ data } : GiftItemsTableProps) {
     const { authState } = useAuth();
     const { events } = useEvents();
+    const { addToast } = useToast();
 
     const [isEditGiftItemModalOpen, setIsEditGiftItemModalOpen] = useState<boolean>(false);
     const [giftItemBeingEdited, setGiftItemBeingEdited] = useState<GiftItem>(DEFAULT_GIFT_ITEM)
@@ -40,10 +43,20 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
             const docRef = getGiftItemDocRef(authState.user.uid, giftItem.id);
             await deleteDoc(docRef);
 
-            console.log('Successfully deleted gift item');
+            addToast({
+                type: 'success',
+                title: 'Successfully Deleted Gift Item',
+                message: `You have successfully deleted ${giftItem.name}.`
+            });
 
         } catch (error) {
-            console.error('Error Deleting Gift Item. Error:', error);
+            devError('Error Deleting Gift Item. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error!',
+                message: `Error deleting ${giftItem.name}. Please try again.`,
+                error: error as Error
+            })
         }
     }
 
@@ -79,6 +92,7 @@ export function GiftItemsTable({ data } : GiftItemsTableProps) {
                                     <a
                                         href={item.url}
                                         target='_blank'
+                                        rel='noopener noreferrer'
                                         className={styles.linkIcon}
                                         title='View Item Online'
                                     >
