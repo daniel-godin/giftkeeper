@@ -10,6 +10,9 @@ import { getPersonDocRef } from '../../../firebase/firestore';
 import { serverTimestamp, UpdateData, writeBatch } from 'firebase/firestore';
 import { db } from '../../../firebase/firebase';
 import { useBirthdayEventManager } from '../../../hooks/useBirthdayEventManager';
+import { useToast } from '../../../contexts/ToastContext';
+import { devError } from '../../../utils/logger';
+import { isValidBirthday } from '../../../utils';
 
 interface EditPersonModalProps {
     isOpen: boolean;
@@ -20,15 +23,14 @@ interface EditPersonModalProps {
 export function EditPersonModal({ isOpen, onClose, data } : EditPersonModalProps) {
     const { authState } = useAuth();
     const { syncBirthdayEvent } = useBirthdayEventManager();
+    const { addToast } = useToast();
 
-    const [status, setStatus] = useState<string>('');
     const [formData, setFormData] = useState<Person>(DEFAULT_PERSON);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     // Makes sure state is cleared and then populated with appropriate data.
     useEffect(() => {
         if (isOpen) {
-            setStatus('');
             setFormData({
                 ...DEFAULT_PERSON,
                 ...data
@@ -51,12 +53,20 @@ export function EditPersonModal({ isOpen, onClose, data } : EditPersonModalProps
         if (!authState.user) { return }; // Guard Clause
         if (!data || !data.id) { return };
 
+        if (formData.birthday && !isValidBirthday(formData.birthday)) {
+        addToast({
+            type: 'warning',
+            title: 'Invalid Birthday',
+            message: 'Birthday must be today or in the past.'
+        });
+        return;
+    }
+
         // If birthdayChanged or nameChanged... means the birthday Event should be created or updated.
         const birthdayChanged = data.birthday !== formData.birthday;
         const nameChanged = data.name !== formData.name;
 
         setIsSubmitting(true);
-        setStatus('Updating Person...');
 
         try {
             // Need writeBatch to sync person document & birthday event document.
@@ -79,21 +89,34 @@ export function EditPersonModal({ isOpen, onClose, data } : EditPersonModalProps
 
             await batch.commit();
 
+            let toastMessage = `Successfully updated ${formData.name}.`
+            if (birthdayChanged) { toastMessage = `Successfully updated ${formData.name} & birthday event.`}
+
+            addToast({
+                type: 'success',
+                title: 'Success!',
+                message: toastMessage
+            })
+
             setTimeout(() => {
                 onClose();
                 resetModal();
             }, 500);
 
         } catch (error) {
-            console.error('Error Updating Person. Error:', error);
-            setStatus('Error Updating Person. Try Again.');
+            devError('Error Updating Person. Error:', error)
+            addToast({
+                type: 'error',
+                title: 'Error',
+                message: `Error updating ${formData.name}. Please try again.`,
+                error: error as Error
+            })
             setIsSubmitting(false);
         }
     }
 
     // Resets All State In Modal
     const resetModal = () => {
-        setStatus('');
         setFormData(DEFAULT_PERSON);
         setIsSubmitting(false);
     }
@@ -164,15 +187,13 @@ export function EditPersonModal({ isOpen, onClose, data } : EditPersonModalProps
                         onChange={handleInputChange}
                     />
 
-                    {/* Outputs Status Messages */}
-                    <output>{status}</output>
-
                     <FormSubmitButton
                         text='Update Person'
                         isSubmitting={isSubmitting}
                         submittingText='Updating Person...'
                         disabled={!formData.name.trim()}
                     />
+
                 </form>
             </div>
         </BaseModal>
