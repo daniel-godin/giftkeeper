@@ -17,6 +17,8 @@ import { EditEventModal } from '../../components/modals/EditEventModal/EditEvent
 import { DEFAULT_EVENT } from '../../constants/defaultObjects';
 import { useAuth } from '../../contexts/AuthContext';
 import { useGiftItems } from '../../contexts/GiftItemsContext';
+import { devError, devLog } from '../../utils/logger';
+import { useToast } from '../../contexts/ToastContext';
 
 export function EventPage() {
     const { authState } = useAuth();
@@ -26,6 +28,7 @@ export function EventPage() {
     const { people  } = usePeople();
     const { giftItems, loading: giftItemsLoading } = useGiftItems();
     const navigate = useNavigate();
+    const { addToast } = useToast();
 
     // State For EditEventModal:
     const [isEditEventModalOpen, setIsEditEventModalOpen] = useState<boolean>(false);
@@ -81,13 +84,24 @@ export function EventPage() {
             const docRef = getEventDocRef(authState.user.uid, eventId);
             await deleteDoc(docRef);
 
-            console.log('Successfully deleted event');
+            devLog(`Successfully deleted eventId: ${eventId}.`);
+            addToast({
+                type: 'success',
+                title: 'Successfully Deleted',
+                message: `You've successfully deleted ${event.title} event.`
+            })
 
             setTimeout(() => {
                 navigate('/events');
             }, 500)
         } catch (error) {
-            console.error('Error Deleting Event. Error:', error);
+            devError('Error Deleting Event. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error!',
+                message: `Unable to delete ${event.title} event. Please try again.`,
+                error: error as Error
+            })
         }
     }
 

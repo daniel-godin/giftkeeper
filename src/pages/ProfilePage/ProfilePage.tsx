@@ -2,17 +2,30 @@ import { sendEmailVerification, sendPasswordResetEmail, signOut } from 'firebase
 import styles from './ProfilePage.module.css'
 import { auth } from '../../firebase/firebase';
 import { useAuth } from '../../contexts/AuthContext';
+import { useToast } from '../../contexts/ToastContext';
+import { devError } from '../../utils/logger';
 
 export function ProfilePage () {
     const { authState } = useAuth();
+    const { addToast } = useToast();
 
     const handleSignOut = async () => {
-        console.log('handleSignOut Triggered');
 
         try {
-            await signOut(auth)
+            await signOut(auth);
+            addToast({
+                type: 'success',
+                title: 'Signed Out',
+                message: 'You have been successfully signed out.'
+            });
         } catch (error) {
-            console.error('Error in handleSignOut:', error);
+            devError('Error in handleSignOut:', error);
+            addToast({
+                type: 'error',
+                title: 'Error Signing Out',
+                message: 'Unable to sign you out.  Please try again.',
+                error: error as Error
+            });
         }
     }
 
@@ -21,20 +34,40 @@ export function ProfilePage () {
         
         try {
             await sendEmailVerification(authState.user);
+            addToast({
+                type: 'info',
+                title: 'Verification Email Sent',
+                message: 'Email verification sent. Please check your email.'
+            })
         } catch (error) {
-            console.error('Error sending verification email. Error:', error);
+            devError('Error sending verification email. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error Sending Verification',
+                message: 'Unable to send verification email.  Please try again.',
+                error: error as Error
+            })
         }
     }
 
     const handlePasswordReset = async () => {
         if (!authState.user || !authState.user.email) { return }; // Guard Clause
 
-        console.log('Reset Password Requested');
-
         try {
             await sendPasswordResetEmail(auth, authState.user.email);
+            addToast({
+                type: 'info',
+                title: 'Password Reset Email Sent',
+                message: 'Password reset email sent. Please check your email.'
+            })
         } catch (error) {
-            console.error('Error resetting password. Error:', error);
+            devError('Error resetting password. Error:', error);
+            addToast({
+                type: 'error',
+                title: 'Error Sending Password Reset',
+                message: 'Unable to send password reset email.  Please try again.',
+                error: error as Error
+            })
         }
     }
 
