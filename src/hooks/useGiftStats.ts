@@ -12,11 +12,6 @@ interface GiftItemsStats {
     purchased: number;
 }
 
-// interface FilterOptions {
-//     personId?: string;
-//     eventId?: string;
-// }
-
 export function useGiftStats() : GiftItemsStats {
     const { giftItems } = useGiftItems();
 
