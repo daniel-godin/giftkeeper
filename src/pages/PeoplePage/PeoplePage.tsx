@@ -1,18 +1,16 @@
-import { useState } from 'react'
 import styles from './PeoplePage.module.css'
 import { AddPersonModal } from '../../components/modals/AddPersonModal/AddPersonModal';
 import { Link } from 'react-router';
 import { usePeople } from '../../contexts/PeopleContext';
 import { useViewport } from '../../contexts/ViewportContext';
-import { PeoplePageHeader } from './components/PeopleHeader/PeopleHeader';
 import { PeopleTable } from './components/PeopleTable/PeopleTable';
+import { PeopleHeader } from './components/PeopleHeader/PeopleHeader';
 
 export function PeoplePage () {
     const deviceType = useViewport();
 
-    const { people, loading: loadingPeople } = usePeople();
+    // const { people, loading: loadingPeople } = usePeople();
 
-    const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
 
     return (
         <section className={styles.peoplePage}>
@@ -34,7 +32,7 @@ export function PeoplePage () {
 
 
 
-            <h1>People</h1>
+            {/* <h1>People</h1>
 
             <button className={styles.addPersonButton} onClick={() => setIsAddPersonModalOpen(true)}>Add Person</button>
 
@@ -65,7 +63,7 @@ export function PeoplePage () {
             <AddPersonModal
                 isOpen={isAddPersonModalOpen}
                 onClose={() => setIsAddPersonModalOpen(false)}
-            />
+            /> */}
 
         </section>
     )
