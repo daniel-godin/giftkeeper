@@ -10,7 +10,6 @@ import { useUpcomingEvents } from '../../../hooks/useUpcomingEvents';
 import { Event } from '../../../types/EventType';
 import { FormInput, FormSelect, FormSubmitButton } from '../../ui';
 import { DEFAULT_GIFT_ITEM } from '../../../constants/defaultObjects';
-import { sanitizeURL } from '../../../utils';
 import { useToast } from '../../../contexts/ToastContext';
 import { devError } from '../../../utils/logger';
 
@@ -105,7 +104,7 @@ export function EditGiftItemModal({ isOpen, onClose, data } : EditGiftItemModalP
                 // Status & Associations
                 status: formData.status,
                 eventId: formData.eventId,
-                url: sanitizeURL(formData.url || ''),
+                url: formData.url || '',
 
                 // // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
                 estimatedCost: formData.estimatedCost,

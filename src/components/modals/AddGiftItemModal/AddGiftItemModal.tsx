@@ -15,7 +15,6 @@ import { DEFAULT_GIFT_ITEM, DEFAULT_PERSON } from '../../../constants/defaultObj
 import { useParams } from 'react-router';
 import { useEvents } from '../../../contexts/EventsContext';
 import { FormInput, FormSelect, FormSubmitButton } from '../../ui';
-import { sanitizeURL } from '../../../utils';
 import { useToast } from '../../../contexts/ToastContext';
 import { devError } from '../../../utils/logger';
 
@@ -204,7 +203,7 @@ export function AddGiftItemModal({ isOpen, onClose } : AddGiftItemModalProps) {
                 // Status & Associations
                 status: formData.status,
                 eventId: formData.eventId,
-                url: sanitizeURL(formData.url || ''),
+                url: formData.url || '',
 
                 // // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
                 estimatedCost: formData.estimatedCost,
