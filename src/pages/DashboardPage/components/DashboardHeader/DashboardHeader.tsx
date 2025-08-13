@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import styles from './DashboardHeader.module.css'
-import { QuickActionButton } from './components/QuickActionButton/QuickActionButton'
+import { QuickActionButton } from '../../../../components/ui/QuickActionButton/QuickActionButton'
 import { CalendarFold, Gift, UsersRound } from 'lucide-react'
 import { AddGiftItemModal } from '../../../../components/modals/AddGiftItemModal/AddGiftItemModal';
 import { AddEventModal } from '../../../../components/modals/AddEventModal/AddEventModal';
