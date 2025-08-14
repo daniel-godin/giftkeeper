@@ -4,11 +4,13 @@ import styles from './PeopleHeader.module.css'
 import { UsersRound } from 'lucide-react';
 import { StatCard } from '../../../../components/ui/StatCard/StatCard';
 import { usePeople } from '../../../../contexts/PeopleContext';
+import { useEvents } from '../../../../contexts/EventsContext';
 
 export function PeopleHeader() {
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
 
     const { people, loading: loadingPeople } = usePeople();
+    const { events, loading: eventsLoading } = useEvents();
     
 
     return (
@@ -20,10 +22,11 @@ export function PeopleHeader() {
                     icon={<UsersRound />}
                     text='Add Person'
                     onClick={() => setIsAddPersonModalOpen(true)}
-                    variant='secondary'
+                    variant='primary'
                 />
             </div>
 
+            {/* TODO:  FIX TYPE OF STATS */}
             <div className={styles.statsOverview}>
                 <StatCard
                     to='/people'
@@ -35,6 +38,15 @@ export function PeopleHeader() {
                     ]}
                 />
 
+                <StatCard
+                    to='/people'
+                    title='EVENTS'
+                    totalCount={events.length}
+                    breakdownStats={[
+                        // TODO: FIX THIS
+                        {count: events.length, label: 'total'}
+                    ]}
+                />
             </div>
         </header>
     )
