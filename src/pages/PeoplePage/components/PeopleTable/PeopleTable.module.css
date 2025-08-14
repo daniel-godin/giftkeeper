@@ -1,0 +1,96 @@
+.peopleTableContainer {
+    background-color: white;
+    
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+
+}
+
+.peopleTableHeader {
+    padding: 1rem;
+
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+    /* border-radius: inherit; */
+    border-radius: 1rem 1rem 0 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.peopleTable {
+    width: 100%;
+    border-collapse: collapse;
+
+
+}
+
+.tableHeader {
+
+}
+
+.tableHeader > tr > th {
+    padding: 1rem;
+}
+
+.tableRow {
+    padding: 1rem;
+}
+
+.tableCell {
+
+}
+
+.nameWithAvatar {
+    display: flex;
+    align-items: center;
+}
+
+/* Avatar */
+.avatar {
+    /* width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-right: 0.75rem; */
+}
+
+.personName {
+
+}
+
+.relationTag {
+
+}
+
+.birthdayInfo {
+
+}
+
+.birthdayDate {
+
+}
+
+.birthdayCountdown {
+
+}
+
+.giftCount {
+
+}
+
+.spentAmount {
+
+}
+
+.actionButtonsContainer {
+    display: flex;
+}
