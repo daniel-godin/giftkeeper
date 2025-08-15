@@ -89,3 +89,44 @@ export const formatBirthdayShort = (birthdayDate: string): string => {
         day: 'numeric'
     })
 }
+
+// Check's whether the MM-DD has passed for current year.  If yes... returns a YYYY-MM-DD with *next year*, otherwise uses *this year*.
+export const getNextBirthdayDate = (birthdayDate: string): string | null => {
+    if (!birthdayDate) { return null }; // Guard.  Missing input
+    if (!isValidDate(birthdayDate)) { return null }; // Invalid DateString.
+    
+    const today = new Date();
+
+    // Parse the date components to avoid timezone issues
+    const [originalYear, originalMonth, originalDay] = birthdayDate.split('-').map(Number);
+
+    // Create date using locale timezone (remember, month is 0-indexed)
+    const birthDate = new Date(originalYear, originalMonth - 1, originalDay);
+
+    // Set to current year
+    const nextBirthday = new Date(
+        today.getFullYear(),
+        birthDate.getMonth(),
+        birthDate.getDate()
+    )
+
+    // If Date has already passed *this* year, move to next year
+    if (nextBirthday <= today) {
+        nextBirthday.setFullYear(today.getFullYear() + 1);
+    }
+
+    // Manually format to avoid timezone issues
+    const year = nextBirthday.getFullYear();
+    const month = String(nextBirthday.getMonth() + 1).padStart(2, '0');
+    const day = String(nextBirthday.getDate()).padStart(2, '0');
+
+    // Return as YYYY-MM-DD string
+    return `${year}-${month}-${day}`;
+}
+
+export const getDaysUntilNextBirthday = (birthdayDate: string): number => {
+    const nextBirthdayDate = getNextBirthdayDate(birthdayDate);
+    if (!nextBirthdayDate) { return 0 };
+    const daysUntil = getDaysUntilDate(nextBirthdayDate);
+    return daysUntil;
+}
