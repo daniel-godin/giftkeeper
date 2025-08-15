@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { usePeople } from '../../../../contexts/PeopleContext'
 import styles from './PeopleTable.module.css'
 import { Link } from 'react-router';
-import { getDaysUntilDate } from '../../../../utils';
+import { formatBirthdayShort, getDaysUntilDate, getDaysUntilNextBirthday } from '../../../../utils';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Person } from '../../../../types/PersonType';
 
@@ -59,11 +59,13 @@ export function PeopleTable() {
 
                             {/* Birthday Information */}
                             <td className={styles.tableCell}>
-                                <div className={styles.birthdayInfo}>
-                                    <div className={styles.birthdayDate}>{person.birthday}</div>
-                                    {/* TODO:  ADD "DAYS AWAY" */}
-                                    <div className={styles.birthdayCountdown}>{person.birthday ? getDaysUntilDate(person.birthday) : 'N/A'}</div>
-                                </div>
+                                {person.birthday && (
+                                    <div className={styles.birthdayInfo}>
+                                        <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
+                                        {/* TODO:  ADD "DAYS AWAY" */}
+                                        <div className={styles.birthdayCountdown}>{getDaysUntilNextBirthday(person.birthday)} days away</div>
+                                    </div>
+                                )}
                             </td>
 
                             {/* Number of Gifts */}
