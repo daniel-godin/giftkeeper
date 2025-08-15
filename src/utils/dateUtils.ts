@@ -75,3 +75,17 @@ export const isValidDateString = (dateString: string): boolean => {
 
     return true
 }
+
+// Valid date string === "YYYY-MM-DD".  Returns a shorted month (eg. Mar, instead of March), with the day.  No year returned.
+export const formatBirthdayShort = (birthdayDate: string): string => {
+    if (!birthdayDate) { return '--' }; // Guard.  Missing input
+    if (!isValidDate(birthdayDate)) { return '--' }; // Invalid DateString.
+
+    const [year, month, day] = birthdayDate.split('-').map(Number);
+    const dateObject = new Date(year, month - 1, day);
+
+    return dateObject.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+    })
+}
