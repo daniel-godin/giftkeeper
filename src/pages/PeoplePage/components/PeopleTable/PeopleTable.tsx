@@ -54,7 +54,7 @@ export function PeopleTable() {
 
                             {/* Relation To User */}
                             <td className={styles.tableCell}>
-                                <span className={styles.relationTag}>{person.relationship}</span>
+                                {person.relationship && (<span className={styles.relationTag}>{person.relationship}</span>)}
                             </td>
 
                             {/* Birthday Information */}
