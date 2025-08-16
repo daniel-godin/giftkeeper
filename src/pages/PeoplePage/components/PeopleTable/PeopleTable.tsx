@@ -1,13 +1,22 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { usePeople } from '../../../../contexts/PeopleContext'
 import styles from './PeopleTable.module.css'
 import { Link } from 'react-router';
 import { formatBirthdayShort, getDaysUntilDate, getDaysUntilNextBirthday } from '../../../../utils';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Person } from '../../../../types/PersonType';
+import { DEFAULT_PERSON } from '../../../../constants/defaultObjects';
+import { EditPersonModal } from '../../../../components/modals/EditPersonModal/EditPersonModal';
+import { usePeopleActions } from '../../../../hooks/usePeopleActions';
+import { AddPersonModal } from '../../../../components/modals/AddPersonModal/AddPersonModal';
 
 export function PeopleTable() {
     const { people, loading: loadingPeople } = usePeople();
+    const { deletePerson } = usePeopleActions();
+
+    const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
+    const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
+    const [personBeingEdited, setPersonBeingEdited] = useState<Person>(DEFAULT_PERSON);
 
     const sortedPeople = useMemo(() => {
         // TODO: Create different ways to sort.
@@ -15,11 +24,15 @@ export function PeopleTable() {
     }, [people])
 
     const handleEditableItem = (person: Person) => {
-        console.log('handleEditableItem')
+        setPersonBeingEdited(person);
+        setIsEditPersonModalOpen(true);
     }
 
     const handleDelete = async (person: Person) => {
-        console.log('handleDelete');
+        const isDeleteSuccessful = await deletePerson(person);
+        if (isDeleteSuccessful) {
+            // Possible navigation.
+        }
     }
 
     return (
@@ -106,11 +119,16 @@ export function PeopleTable() {
                                     </button>
                                 </div>
                             </td>
-
                         </tr>
                     ))}
                 </tbody>
             </table>
+
+            <EditPersonModal
+                isOpen={isEditPersonModalOpen}
+                onClose={() => setIsEditPersonModalOpen(false)}
+                data={personBeingEdited}
+            />
         </div>
     )
 }
