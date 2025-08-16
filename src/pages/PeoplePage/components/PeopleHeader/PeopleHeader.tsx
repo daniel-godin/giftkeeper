@@ -5,12 +5,13 @@ import { UsersRound } from 'lucide-react';
 import { StatCard } from '../../../../components/ui/StatCard/StatCard';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import { useEvents } from '../../../../contexts/EventsContext';
+import { AddPersonModal } from '../../../../components/modals/AddPersonModal/AddPersonModal';
 
 export function PeopleHeader() {
-    const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
-
     const { people, loading: loadingPeople } = usePeople();
     const { events, loading: eventsLoading } = useEvents();
+
+    const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
     
 
     return (
@@ -48,6 +49,11 @@ export function PeopleHeader() {
                     ]}
                 />
             </div>
+
+            <AddPersonModal
+                isOpen={isAddPersonModalOpen}
+                onClose={() => setIsAddPersonModalOpen(false)}
+            />
         </header>
     )
 }
