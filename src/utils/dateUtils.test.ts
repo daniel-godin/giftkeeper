@@ -273,3 +273,17 @@ describe('formatBirthdayShort', () => {
         expect(formatBirthdayShort('2000-07-04')).toBe('Jul 4');
     })
 })
+
+// Tests for getNextBirthdayDate
+// Input: Date String ("YYYY-MM-DD").  Output:  Date String or null.
+// Checks whether a MM-DD has passed for current year.  If yes, uses this year + 1, otherwise uses this year.
+// describe('getNextBirthdayDate', () => {
+
+// })
+
+// Tests for getDaysUntilNextBirthday
+// Input:  Date String ("YYYY-MM-DD").  Output: Number (0 for falsey).
+// Uses getNextBirthdayDate combined with a user's birthday date input to get the days until their *next* birthday
+// describe('getDaysUntilNextBirthday', () => {
+
+// })
