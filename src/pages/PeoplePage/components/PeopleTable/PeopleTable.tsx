@@ -1,27 +1,112 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { usePeople } from '../../../../contexts/PeopleContext'
 import styles from './PeopleTable.module.css'
 import { Link } from 'react-router';
-import { formatBirthdayShort, getDaysUntilDate, getDaysUntilNextBirthday } from '../../../../utils';
+import { formatBirthdayShort, getDaysUntilNextBirthday } from '../../../../utils';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Person } from '../../../../types/PersonType';
 import { DEFAULT_PERSON } from '../../../../constants/defaultObjects';
 import { EditPersonModal } from '../../../../components/modals/EditPersonModal/EditPersonModal';
 import { usePeopleActions } from '../../../../hooks/usePeopleActions';
-import { AddPersonModal } from '../../../../components/modals/AddPersonModal/AddPersonModal';
+import { useGiftItems } from '../../../../contexts/GiftItemsContext';
+import { formatCurrency } from '../../../../utils/currencyUtils';
+import { FormInput, FormSelect } from '../../../../components/ui';
+
+type SortByOptions = 'name' | 'birthday' | 'giftCount' | 'recentlyAdded';
+
+interface PeopleSortOptions {
+    sortBy: SortByOptions;
+    sortDirection: 'asc' | 'desc';
+    searchTerm: string;
+}
+
+const sortDropDown = [
+    { optionLabel: 'Name', optionValue: 'name' },
+    { optionLabel: 'Birthday', optionValue: 'birthday' },
+    { optionLabel: 'Gift Count', optionValue: 'giftCount' },
+    { optionLabel: 'Recently Added', optionValue: 'recentlyAdded' },
+
+]
 
 export function PeopleTable() {
     const { people, loading: loadingPeople } = usePeople();
+    const { giftItems } = useGiftItems();
     const { deletePerson } = usePeopleActions();
 
-    const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
+    const [sortOptions, setSortOptions] = useState<PeopleSortOptions>({sortBy: 'name', sortDirection: 'asc', searchTerm: ''});
+
+    // Modal State
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
     const [personBeingEdited, setPersonBeingEdited] = useState<Person>(DEFAULT_PERSON);
 
+    // TODO: DELETE THIS AFTER DEV
+    // useEffect(() => {
+    //     console.log('sortOptions:', sortOptions);
+    // }, [sortOptions])
+
     const sortedPeople = useMemo(() => {
+        let result = [...people];
+
+        // Filter First
+        if (sortOptions.searchTerm) {
+            result = result.filter(person => {
+                return person.name.toLowerCase().includes(sortOptions.searchTerm.toLowerCase());
+            })
+        }
+
         // TODO: Create different ways to sort.
-        return people;
-    }, [people])
+        if (sortOptions.sortBy === 'name') {
+            return result.sort((a, b) => {
+                const personA = a.name.toUpperCase();
+                const personB = b.name.toUpperCase();
+                if (personA < personB) { return -1 };
+                if (personA > personB) { return 1 };
+                return 0
+            })
+        }
+
+        if (sortOptions.sortBy === 'recentlyAdded') {
+            return result.sort((a, b) => {
+                const personA = a.createdAt;
+                const personB = b.createdAt;
+                if (!personA || !personB) { return 0 };
+                if (personA > personB) { return -1 };
+                if (personA < personB) { return 1 };
+                return 0
+            })
+        }
+
+        return result;
+    }, [people, sortOptions, sortOptions.searchTerm]);
+
+    // Saves number of gift items & total spent in a useMemo so it doesn't have to calculate every rerender.
+    const giftStatsByPerson = useMemo(() => {
+        const stats: Record<string, { giftCount: number; totalSpent: number }> = {};
+
+        giftItems.forEach(item => {
+            if (!item.personId) { return }; // Guard
+
+            if (!stats[item.personId]) {
+                stats[item.personId] = { giftCount: 0, totalSpent: 0 };
+            }
+
+            stats[item.personId].giftCount++;
+
+            if (item.status === 'purchased' && item.purchasedCost) {
+                stats[item.personId].totalSpent += item.purchasedCost;
+            }
+        })
+
+        return stats;
+    }, [giftItems]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setSortOptions(prev => ({
+            ...prev,
+            [name]: value
+        }))
+    }
 
     const handleEditableItem = (person: Person) => {
         setPersonBeingEdited(person);
@@ -29,18 +114,27 @@ export function PeopleTable() {
     }
 
     const handleDelete = async (person: Person) => {
-        const isDeleteSuccessful = await deletePerson(person);
-        if (isDeleteSuccessful) {
-            // Possible navigation.
-        }
+        await deletePerson(person);
     }
 
     return (
         <div className={styles.peopleTableContainer}>
             <header className={styles.peopleTableHeader}>
-                <span>Sort People</span>
-                <span>Sort Name</span>
-                <span>Search People</span>
+                <form className={styles.sortForm} autoComplete='off'>
+                    <FormSelect
+                        name='sortBy'
+                        options={sortDropDown}
+                        value={sortOptions.sortBy}
+                        onChange={handleInputChange}
+                    />
+
+                    <FormInput
+                        type='text'
+                        name='searchTerm'
+                        value={sortOptions.searchTerm}
+                        onChange={handleInputChange}
+                    />
+                </form>
             </header>
 
             <table className={styles.peopleTable}>
@@ -81,24 +175,25 @@ export function PeopleTable() {
                                 )}
                             </td>
 
-                            {/* Number of Gifts */}
+                            {/* Number of Gifts For Each Person (person.id) */}
                             <td className={styles.tableCell}>
-                                {/* TODO:  Hook up giftItems with filters in a useMemo probably */}
-                                <span className={styles.giftCount}>5</span>
+                                {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
+                                    <span className={styles.giftCount}>{giftStatsByPerson[person.id].giftCount}</span>
+                                )}
                             </td>
 
                             {/* Total Spent On Person */}
                             <td className={styles.tableCell}>
-                                {/* TODO:  Hook up giftItems with purchasedCost filter in a useMemo */}
-                                <span className={styles.spentAmount}>$240</span>
+                                {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
+                                    <span className={styles.spentAmount}>{formatCurrency(giftStatsByPerson[person.id].totalSpent)}</span>
+                                )}
                             </td>
 
                             {/* Actions:  Edit/Delete Person */}
                             <td className={styles.tableCell}>
                                 <div className={styles.actionButtonsContainer}>
 
-
-                                    {/* Edit Button -- Opens "EditGiftItemModal" */}
+                                    {/* Edit Button -- Opens "EditPersonModal" */}
                                     <button 
                                         type='button'
                                         className='unstyled-button'
@@ -107,7 +202,7 @@ export function PeopleTable() {
                                         <Pencil />
                                     </button>
 
-                                    {/* Delete Button -- Deletes Gift Item */}
+                                    {/* Delete Button -- Deletes Person */}
                                     <button 
                                         type='button'
                                         className='unstyled-button'
