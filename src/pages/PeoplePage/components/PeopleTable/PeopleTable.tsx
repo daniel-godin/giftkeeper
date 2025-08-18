@@ -86,6 +86,14 @@ export function PeopleTable() {
             return result.sort((a, b) => {
                 const personA = a.name.toUpperCase();
                 const personB = b.name.toUpperCase();
+
+                // Descending Names
+                if (sortOptions.sortDirection === 'desc') {
+                    if (personA > personB) { return -1 };
+                    if (personA < personB) { return 1 };
+                    return 0
+                }
+
                 if (personA < personB) { return -1 };
                 if (personA > personB) { return 1 };
                 return 0
@@ -96,7 +104,16 @@ export function PeopleTable() {
             return result.sort((a, b) => {
                 const personA = a.createdAt;
                 const personB = b.createdAt;
-                if (!personA || !personB) { return 0 };
+
+                if (!personA || !personB) { return 0 }; // Guard
+
+                // Descending Names
+                if (sortOptions.sortDirection === 'desc') {
+                    if (personA < personB) { return -1 };
+                    if (personA > personB) { return 1 };
+                    return 0
+                }
+
                 if (personA > personB) { return -1 };
                 if (personA < personB) { return 1 };
                 return 0
