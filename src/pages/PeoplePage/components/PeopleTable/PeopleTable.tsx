@@ -25,7 +25,12 @@ const sortDropDown = [
     { optionLabel: 'Birthday', optionValue: 'birthday' },
     { optionLabel: 'Gift Count', optionValue: 'giftCount' },
     { optionLabel: 'Recently Added', optionValue: 'recentlyAdded' },
+]
 
+// For FormSelect Dropdown in JSX
+const sortDirectionOptions = [
+    { optionLabel: 'Asc', optionValue: 'asc' },
+    { optionLabel: 'Desc', optionValue: 'desc' },
 ]
 
 export function PeopleTable() {
@@ -44,11 +49,33 @@ export function PeopleTable() {
     //     console.log('sortOptions:', sortOptions);
     // }, [sortOptions])
 
+    // Saves number of gift items & total spent in a useMemo so it doesn't have to calculate every rerender.
+    const giftStatsByPerson = useMemo(() => {
+        const stats: Record<string, { giftCount: number; totalSpent: number }> = {};
+
+        giftItems.forEach(item => {
+            if (!item.personId) { return }; // Guard
+
+            if (!stats[item.personId]) {
+                stats[item.personId] = { giftCount: 0, totalSpent: 0 };
+            }
+
+            stats[item.personId].giftCount++;
+
+            if (item.status === 'purchased' && item.purchasedCost) {
+                stats[item.personId].totalSpent += item.purchasedCost;
+            }
+        })
+
+        return stats;
+    }, [giftItems]);
+
     const sortedPeople = useMemo(() => {
         let result = [...people];
 
         // Filter First
         if (sortOptions.searchTerm) {
+            // TODO:  Add "nickname" into the searchable text as well.
             result = result.filter(person => {
                 return person.name.toLowerCase().includes(sortOptions.searchTerm.toLowerCase());
             })
@@ -76,29 +103,23 @@ export function PeopleTable() {
             })
         }
 
+        if (sortOptions.sortBy === 'giftCount') {
+            return result.sort((a, b) => {
+                const giftCountA = giftStatsByPerson[a.id || ''].giftCount || 0;
+                const giftCountB = giftStatsByPerson[b.id || ''].giftCount || 0;
+
+                if (sortOptions.sortDirection === 'desc') {
+                    return giftCountB - giftCountA;
+                }
+
+                return giftCountA - giftCountB;
+            })
+        }
+
         return result;
-    }, [people, sortOptions, sortOptions.searchTerm]);
+    }, [people, sortOptions, sortOptions.searchTerm, sortOptions.sortBy]);
 
-    // Saves number of gift items & total spent in a useMemo so it doesn't have to calculate every rerender.
-    const giftStatsByPerson = useMemo(() => {
-        const stats: Record<string, { giftCount: number; totalSpent: number }> = {};
 
-        giftItems.forEach(item => {
-            if (!item.personId) { return }; // Guard
-
-            if (!stats[item.personId]) {
-                stats[item.personId] = { giftCount: 0, totalSpent: 0 };
-            }
-
-            stats[item.personId].giftCount++;
-
-            if (item.status === 'purchased' && item.purchasedCost) {
-                stats[item.personId].totalSpent += item.purchasedCost;
-            }
-        })
-
-        return stats;
-    }, [giftItems]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -132,6 +153,14 @@ export function PeopleTable() {
                         type='text'
                         name='searchTerm'
                         value={sortOptions.searchTerm}
+                        onChange={handleInputChange}
+                    />
+
+                    {/* Sorting Direction (asc/desc) */}
+                    <FormSelect
+                        name='sortDirection'
+                        options={sortDirectionOptions}
+                        value={sortOptions.sortDirection}
                         onChange={handleInputChange}
                     />
                 </form>
