@@ -12,7 +12,7 @@ import { useGiftItems } from '../../../../contexts/GiftItemsContext';
 import { formatCurrency } from '../../../../utils/currencyUtils';
 import { FormInput, FormSelect } from '../../../../components/ui';
 
-type SortByOptions = 'name' | 'birthday' | 'giftCount' | 'recentlyAdded';
+type SortByOptions = 'name' | 'birthday' | 'giftCount' | 'totalSpent' | 'recentlyAdded';
 
 interface PeopleSortOptions {
     sortBy: SortByOptions;
@@ -22,8 +22,9 @@ interface PeopleSortOptions {
 
 const sortDropDown = [
     { optionLabel: 'Name', optionValue: 'name' },
-    { optionLabel: 'Birthday', optionValue: 'birthday' },
+    { optionLabel: 'Upcoming Birthday', optionValue: 'birthday' },
     { optionLabel: 'Gift Count', optionValue: 'giftCount' },
+    { optionLabel: 'Total Spent', optionValue: 'totalSpent' },
     { optionLabel: 'Recently Added', optionValue: 'recentlyAdded' },
 ]
 
@@ -53,12 +54,16 @@ export function PeopleTable() {
     const giftStatsByPerson = useMemo(() => {
         const stats: Record<string, { giftCount: number; totalSpent: number }> = {};
 
-        giftItems.forEach(item => {
-            if (!item.personId) { return }; // Guard
+        // Sets up Object.personId and puts them at 0 giftCount & 0 totalSpent.
+        if (people) {
+            people.forEach(person => {
+                if (!person.id) { return }; // Guard
+                stats[person.id] = { giftCount: 0, totalSpent: 0 };
+            })
+        }
 
-            if (!stats[item.personId]) {
-                stats[item.personId] = { giftCount: 0, totalSpent: 0 };
-            }
+        giftItems.forEach(item => {
+            if (!item.personId) { return }; // Guard.  If no personId in the giftItem... It can't be attached to anything. SKIP.
 
             stats[item.personId].giftCount++;
 
@@ -68,7 +73,7 @@ export function PeopleTable() {
         })
 
         return stats;
-    }, [giftItems]);
+    }, [giftItems, people]);
 
     const sortedPeople = useMemo(() => {
         let result = [...people];
@@ -100,6 +105,23 @@ export function PeopleTable() {
             })
         }
 
+        if (sortOptions.sortBy === 'birthday') {
+            return result.sort((a, b) => {
+                const personA = getDaysUntilNextBirthday(a.birthday || '');
+                const personB = getDaysUntilNextBirthday(b.birthday || '');
+
+                if (!personA || !personB) { return 0 }; // Guard if one has no birthdate "YYYY-MM-DD"
+
+                // Descending:
+                if (sortOptions.sortDirection === 'desc') {
+                    return personB - personA;
+                }
+
+                return personA - personB;
+            })
+        }
+
+        // TODO:  FIX THIS TO USE FIREBASE/FIRESTORE TIMESTAMP OBJECTS (seconds/milliseconds)
         if (sortOptions.sortBy === 'recentlyAdded') {
             return result.sort((a, b) => {
                 const personA = a.createdAt;
@@ -122,14 +144,27 @@ export function PeopleTable() {
 
         if (sortOptions.sortBy === 'giftCount') {
             return result.sort((a, b) => {
-                const giftCountA = giftStatsByPerson[a.id || ''].giftCount || 0;
-                const giftCountB = giftStatsByPerson[b.id || ''].giftCount || 0;
+                const giftCountA = giftStatsByPerson[a.id || '']?.giftCount || 0;
+                const giftCountB = giftStatsByPerson[b.id || '']?.giftCount || 0;
 
                 if (sortOptions.sortDirection === 'desc') {
                     return giftCountB - giftCountA;
                 }
 
                 return giftCountA - giftCountB;
+            })
+        }
+
+        if (sortOptions.sortBy === 'totalSpent') {
+            return result.sort((a, b) => {
+                const totalSpentA = giftStatsByPerson[a.id || '']?.totalSpent || 0;
+                const totalSpentB = giftStatsByPerson[b.id || '']?.totalSpent || 0;
+
+                if (sortOptions.sortDirection === 'desc') {
+                    return totalSpentB - totalSpentA;
+                }
+
+                return totalSpentA - totalSpentB;
             })
         }
 
