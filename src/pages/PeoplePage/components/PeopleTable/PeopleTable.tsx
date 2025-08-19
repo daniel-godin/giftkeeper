@@ -182,8 +182,6 @@ export function PeopleTable() {
         return result;
     }, [people, sortOptions, sortOptions.searchTerm, sortOptions.sortBy]);
 
-
-
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = e.target;
         setSortOptions(prev => ({
