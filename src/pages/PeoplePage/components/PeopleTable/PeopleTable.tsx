@@ -249,10 +249,12 @@ export function PeopleTable() {
                         <tr key={person.id} className={styles.tableRow}>
                             {/* Person Name + First Letter Avatar */}
                             <td className={styles.tableCell}>
-                                <div className={styles.nameWithAvatar}>
-                                    <div className={styles.avatar}>{person.name.slice(0, 1)}</div>
-                                    <Link to={`/people/${person.id}`} className={`unstyled-link ${styles.personName}`}>{person.name}</Link>
-                                </div>
+                                <Link to={`/people/${person.id}`} className={`unstyled-link ${styles.personName}`}>
+                                    <div className={styles.nameWithAvatar}>
+                                        <div className={styles.avatar}>{person.name.slice(0, 1)}</div>
+                                        {person.name}
+                                    </div>
+                                </Link>
                             </td>
 
                             {/* Relation To User */}
