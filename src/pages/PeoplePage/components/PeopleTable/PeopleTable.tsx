@@ -21,11 +21,11 @@ interface PeopleSortOptions {
 }
 
 const sortDropDown = [
-    { optionLabel: 'Name', optionValue: 'name' },
-    { optionLabel: 'Upcoming Birthday', optionValue: 'birthday' },
-    { optionLabel: 'Gift Count', optionValue: 'giftCount' },
-    { optionLabel: 'Total Spent', optionValue: 'totalSpent' },
-    { optionLabel: 'Recently Added', optionValue: 'recentlyAdded' },
+    { optionLabel: 'Sort: Name', optionValue: 'name' },
+    { optionLabel: 'Sort: Upcoming Birthday', optionValue: 'birthday' },
+    { optionLabel: 'Sort: Gift Count', optionValue: 'giftCount' },
+    { optionLabel: 'Sort: Total Spent', optionValue: 'totalSpent' },
+    { optionLabel: 'Sort: Recently Added', optionValue: 'recentlyAdded' },
 ]
 
 // For FormSelect Dropdown in JSX
@@ -39,7 +39,7 @@ export function PeopleTable() {
     const { giftItems } = useGiftItems();
     const { deletePerson } = usePeopleActions();
 
-    const [sortOptions, setSortOptions] = useState<PeopleSortOptions>({sortBy: 'name', sortDirection: 'asc', searchTerm: ''});
+    const [sortOptions, setSortOptions] = useState<PeopleSortOptions>({ sortBy: 'name', sortDirection: 'asc', searchTerm: '' });
 
     // Modal State
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
@@ -78,21 +78,24 @@ export function PeopleTable() {
     const sortedPeople = useMemo(() => {
         let result = [...people];
 
-        // Filter First
+        // Filter First -- Filtered by Name, Nickname, or Relationship
         if (sortOptions.searchTerm) {
-            // TODO:  Add "nickname" into the searchable text as well.
             result = result.filter(person => {
-                return person.name.toLowerCase().includes(sortOptions.searchTerm.toLowerCase());
+                const searchTerm = sortOptions.searchTerm.toLowerCase();
+
+                return person.name.toLowerCase().includes(searchTerm) || 
+                (person.nickname && person.nickname.toLowerCase().includes(searchTerm)) ||
+                (person.relationship && person.relationship.toLowerCase().includes(searchTerm))
             })
         }
 
-        // TODO: Create different ways to sort.
+        // Sort By Name
         if (sortOptions.sortBy === 'name') {
             return result.sort((a, b) => {
-                const personA = a.name.toUpperCase();
-                const personB = b.name.toUpperCase();
+                const personA = a.name.toLowerCase();
+                const personB = b.name.toLowerCase();
 
-                // Descending Names
+                // Descending
                 if (sortOptions.sortDirection === 'desc') {
                     if (personA > personB) { return -1 };
                     if (personA < personB) { return 1 };
@@ -110,9 +113,12 @@ export function PeopleTable() {
                 const personA = getDaysUntilNextBirthday(a.birthday || '');
                 const personB = getDaysUntilNextBirthday(b.birthday || '');
 
-                if (!personA || !personB) { return 0 }; // Guard if one has no birthdate "YYYY-MM-DD"
+                // Handle missing birthdays -- Put At Bottom of List
+                if (!personA && !personB) { return 0 };
+                if (!personA) { return 1 };
+                if (!personB) { return -1 };
 
-                // Descending:
+                // Descending
                 if (sortOptions.sortDirection === 'desc') {
                     return personB - personA;
                 }
@@ -127,9 +133,12 @@ export function PeopleTable() {
                 const personA = a.createdAt;
                 const personB = b.createdAt;
 
-                if (!personA || !personB) { return 0 }; // Guard
+                // Handle missing timestamps - always put at bottom
+                if (!personA && !personB) { return 0 };
+                if (!personA) { return 1 };
+                if (!personB) { return -1 };
 
-                // Descending Names
+                // Descending
                 if (sortOptions.sortDirection === 'desc') {
                     if (personA < personB) { return -1 };
                     if (personA > personB) { return 1 };
@@ -147,6 +156,7 @@ export function PeopleTable() {
                 const giftCountA = giftStatsByPerson[a.id || '']?.giftCount || 0;
                 const giftCountB = giftStatsByPerson[b.id || '']?.giftCount || 0;
 
+                // Descending
                 if (sortOptions.sortDirection === 'desc') {
                     return giftCountB - giftCountA;
                 }
@@ -160,6 +170,7 @@ export function PeopleTable() {
                 const totalSpentA = giftStatsByPerson[a.id || '']?.totalSpent || 0;
                 const totalSpentB = giftStatsByPerson[b.id || '']?.totalSpent || 0;
 
+                // Descending
                 if (sortOptions.sortDirection === 'desc') {
                     return totalSpentB - totalSpentA;
                 }
@@ -194,6 +205,8 @@ export function PeopleTable() {
         <div className={styles.peopleTableContainer}>
             <header className={styles.peopleTableHeader}>
                 <form className={styles.sortForm} autoComplete='off'>
+
+                    {/* Sort By Options: Name, Upcoming Birthday, Gift Count, Total Spent, or Recently Added */}
                     <FormSelect
                         name='sortBy'
                         options={sortDropDown}
@@ -201,9 +214,11 @@ export function PeopleTable() {
                         onChange={handleInputChange}
                     />
 
+                    {/* Text Search Input -- Name/Nickname/Relationship */}
                     <FormInput
                         type='text'
                         name='searchTerm'
+                        placeholder='search people...'
                         value={sortOptions.searchTerm}
                         onChange={handleInputChange}
                     />
@@ -250,8 +265,12 @@ export function PeopleTable() {
                                 {person.birthday && (
                                     <div className={styles.birthdayInfo}>
                                         <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
-                                        {/* TODO:  ADD "DAYS AWAY" */}
-                                        <div className={styles.birthdayCountdown}>{getDaysUntilNextBirthday(person.birthday)} days away</div>
+                                        {getDaysUntilNextBirthday(person.birthday) ? (
+                                            <div className={styles.birthdayCountdown}>{getDaysUntilNextBirthday(person.birthday)} days away</div>
+                                        ) : (
+                                            <div className={styles.birthdayCountdown}>--</div>
+                                        )}
+                                        
                                     </div>
                                 )}
                             </td>
