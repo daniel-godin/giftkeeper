@@ -282,7 +282,7 @@ export function PeopleTable() {
                                         <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
                                         {getDaysUntilNextBirthday(person.birthday) ? (
                                             <div 
-                                                className={`${styles.birthdayCountdown} ${getBirthdayUrgency(person.birthday)}`}
+                                                className={`${styles.birthdayCountdown} ${styles[getBirthdayUrgency(person.birthday)]}`}
                                             >
                                                 {getDaysUntilNextBirthday(person.birthday)} days away
                                             </div>

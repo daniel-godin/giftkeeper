@@ -136,3 +136,16 @@
     display: flex;
     gap: 0.5rem;
 }
+
+/* Status Colors for Birthday */
+.urgent {
+    color: var(--color-urgent);
+}
+
+.warning {
+    color: var(--color-warning);
+}
+
+.good {
+    color: var(--color-good);
+}
