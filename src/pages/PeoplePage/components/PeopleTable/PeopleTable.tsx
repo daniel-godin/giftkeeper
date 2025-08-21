@@ -182,7 +182,7 @@ export function PeopleTable() {
 
         if (!daysUntil) { return '' } // No class for invalid dates.  Should be *grey* color.
         if (daysUntil === 0) { return 'urgent' }; // This means TODAY is their birthday.  Very urgent.
-        
+
         switch (true) {
             case (daysUntil <= 7):
                 return 'urgent';
@@ -243,102 +243,134 @@ export function PeopleTable() {
                 </form>
             </header>
 
-            <table className={styles.peopleTable}>
-                <thead className={styles.tableHeader}>
-                    <tr className={styles.tableRow}>
-                        <th>NAME</th>
-                        <th>RELATION</th>
-                        <th>BIRTHDAY</th>
-                        <th>GIFTS</th>
-                        <th>SPENT</th>
-                        <th>ACTIONS</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {sortedPeople.map(person => (
-                        <tr key={person.id} className={styles.tableRow}>
-                            {/* Person Name + First Letter Avatar */}
-                            <td className={styles.tableCell}>
-                                <Link to={`/people/${person.id}`} className={`unstyled-link ${styles.personName}`}>
-                                    <div className={styles.nameWithAvatar}>
-                                        <div className={styles.avatar}>{person.name.slice(0, 1)}</div>
-                                        {person.name}
-                                    </div>
-                                </Link>
-                            </td>
-
-                            {/* Relation To User */}
-                            <td className={styles.tableCell}>
-                                {person.relationship && (<span className={styles.relationTag}>{person.relationship}</span>)}
-                            </td>
-
-                            {/* Birthday Information */}
-                            <td className={styles.tableCell}>
-                                {person.birthday && (
-                                    <div className={styles.birthdayInfo}>
-                                        <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
-                                        {getDaysUntilNextBirthday(person.birthday) ? (
-                                            <div 
-                                                className={`${styles.birthdayCountdown} ${styles[getBirthdayUrgency(person.birthday)]}`}
-                                            >
-                                                {getDaysUntilNextBirthday(person.birthday)} days away
-                                            </div>
-                                        ) : (
-                                            <div className={styles.birthdayCountdown}>--</div>
-                                        )}
-                                    </div>
-                                )}
-                            </td>
-
-                            {/* Number of Gifts For Each Person (person.id) */}
-                            <td className={styles.tableCell}>
-                                {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
-                                    <span className={styles.giftCount}>{giftStatsByPerson[person.id].giftCount}</span>
-                                )}
-                            </td>
-
-                            {/* Total Spent On Person */}
-                            <td className={styles.tableCell}>
-                                {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
-                                    <span className={styles.spentAmount}>{formatCurrency(giftStatsByPerson[person.id].totalSpent)}</span>
-                                )}
-                            </td>
-
-                            {/* Actions:  Edit/Delete Person */}
-                            <td className={styles.tableCell}>
-                                <div className={styles.actionButtonsContainer}>
-
-                                    {/* Edit Button -- Opens "EditPersonModal" */}
-                                    <button 
-                                        type='button'
-                                        className='unstyled-button'
-                                        onClick={() => handleEditableItem(person) }
-                                    >
-                                        <Pencil />
-                                    </button>
-
-                                    {/* Delete Button -- Deletes Person */}
-                                    <button 
-                                        type='button'
-                                        className='unstyled-button'
-                                        onClick={() => handleDelete(person) }
-                                    >
-                                        <Trash2
-                                            color='#dc3545'
-                                        />
-                                    </button>
-                                </div>
-                            </td>
+            {/* Table With People Data */}
+            {loadingPeople ? (
+                <SkeletonTable rows={5} />
+            ) : (
+                <table className={styles.peopleTable}>
+                    <thead className={styles.tableHeader}>
+                        <tr className={styles.tableRow}>
+                            <th>NAME</th>
+                            <th>RELATION</th>
+                            <th>BIRTHDAY</th>
+                            <th>GIFTS</th>
+                            <th>SPENT</th>
+                            <th>ACTIONS</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {sortedPeople.map(person => (
+                            <tr key={person.id} className={styles.tableRow}>
+                                {/* Person Name + First Letter Avatar */}
+                                <td className={styles.tableCell}>
+                                    <Link to={`/people/${person.id}`} className={`unstyled-link ${styles.personName}`}>
+                                        <div className={styles.nameWithAvatar}>
+                                            <div className={styles.avatar}>{person.name.slice(0, 1)}</div>
+                                            {person.name}
+                                        </div>
+                                    </Link>
+                                </td>
 
+                                {/* Relation To User */}
+                                <td className={styles.tableCell}>
+                                    {person.relationship && (<span className={styles.relationTag}>{person.relationship}</span>)}
+                                </td>
+
+                                {/* Birthday Information */}
+                                <td className={styles.tableCell}>
+                                    {person.birthday && (
+                                        <div className={styles.birthdayInfo}>
+                                            <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
+                                            {getDaysUntilNextBirthday(person.birthday) ? (
+                                                <div 
+                                                    className={`${styles.birthdayCountdown} ${styles[getBirthdayUrgency(person.birthday)]}`}
+                                                >
+                                                    {getDaysUntilNextBirthday(person.birthday)} days away
+                                                </div>
+                                            ) : (
+                                                <div className={styles.birthdayCountdown}>--</div>
+                                            )}
+                                        </div>
+                                    )}
+                                </td>
+
+                                {/* Number of Gifts For Each Person (person.id) */}
+                                <td className={styles.tableCell}>
+                                    {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
+                                        <span className={styles.giftCount}>{giftStatsByPerson[person.id].giftCount}</span>
+                                    )}
+                                </td>
+
+                                {/* Total Spent On Person */}
+                                <td className={styles.tableCell}>
+                                    {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
+                                        <span className={styles.spentAmount}>{formatCurrency(giftStatsByPerson[person.id].totalSpent)}</span>
+                                    )}
+                                </td>
+
+                                {/* Actions:  Edit/Delete Person */}
+                                <td className={styles.tableCell}>
+                                    <div className={styles.actionButtonsContainer}>
+
+                                        {/* Edit Button -- Opens "EditPersonModal" */}
+                                        <button 
+                                            type='button'
+                                            className='unstyled-button'
+                                            onClick={() => handleEditableItem(person) }
+                                        >
+                                            <Pencil />
+                                        </button>
+
+                                        {/* Delete Button -- Deletes Person */}
+                                        <button 
+                                            type='button'
+                                            className='unstyled-button'
+                                            onClick={() => handleDelete(person) }
+                                        >
+                                            <Trash2
+                                                color='#dc3545'
+                                            />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+            
             <EditPersonModal
                 isOpen={isEditPersonModalOpen}
                 onClose={() => setIsEditPersonModalOpen(false)}
                 data={personBeingEdited}
             />
         </div>
+    )
+}
+
+const SkeletonTable = ({ rows = 5 }) => {
+
+    return (
+        <table className={styles.peopleTable}>
+            <thead className={styles.tableHeader}>
+                <tr>
+                    <th>NAME</th>
+                    <th>RELATION</th>
+                    <th>BIRTHDAY</th>
+                    <th>GIFTS</th>
+                    <th>SPENT</th>
+                    <th>ACTIONS</th>
+                </tr>
+            </thead>
+            <tbody>
+                {Array(rows).fill(0).map((_, i) => (
+                    <tr key={i} className={styles.tableRow}>
+                        <td className={styles.tableCell}>
+                            <div className="skeleton-line" style={{ width: '100%' }} />
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>  
     )
 }
