@@ -182,6 +182,20 @@ export function PeopleTable() {
         return result;
     }, [people, sortOptions, sortOptions.searchTerm, sortOptions.sortBy]);
 
+    const getBirthdayUrgency = (birthday: string): string => {
+        if (!birthday) { return '' }; // Guard for empty string
+        const daysUntil = getDaysUntilNextBirthday(birthday);
+
+        switch (true) {
+            case (daysUntil <= 7):
+                return 'urgent';
+            case (daysUntil <= 21):
+                return 'warning';
+            default:
+                return 'good';
+        }
+    }
+
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = e.target;
         setSortOptions(prev => ({
@@ -267,11 +281,14 @@ export function PeopleTable() {
                                     <div className={styles.birthdayInfo}>
                                         <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
                                         {getDaysUntilNextBirthday(person.birthday) ? (
-                                            <div className={styles.birthdayCountdown}>{getDaysUntilNextBirthday(person.birthday)} days away</div>
+                                            <div 
+                                                className={`${styles.birthdayCountdown} ${getBirthdayUrgency(person.birthday)}`}
+                                            >
+                                                {getDaysUntilNextBirthday(person.birthday)} days away
+                                            </div>
                                         ) : (
                                             <div className={styles.birthdayCountdown}>--</div>
                                         )}
-                                        
                                     </div>
                                 )}
                             </td>
