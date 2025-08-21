@@ -11,6 +11,7 @@ import { usePeopleActions } from '../../../../hooks/usePeopleActions';
 import { useGiftItems } from '../../../../contexts/GiftItemsContext';
 import { formatCurrency } from '../../../../utils/currencyUtils';
 import { FormInput, FormSelect } from '../../../../components/ui';
+import { Timestamp } from 'firebase/firestore';
 
 type SortByOptions = 'name' | 'birthday' | 'giftCount' | 'totalSpent' | 'recentlyAdded';
 
@@ -47,7 +48,8 @@ export function PeopleTable() {
 
     // TODO: DELETE THIS AFTER DEV
     // useEffect(() => {
-    //     console.log('sortOptions:', sortOptions);
+    //     // console.log('sortOptions:', sortOptions);
+    //     console.log(sortedPeople)
     // }, [sortOptions])
 
     // Saves number of gift items & total spent in a useMemo so it doesn't have to calculate every rerender.
@@ -75,6 +77,8 @@ export function PeopleTable() {
         return stats;
     }, [giftItems, people]);
 
+    // Filters & Sorts people in various ways.
+    // Eventually this will be done using Firestore orderBy, sortBy, & limit() methods for better performance/pagination.
     const sortedPeople = useMemo(() => {
         let result = [...people];
 
@@ -127,27 +131,23 @@ export function PeopleTable() {
             })
         }
 
-        // TODO:  FIX THIS TO USE FIREBASE/FIRESTORE TIMESTAMP OBJECTS (seconds/milliseconds)
+        // Sorts 'desc' (always) by recently added. Uses Firestore Timestamp.seconds for comparison
         if (sortOptions.sortBy === 'recentlyAdded') {
             return result.sort((a, b) => {
-                const personA = a.createdAt;
-                const personB = b.createdAt;
+                const personA: Timestamp = a.createdAt as Timestamp;
+                const personB: Timestamp = b.createdAt as Timestamp;
 
-                // Handle missing timestamps - always put at bottom
+                // Handle missing timestamp objects - always put at bottom
                 if (!personA && !personB) { return 0 };
                 if (!personA) { return 1 };
                 if (!personB) { return -1 };
 
-                // Descending
-                if (sortOptions.sortDirection === 'desc') {
-                    if (personA < personB) { return -1 };
-                    if (personA > personB) { return 1 };
-                    return 0
-                }
+                // Get Firestore Timestamp.seconds for comparison
+                const timestampA = personA.seconds;
+                const timestampB = personB.seconds;
 
-                if (personA > personB) { return -1 };
-                if (personA < personB) { return 1 };
-                return 0
+                // ALWAYS return 'desc', "recently added" makes no sense to have oldest first, ever.
+                return timestampB - timestampA;
             })
         }
 
@@ -227,6 +227,7 @@ export function PeopleTable() {
                         options={sortDirectionOptions}
                         value={sortOptions.sortDirection}
                         onChange={handleInputChange}
+                        disabled={sortOptions.sortBy === 'recentlyAdded'}
                     />
                 </form>
             </header>
