@@ -10,6 +10,16 @@
     --label-font-size: 0.9rem;
     --label-font-weight: 600;
     --label-color: #495057;
+
+    /* Urgency Colors */
+    --color-urgent: #e53e3e; /* Within 7 days */
+    --color-warning: #f6ad55; /* Within 21 days */
+    --color-good: #48bb78; /* Over 21 days */
+
+    /* Urgency Backgrounds */
+    --bg-urgent: linear-gradient(135deg, #fed7d7 0%, #f7fafc 100%);
+    --bg-warning: linear-gradient(135deg, #fef5e7 0%, #f7fafc 100%);
+    --bg-good: linear-gradient(135deg, #f0fff4 0%, #f7fafc 100%);
 }
 
 * {
