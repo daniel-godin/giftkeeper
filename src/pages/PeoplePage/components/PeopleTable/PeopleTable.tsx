@@ -46,12 +46,6 @@ export function PeopleTable() {
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
     const [personBeingEdited, setPersonBeingEdited] = useState<Person>(DEFAULT_PERSON);
 
-    // TODO: DELETE THIS AFTER DEV
-    // useEffect(() => {
-    //     // console.log('sortOptions:', sortOptions);
-    //     console.log(sortedPeople)
-    // }, [sortOptions])
-
     // Saves number of gift items & total spent in a useMemo so it doesn't have to calculate every rerender.
     const giftStatsByPerson = useMemo(() => {
         const stats: Record<string, { giftCount: number; totalSpent: number }> = {};
@@ -186,6 +180,9 @@ export function PeopleTable() {
         if (!birthday) { return '' }; // Guard for empty string
         const daysUntil = getDaysUntilNextBirthday(birthday);
 
+        if (!daysUntil) { return '' } // No class for invalid dates.  Should be *grey* color.
+        if (daysUntil === 0) { return 'urgent' }; // This means TODAY is their birthday.  Very urgent.
+        
         switch (true) {
             case (daysUntil <= 7):
                 return 'urgent';
