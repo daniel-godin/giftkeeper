@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { usePeople } from '../../../../contexts/PeopleContext'
 import styles from './PeopleTable.module.css'
 import { Link } from 'react-router';
@@ -21,6 +21,7 @@ interface PeopleSortOptions {
     searchTerm: string;
 }
 
+// For FormSelect sorting Dropdown in JSX
 const sortDropDown = [
     { optionLabel: 'Sort: Name', optionValue: 'name' },
     { optionLabel: 'Sort: Upcoming Birthday', optionValue: 'birthday' },
