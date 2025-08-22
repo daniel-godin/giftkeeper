@@ -6,7 +6,7 @@ import { Timestamp } from "firebase/firestore";
 
 type SortByOptions = 'name' | 'birthday' | 'giftCount' | 'totalSpent' | 'recentlyAdded';
 
-interface PeopleSortOptions {
+export interface PeopleSortOptions {
     sortBy: SortByOptions;
     sortDirection: 'asc' | 'desc';
     searchTerm: string;

@@ -12,25 +12,14 @@ import { formatCurrency } from '../../../../utils/currencyUtils';
 import { FormInput, FormSelect } from '../../../../components/ui';
 import { usePeopleFiltered } from '../../../../hooks/usePeopleFiltered';
 
-// For FormSelect sorting Dropdown in JSX
-const sortDropDown = [
-    { optionLabel: 'Sort: Name', optionValue: 'name' },
-    { optionLabel: 'Sort: Upcoming Birthday', optionValue: 'birthday' },
-    { optionLabel: 'Sort: Gift Count', optionValue: 'giftCount' },
-    { optionLabel: 'Sort: Total Spent', optionValue: 'totalSpent' },
-    { optionLabel: 'Sort: Recently Added', optionValue: 'recentlyAdded' },
-]
+interface PeopleTableProps {
+    people: Person[];
+    giftStatsByPerson: Record<string, { giftCount: number; totalSpent: number }>
+}
 
-// For FormSelect Dropdown in JSX
-const sortDirectionOptions = [
-    { optionLabel: 'Asc', optionValue: 'asc' },
-    { optionLabel: 'Desc', optionValue: 'desc' },
-]
-
-export function PeopleTable() {
+export function PeopleTable({ people, giftStatsByPerson } : PeopleTableProps) {
     const { loading: loadingPeople } = usePeople();
     const { deletePerson } = usePeopleActions();
-    const { sortOptions, setSortOptions, filteredPeople, giftStatsByPerson } = usePeopleFiltered();
 
     // Modal State
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
@@ -53,14 +42,6 @@ export function PeopleTable() {
         }
     }
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setSortOptions(prev => ({
-            ...prev,
-            [name]: value
-        }))
-    }
-
     const handleEditableItem = (person: Person) => {
         setPersonBeingEdited(person);
         setIsEditPersonModalOpen(true);
@@ -72,36 +53,6 @@ export function PeopleTable() {
 
     return (
         <div className={styles.peopleTableContainer}>
-            <header className={styles.peopleTableHeader}>
-                <form className={styles.sortForm} autoComplete='off'>
-
-                    {/* Sort By Options: Name, Upcoming Birthday, Gift Count, Total Spent, or Recently Added */}
-                    <FormSelect
-                        name='sortBy'
-                        options={sortDropDown}
-                        value={sortOptions.sortBy}
-                        onChange={handleInputChange}
-                    />
-
-                    {/* Text Search Input -- Name/Nickname/Relationship */}
-                    <FormInput
-                        type='text'
-                        name='searchTerm'
-                        placeholder='search people...'
-                        value={sortOptions.searchTerm}
-                        onChange={handleInputChange}
-                    />
-
-                    {/* Sorting Direction (asc/desc) */}
-                    <FormSelect
-                        name='sortDirection'
-                        options={sortDirectionOptions}
-                        value={sortOptions.sortDirection}
-                        onChange={handleInputChange}
-                        disabled={sortOptions.sortBy === 'recentlyAdded'}
-                    />
-                </form>
-            </header>
 
             {/* Table With People Data */}
             {loadingPeople ? (
@@ -119,7 +70,7 @@ export function PeopleTable() {
                         </tr>
                     </thead>
                     <tbody>
-                        {filteredPeople.map(person => (
+                        {people.map(person => (
                             <tr key={person.id} className={styles.tableRow}>
                                 {/* Person Name + First Letter Avatar */}
                                 <td className={styles.tableCell}>

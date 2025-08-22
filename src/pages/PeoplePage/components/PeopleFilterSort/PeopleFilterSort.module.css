@@ -1,0 +1,10 @@
+.sortForm {
+    background-color: white;
+
+    padding: 1rem;
+
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
