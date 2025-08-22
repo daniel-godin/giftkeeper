@@ -2,6 +2,7 @@ import styles from './PeoplePage.module.css'
 import { useViewport } from '../../contexts/ViewportContext';
 import { PeopleTable } from './components/PeopleTable/PeopleTable';
 import { PeopleHeader } from './components/PeopleHeader/PeopleHeader';
+import { PeopleList } from './components/PeopleList/PeopleList';
 
 export function PeoplePage () {
     const deviceType = useViewport();
@@ -16,7 +17,7 @@ export function PeoplePage () {
             {deviceType === 'desktop' && ( <PeopleTable /> )}
 
             {/* Load card list version if user is on mobile sized screen (below 768px) */}
-
+            {deviceType === 'mobile' && ( <PeopleList /> )}
 
         </section>
     )
