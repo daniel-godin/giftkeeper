@@ -3,16 +3,16 @@ import { QuickActionButton } from '../../../../components/ui/QuickActionButton/Q
 import styles from './PeopleHeader.module.css'
 import { UsersRound } from 'lucide-react';
 import { StatCard } from '../../../../components/ui/StatCard/StatCard';
-import { usePeople } from '../../../../contexts/PeopleContext';
-import { useEvents } from '../../../../contexts/EventsContext';
 import { AddPersonModal } from '../../../../components/modals/AddPersonModal/AddPersonModal';
+import { useGiftStats } from '../../../../hooks/useGiftStats';
+import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';
 
 export function PeopleHeader() {
-    const { people, loading: loadingPeople } = usePeople();
-    const { events, loading: eventsLoading } = useEvents();
+    const giftStats = useGiftStats();
+    const upcomingEventsTotal = useUpcomingEvents();
+    const upcomingEvents = useUpcomingEvents(undefined, '30days');
 
     const [isAddPersonModalOpen, setIsAddPersonModalOpen] = useState<boolean>(false);
-    
 
     return (
         <header className={styles.peopleHeader}>
@@ -27,25 +27,25 @@ export function PeopleHeader() {
                 />
             </div>
 
-            {/* TODO:  FIX TYPE OF STATS */}
+            {/* Various Stats - total upcoming events + events within 30 days */}
+            {/* Gift Stats */}
             <div className={styles.statsOverview}>
                 <StatCard
-                    to='/people'
-                    title='PEOPLE'
-                    totalCount={people.length}
+                    to='/events'
+                    title='UPCOMING EVENTS'
+                    totalCount={upcomingEventsTotal.length}
                     breakdownStats={[
-                        // TODO: FIX THIS
-                        {count: people.length, label: 'total'}
+                        {count: upcomingEvents.length, label: 'within 30 days'}
                     ]}
                 />
 
                 <StatCard
-                    to='/people'
-                    title='EVENTS'
-                    totalCount={events.length}
+                    to='/giftItems'
+                    title='GIFTS'
+                    totalCount={giftStats.total}
                     breakdownStats={[
-                        // TODO: FIX THIS
-                        {count: events.length, label: 'total'}
+                        {count: giftStats.ideas, label: 'ideas'},
+                        {count: giftStats.purchased, label: 'bought'}
                     ]}
                 />
             </div>
