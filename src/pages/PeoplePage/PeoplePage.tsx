@@ -3,6 +3,7 @@ import { useViewport } from '../../contexts/ViewportContext';
 import { PeopleTable } from './components/PeopleTable/PeopleTable';
 import { PeopleHeader } from './components/PeopleHeader/PeopleHeader';
 import { PeopleList } from './components/PeopleList/PeopleList';
+import { PeopleFilterSort } from './components/PeopleFilterSort/PeopleFilterSort';
 
 export function PeoplePage () {
     const deviceType = useViewport();
@@ -12,6 +13,10 @@ export function PeoplePage () {
 
             {/* Rename this to PeopleHeader */}
             <PeopleHeader />
+
+            {/* <PeopleFilterSort
+
+            /> */}
 
             {/* Load table version if user is on desktop sized screen (768+px) */}
             {deviceType === 'desktop' && ( <PeopleTable /> )}
