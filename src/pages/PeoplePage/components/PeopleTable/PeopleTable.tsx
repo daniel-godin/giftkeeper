@@ -9,8 +9,6 @@ import { DEFAULT_PERSON } from '../../../../constants/defaultObjects';
 import { EditPersonModal } from '../../../../components/modals/EditPersonModal/EditPersonModal';
 import { usePeopleActions } from '../../../../hooks/usePeopleActions';
 import { formatCurrency } from '../../../../utils/currencyUtils';
-import { FormInput, FormSelect } from '../../../../components/ui';
-import { usePeopleFiltered } from '../../../../hooks/usePeopleFiltered';
 
 interface PeopleTableProps {
     people: Person[];
