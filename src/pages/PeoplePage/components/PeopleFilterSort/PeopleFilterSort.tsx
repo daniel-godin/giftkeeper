@@ -39,12 +39,12 @@ export function PeopleFilterSort({ sortOptions, setSortOptions } : PeopleFilterS
 
     return (
         <div className={styles.peopleFilterSort}>
-            <header className={styles.peopleFilterSortHeader}>
+            <header className={`${styles.peopleFilterSortHeader}`} onClick={() => setShowSortOptions(!showSortOptions)}>
                 <span>🔍 Filter & Sort</span>
                 {showSortOptions ? ( 
-                    <button className='unstyled-button' onClick={() => setShowSortOptions(false)}>▼</button>
+                    <button className='unstyled-button'>▼</button>
                 ) : (
-                    <button className='unstyled-button' onClick={() => setShowSortOptions(true)}>▲</button>
+                    <button className='unstyled-button'>▲</button>
                 )}
             </header>
 
