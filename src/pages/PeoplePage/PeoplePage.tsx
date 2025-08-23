@@ -29,7 +29,12 @@ export function PeoplePage () {
             )}
 
             {/* Load card list version if user is on mobile sized screen (below 768px) */}
-            {deviceType === 'mobile' && ( <PeopleList /> )}
+            {deviceType === 'mobile' && ( 
+                <PeopleList 
+                    people={filteredPeople}
+                    giftStatsByPerson={giftStatsByPerson}
+                /> 
+            )}
 
         </section>
     )
