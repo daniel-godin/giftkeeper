@@ -13,7 +13,6 @@ export function PeoplePage () {
     return (
         <section className={styles.peoplePage}>
 
-            {/* Rename this to PeopleHeader */}
             <PeopleHeader />
 
             <PeopleFilterSort
