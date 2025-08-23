@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FormInput, FormSelect } from '../../../../components/ui'
 import { useGiftItems } from '../../../../contexts/GiftItemsContext';
 import { usePeople } from '../../../../contexts/PeopleContext';
@@ -26,6 +27,8 @@ const sortDirectionOptions = [
 
 export function PeopleFilterSort({ sortOptions, setSortOptions } : PeopleFilterSortProps) {
 
+    const [showSortOptions, setShowSortOptions] = useState<boolean>(true);
+
     const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
         const { name, value } = e.target;
         setSortOptions(prev => ({
@@ -35,34 +38,48 @@ export function PeopleFilterSort({ sortOptions, setSortOptions } : PeopleFilterS
     }
 
     return (
-        <form className={styles.sortForm} autoComplete='off'>
+        <div className={styles.peopleFilterSort}>
+            <header className={styles.peopleFilterSortHeader}>
+                <span>🔍 Filter & Sort</span>
+                {showSortOptions ? ( 
+                    <button className='unstyled-button' onClick={() => setShowSortOptions(false)}>▼</button>
+                ) : (
+                    <button className='unstyled-button' onClick={() => setShowSortOptions(true)}>▲</button>
+                )}
+            </header>
 
-            {/* Sort By Options: Name, Upcoming Birthday, Gift Count, Total Spent, or Recently Added */}
-            <FormSelect
-                name='sortBy'
-                options={sortDropDown}
-                value={sortOptions.sortBy}
-                onChange={handleInputChange}
-            />
+            {showSortOptions && (
+                <form className={styles.form} autoComplete='off'>
 
-            {/* Text Search Input -- Name/Nickname/Relationship */}
-            <FormInput
-                type='text'
-                name='searchTerm'
-                placeholder='search people...'
-                value={sortOptions.searchTerm}
-                onChange={handleInputChange}
-            />
+                    {/* Text Search Input -- Name/Nickname/Relationship */}
+                    <FormInput
+                        type='text'
+                        name='searchTerm'
+                        placeholder='search people...'
+                        value={sortOptions.searchTerm}
+                        onChange={handleInputChange}
+                    />
 
-            {/* Sorting Direction (asc/desc) */}
-            <FormSelect
-                name='sortDirection'
-                options={sortDirectionOptions}
-                value={sortOptions.sortDirection}
-                onChange={handleInputChange}
-                disabled={sortOptions.sortBy === 'recentlyAdded'}
-            />
-            
-        </form>
+                    <div className={styles.sortContainer}>
+                        {/* Sort By Options: Name, Upcoming Birthday, Gift Count, Total Spent, or Recently Added */}
+                        <FormSelect
+                            name='sortBy'
+                            options={sortDropDown}
+                            value={sortOptions.sortBy}
+                            onChange={handleInputChange}
+                        />
+
+                        {/* Sorting Direction (asc/desc) */}
+                        <FormSelect
+                            name='sortDirection'
+                            options={sortDirectionOptions}
+                            value={sortOptions.sortDirection}
+                            onChange={handleInputChange}
+                            disabled={sortOptions.sortBy === 'recentlyAdded'}
+                        />
+                    </div>
+                </form>
+            )}
+        </div>
     )
 }
