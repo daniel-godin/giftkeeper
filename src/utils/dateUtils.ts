@@ -1,3 +1,6 @@
+import { UrgencyLevel } from "../types/CommonTypes";
+import { EventTypes } from "../types/EventType";
+
 // Date string input "YYYY-MM-DD"
 export const getDaysUntilDate = (date: string): number => {
     // Check format first
@@ -129,4 +132,29 @@ export const getDaysUntilNextBirthday = (birthdayDate: string): number => {
     if (!nextBirthdayDate) { return 0 };
     const daysUntil = getDaysUntilDate(nextBirthdayDate);
     return daysUntil;
+}
+
+// Takes in a dateString with an optional eventType
+// Returns "urgent", "warning", or "good" strings, depending on how soon an event is.
+export const getEventUrgency = (dateString: string, eventType?: EventTypes): UrgencyLevel => {
+    if (!dateString) { return '' }; // Guard
+
+    let daysUntil: number;
+    if (eventType === 'birthday') { 
+        daysUntil = getDaysUntilNextBirthday(dateString);
+    } else {
+        daysUntil = getDaysUntilDate(dateString);
+    }
+
+    if (daysUntil === null || daysUntil === undefined) { return '' }; // No class name return.
+    if (daysUntil === 0) { return 'urgent' }; // This means TODAY is the date.  URGENT.
+
+    switch (true) {
+        case (daysUntil <= 7):
+            return 'urgent';
+        case (daysUntil <= 21):
+            return 'warning';
+        default:
+            return 'good';
+    }
 }
