@@ -1,21 +1,81 @@
 import { usePeople } from '../../../../contexts/PeopleContext'
+import { Person } from '../../../../types/PersonType';
 import styles from './PeopleList.module.css'
+import { formatBirthdayShort, getDaysUntilNextBirthday } from '../../../../utils';
+import { Link } from 'react-router';
+import { formatCurrency } from '../../../../utils/currencyUtils';
 
-export function PeopleList() {
-    const { people } = usePeople();
+interface PeopleListProps {
+    people: Person[];
+    giftStatsByPerson: Record<string, { giftCount: number; totalSpent: number }>
+}
+
+export function PeopleList({ people, giftStatsByPerson } : PeopleListProps) {
+    const { loading: loadingPeople } = usePeople();
+
+    const getBirthdayUrgency = (birthday: string): string => {
+        if (!birthday) { return '' }; // Guard for empty string
+        const daysUntil = getDaysUntilNextBirthday(birthday);
+
+        if (!daysUntil) { return '' } // No class for invalid dates.  Should be *grey* color.
+        if (daysUntil === 0) { return 'urgent' }; // This means TODAY is their birthday.  Very urgent.
+
+        switch (true) {
+            case (daysUntil <= 7):
+                return 'urgent';
+            case (daysUntil <= 21):
+                return 'warning';
+            default:
+                return 'good';
+        }
+    }
 
     return (
         <div className={styles.peopleListContainer}>
-            <header className={styles.peopleListHeader}>
-                {/* # of people found */}
-
-                {/* List/Grid toggle?? */}
-            </header>
 
             {/* Mapping of "filtered/sorted people" */}
-            {/* {people.map(person => (
-                // PersonCard
-            ))} */}
+            {people && people.map(person => (
+                <Link to={`/people/${person.id}`} key={person.id} className={`unstyled-link`}>
+                    <div className={styles.personCard}>
+                        <div className={styles.cardRow}>
+                            <div className={styles.nameWithAvatar}>
+                                <div className={styles.avatar}>{person.name.slice(0, 1)}</div>
+                                <span className={styles.personName}>{person.name}</span>
+                            </div>
+
+                            {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
+                                    <span className={styles.giftCount}>{giftStatsByPerson[person.id].giftCount} 🎁</span>
+                                )}
+                        </div>
+                        <div className={styles.cardRow}>
+                            <div className={styles.leftSide}>
+                                {person.relationship && (<span className={styles.relationTag}>{person.relationship}</span>)}
+                                {person.relationship && person.birthday && ( <span> • </span> )}
+                                {person.birthday && (
+                                    <div className={styles.birthdayInfo}>
+                                        <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
+                                        {getDaysUntilNextBirthday(person.birthday) ? (
+                                            <div 
+                                                className={`${styles.birthdayCountdown} ${styles[getBirthdayUrgency(person.birthday)]}`}
+                                            >
+                                                ({getDaysUntilNextBirthday(person.birthday)} days)
+                                            </div>
+                                        ) : (
+                                            <div className={styles.birthdayCountdown}>--</div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className={styles.rightSide}>
+                                {person.id && giftStatsByPerson && giftStatsByPerson[person.id] && (
+                                    <span className={styles.spentAmount}>{formatCurrency(giftStatsByPerson[person.id].totalSpent)}</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </Link>
+            ))}
         </div>
     )
 }
