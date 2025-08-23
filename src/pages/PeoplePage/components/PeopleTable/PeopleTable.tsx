@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { usePeople } from '../../../../contexts/PeopleContext'
 import styles from './PeopleTable.module.css'
 import { Link } from 'react-router';
-import { formatBirthdayShort, getDaysUntilNextBirthday } from '../../../../utils';
+import { formatBirthdayShort, getDaysUntilNextBirthday, getEventUrgency } from '../../../../utils';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Person } from '../../../../types/PersonType';
 import { DEFAULT_PERSON } from '../../../../constants/defaultObjects';
@@ -22,23 +22,6 @@ export function PeopleTable({ people, giftStatsByPerson } : PeopleTableProps) {
     // Modal State
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
     const [personBeingEdited, setPersonBeingEdited] = useState<Person>(DEFAULT_PERSON);
-
-    const getBirthdayUrgency = (birthday: string): string => {
-        if (!birthday) { return '' }; // Guard for empty string
-        const daysUntil = getDaysUntilNextBirthday(birthday);
-
-        if (!daysUntil) { return '' } // No class for invalid dates.  Should be *grey* color.
-        if (daysUntil === 0) { return 'urgent' }; // This means TODAY is their birthday.  Very urgent.
-
-        switch (true) {
-            case (daysUntil <= 7):
-                return 'urgent';
-            case (daysUntil <= 21):
-                return 'warning';
-            default:
-                return 'good';
-        }
-    }
 
     const handleEditableItem = (person: Person) => {
         setPersonBeingEdited(person);
@@ -92,7 +75,7 @@ export function PeopleTable({ people, giftStatsByPerson } : PeopleTableProps) {
                                             <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
                                             {getDaysUntilNextBirthday(person.birthday) ? (
                                                 <div 
-                                                    className={`${styles.birthdayCountdown} ${styles[getBirthdayUrgency(person.birthday)]}`}
+                                                    className={`${styles.birthdayCountdown} ${styles[getEventUrgency(person.birthday, 'birthday')]}`}
                                                 >
                                                     {getDaysUntilNextBirthday(person.birthday)} days away
                                                 </div>

@@ -1,7 +1,7 @@
 import { usePeople } from '../../../../contexts/PeopleContext'
 import { Person } from '../../../../types/PersonType';
 import styles from './PeopleList.module.css'
-import { formatBirthdayShort, getDaysUntilNextBirthday } from '../../../../utils';
+import { formatBirthdayShort, getDaysUntilNextBirthday, getEventUrgency } from '../../../../utils';
 import { Link } from 'react-router';
 import { formatCurrency } from '../../../../utils/currencyUtils';
 
@@ -12,23 +12,6 @@ interface PeopleListProps {
 
 export function PeopleList({ people, giftStatsByPerson } : PeopleListProps) {
     const { loading: loadingPeople } = usePeople();
-
-    const getBirthdayUrgency = (birthday: string): string => {
-        if (!birthday) { return '' }; // Guard for empty string
-        const daysUntil = getDaysUntilNextBirthday(birthday);
-
-        if (!daysUntil) { return '' } // No class for invalid dates.  Should be *grey* color.
-        if (daysUntil === 0) { return 'urgent' }; // This means TODAY is their birthday.  Very urgent.
-
-        switch (true) {
-            case (daysUntil <= 7):
-                return 'urgent';
-            case (daysUntil <= 21):
-                return 'warning';
-            default:
-                return 'good';
-        }
-    }
 
     return (
         <>
@@ -59,7 +42,7 @@ export function PeopleList({ people, giftStatsByPerson } : PeopleListProps) {
                                                 <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
                                                 {getDaysUntilNextBirthday(person.birthday) ? (
                                                     <div 
-                                                        className={`${styles.birthdayCountdown} ${styles[getBirthdayUrgency(person.birthday)]}`}
+                                                        className={`${styles.birthdayCountdown} ${styles[getEventUrgency(person.birthday, 'birthday')]}`}
                                                     >
                                                         ({getDaysUntilNextBirthday(person.birthday)} days)
                                                     </div>
