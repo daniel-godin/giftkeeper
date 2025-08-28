@@ -1,9 +1,6 @@
 import { Link, useNavigate, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useMemo, useState } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { getPersonDocRef } from '../../firebase/firestore';
-import { deleteDoc } from 'firebase/firestore';
 import { Person } from '../../types/PersonType';
 import { getDaysUntilDate } from '../../utils';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
@@ -18,11 +15,9 @@ import { DEFAULT_PERSON } from '../../constants/defaultObjects';
 import { EditPersonModal } from '../../components/modals/EditPersonModal/EditPersonModal';
 import { AddEventModal } from '../../components/modals/AddEventModal/AddEventModal';
 import { useGiftItems } from '../../contexts/GiftItemsContext';
-import { useToast } from '../../contexts/ToastContext';
-import { devError, devLog } from '../../utils/logger';
+import { usePeopleActions } from '../../hooks/usePeopleActions';
 
 export function PersonPage() {
-    const { authState } = useAuth();
     const { personId } = useParams();
     const deviceType = useViewport();
     const { people, loading: peopleLoading } = usePeople();
@@ -30,7 +25,7 @@ export function PersonPage() {
     const upcomingEvents = useUpcomingEvents(personId);
     const { giftItems } = useGiftItems();
     const navigate = useNavigate();
-    const { addToast } = useToast();
+    const { deletePerson } = usePeopleActions();
 
     // State For Modals:
     const [isEditPersonModalOpen, setIsEditPersonModalOpen] = useState<boolean>(false);
@@ -48,35 +43,12 @@ export function PersonPage() {
     }, [personId, people])
 
     const handleDelete = async () => {
-        if (!authState.user) { return }; // Auth Guard Clause
-        if (!personId) { return }; // PersonID Guard Clause
+        const isDeleteSuccessful = await deletePerson(person);
 
-        if (!window.confirm(`Are you sure you want to delete ${person.name}?`)) {
-            return; // Confirm Window
-        }
-
-        try {
-            const docRef = getPersonDocRef(authState.user?.uid, personId);
-            await deleteDoc(docRef);
-
-            devLog(`Successfully deleted person with personId: ${personId}.`)
-            addToast({
-                type: 'success',
-                title: 'Successfully Deleted',
-                message: `You have successfully deleted ${person.name}.`
-            })
-
+        if (isDeleteSuccessful) {
             setTimeout(() => {
                 navigate('/people');
             }, 500)
-        } catch (error) {
-            devError('Error Deleting Person. Error:', error);
-            addToast({
-                type: 'error',
-                title: 'Error!',
-                message: `Unable to delete ${person.name}. Please try again.`,
-                error: error as Error
-            })
         }
     }
 

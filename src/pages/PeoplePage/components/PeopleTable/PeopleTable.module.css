@@ -1,0 +1,128 @@
+.peopleTableContainer {
+    background-color: white;
+    
+    border: 1px solid #e2e8f0;
+
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.peopleTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tableHeader {
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.tableHeader th {
+    padding: 1rem;
+    text-align: left;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tableHeader > tr > th {
+    padding: 1rem;
+}
+
+.tableRow {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+    background-color: #fafbfc;
+}
+
+.tableCell {
+    padding: 1rem;
+    vertical-align: middle;
+}
+
+.nameWithAvatar {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Avatar */
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.personName {
+    font-weight: 600;
+    color: #1a202c;
+    text-decoration: none;
+}
+
+.personName:hover {
+    color: #667eea;
+}
+
+.relationTag {
+    background-color: #e2e8f0;
+    color: #64748b;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.birthdayInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.birthdayDate {
+    font-weight: 500;
+    color: #1a202c;
+}
+
+.birthdayCountdown {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.giftCount {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.spentAmount {
+    font-weight: 600;
+    color: #48bb78;
+}
+
+.actionButtonsContainer {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Status Colors for Birthday */
+.urgent {
+    color: var(--color-urgent);
+}
+
+.warning {
+    color: var(--color-warning);
+}
+
+.good {
+    color: var(--color-good);
+}

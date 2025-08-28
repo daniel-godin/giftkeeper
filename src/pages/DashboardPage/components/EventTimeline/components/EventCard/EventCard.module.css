@@ -14,18 +14,18 @@
 }
 
 .urgent {
-    border-color: #e53e3e;
-    background: linear-gradient(135deg, #fed7d7 0%, #f7fafc 100%);
+    border-color: var(--color-urgent);
+    background: var(--bg-urgent);
 }
 
 .warning {
-    border-color: #f6ad55;
-    background: linear-gradient(135deg, #fef5e7 0%, #f7fafc 100%);
+    border-color: var(--color-warning);
+    background: var(--bg-warning);
 }
 
 .good {
-    border-color: #48bb78;
-    background: linear-gradient(135deg, #f0fff4 0%, #f7fafc 100%);
+    border-color: var(--color-good);
+    background: var(--bg-good);
 }
 
 .eventCardHeader {

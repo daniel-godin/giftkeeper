@@ -60,19 +60,6 @@
     color: transparent;
 }
 
-/* Header Text For Each Section */
-h2 {
-    font-size: 3rem;
-    font-weight: 800;
-    text-align: center;
-}
-
-h3 {
-    font-size: 2rem;
-    font-weight: 700;
-    text-align: center;
-}
-
 .subHeaderText {
     color: #64748b;
     font-size: 1.25rem;

@@ -9,7 +9,7 @@ export interface Event {
 
     // Event Details
     date: string; // Possibly add a "DateRange" for events that last multiple days.
-    type?: string; // Birthday, Holiday, Anniversary, etc.
+    type?: EventTypes; // Birthday, Holiday, Anniversary, etc.
     recurring?: boolean; // Annual recurring events like birthdays.
 
     // Costs -- Store in cents.  100 cents = 1 dollar.  Using 'number' for easier math.
@@ -22,3 +22,5 @@ export interface Event {
     createdAt?: Timestamp | FieldValue;
     updatedAt?: Timestamp | FieldValue;
 }
+
+export type EventTypes = 'birthday' | '';

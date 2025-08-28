@@ -6,6 +6,7 @@ import { useUpcomingEvents } from "./useUpcomingEvents";
 import { getEventDocRef, getEventsCollRef } from "../firebase/firestore";
 import { DEFAULT_EVENT } from "../constants/defaultObjects";
 import { devError, devLog, devWarn } from "../utils/logger";
+import { getNextBirthdayDate } from "../utils";
 
 export const useBirthdayEventManager = () => {
     const { authState } = useAuth();
@@ -43,7 +44,7 @@ export const useBirthdayEventManager = () => {
                 ...DEFAULT_EVENT,
                 id: newDocRef.id,
                 title: `${personName}'s Birthday`,
-                date: nextBirthday,
+                date: nextBirthday || '',
                 people: [personId],
     
                 type: 'birthday',
@@ -90,37 +91,6 @@ export const useBirthdayEventManager = () => {
         } catch (error) {          
             devError('Error in updateBirthdayEvent. Error:', error);
         }
-    }
-
-    // Check's whether the MM-DD has passed for current year.  If yes... returns a YYYY-MM-DD with *next year*, otherwise uses *this year*.
-    const getNextBirthdayDate = (birthday: string): string => {
-        const today = new Date();
-
-        // Parse the date components to avoid timezone issues
-        const [originalYear, originalMonth, originalDay] = birthday.split('-').map(Number);
-
-        // Create date using locale timezone (remember, month is 0-indexed)
-        const birthDate = new Date(originalYear, originalMonth - 1, originalDay);
-    
-        // Set to current year
-        const nextBirthday = new Date(
-            today.getFullYear(),
-            birthDate.getMonth(),
-            birthDate.getDate()
-        )
-    
-        // If Date has already passed *this* year, move to next year
-        if (nextBirthday <= today) {
-            nextBirthday.setFullYear(today.getFullYear() + 1);
-        }
-
-        // Manually format to avoid timezone issues
-        const year = nextBirthday.getFullYear();
-        const month = String(nextBirthday.getMonth() + 1).padStart(2, '0');
-        const day = String(nextBirthday.getDate()).padStart(2, '0');
-
-        // Return as YYYY-MM-DD string
-        return `${year}-${month}-${day}`;
     }
 
     const findUpcomingBirthdayEvent = (personId: string): Event | null => {

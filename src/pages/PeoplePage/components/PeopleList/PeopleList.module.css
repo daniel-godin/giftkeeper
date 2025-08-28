@@ -1,0 +1,106 @@
+.peopleListContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    padding-bottom: 2rem;
+}
+
+.personCard {
+    background-color: white;
+    padding: 0.75rem;
+
+    border-radius: 1rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.cardRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nameWithAvatar {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Avatar */
+.avatar {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.personName {
+    font-weight: 600;
+    color: #1a202c;
+    text-decoration: none;
+}
+
+.personName:hover {
+    color: #667eea;
+}
+
+.leftSide {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+}
+
+.relationTag {
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.birthdayInfo {
+    display: flex;
+    gap: 0.25rem;
+    align-items: center;
+
+    font-size: 0.8rem;
+}
+
+.birthdayDate {
+    font-weight: 500;
+    color: #1a202c;
+}
+
+.birthdayCountdown {
+    color: #64748b;
+    font-weight: 600;
+}
+
+.giftCount {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.spentAmount {
+    font-weight: 600;
+    color: #48bb78;
+}
+    
+/* Status Colors for Birthday */
+.urgent {
+    color: var(--color-urgent);
+}
+
+.warning {
+    color: var(--color-warning);
+}
+
+.good {
+    color: var(--color-good);
+}

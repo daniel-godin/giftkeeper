@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import styles from './DashboardHeader.module.css'
-import { QuickActionButton } from './components/QuickActionButton/QuickActionButton'
+import { QuickActionButton } from '../../../../components/ui/QuickActionButton/QuickActionButton'
 import { CalendarFold, Gift, UsersRound } from 'lucide-react'
 import { AddGiftItemModal } from '../../../../components/modals/AddGiftItemModal/AddGiftItemModal';
 import { AddEventModal } from '../../../../components/modals/AddEventModal/AddEventModal';
 import { AddPersonModal } from '../../../../components/modals/AddPersonModal/AddPersonModal';
-import { StatCard } from './components/StatCard/StatCard';
+import { StatCard } from '../../../../components/ui/StatCard/StatCard';
 import { useEvents } from '../../../../contexts/EventsContext';
 import { usePeople } from '../../../../contexts/PeopleContext';
 import { useUpcomingEvents } from '../../../../hooks/useUpcomingEvents';

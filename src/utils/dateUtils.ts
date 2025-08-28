@@ -1,3 +1,6 @@
+import { UrgencyLevel } from "../types/CommonTypes";
+import { EventTypes } from "../types/EventType";
+
 // Date string input "YYYY-MM-DD"
 export const getDaysUntilDate = (date: string): number => {
     // Check format first
@@ -74,4 +77,84 @@ export const isValidDateString = (dateString: string): boolean => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dateString)) { return false };
 
     return true
+}
+
+// Valid date string === "YYYY-MM-DD".  Returns a shorted month (eg. Mar, instead of March), with the day.  No year returned.
+export const formatBirthdayShort = (birthdayDate: string): string => {
+    if (!birthdayDate) { return '--' }; // Guard.  Missing input
+    if (!isValidDate(birthdayDate)) { return '--' }; // Invalid DateString.
+
+    const [year, month, day] = birthdayDate.split('-').map(Number);
+    const dateObject = new Date(year, month - 1, day);
+
+    return dateObject.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric'
+    })
+}
+
+// Check's whether the MM-DD has passed for current year.  If yes... returns a YYYY-MM-DD with *next year*, otherwise uses *this year*.
+export const getNextBirthdayDate = (birthdayDate: string): string | null => {
+    if (!birthdayDate) { return null }; // Guard.  Missing input
+    if (!isValidDate(birthdayDate)) { return null }; // Invalid DateString.
+    
+    const today = new Date();
+
+    // Parse the date components to avoid timezone issues
+    const [originalYear, originalMonth, originalDay] = birthdayDate.split('-').map(Number);
+
+    // Create date using locale timezone (remember, month is 0-indexed)
+    const birthDate = new Date(originalYear, originalMonth - 1, originalDay);
+
+    // Set to current year
+    const nextBirthday = new Date(
+        today.getFullYear(),
+        birthDate.getMonth(),
+        birthDate.getDate()
+    )
+
+    // If Date has already passed *this* year, move to next year
+    if (nextBirthday <= today) {
+        nextBirthday.setFullYear(today.getFullYear() + 1);
+    }
+
+    // Manually format to avoid timezone issues
+    const year = nextBirthday.getFullYear();
+    const month = String(nextBirthday.getMonth() + 1).padStart(2, '0');
+    const day = String(nextBirthday.getDate()).padStart(2, '0');
+
+    // Return as YYYY-MM-DD string
+    return `${year}-${month}-${day}`;
+}
+
+export const getDaysUntilNextBirthday = (birthdayDate: string): number => {
+    const nextBirthdayDate = getNextBirthdayDate(birthdayDate);
+    if (!nextBirthdayDate) { return 0 };
+    const daysUntil = getDaysUntilDate(nextBirthdayDate);
+    return daysUntil;
+}
+
+// Takes in a dateString with an optional eventType
+// Returns "urgent", "warning", or "good" strings, depending on how soon an event is.
+export const getEventUrgency = (dateString: string, eventType?: EventTypes): UrgencyLevel => {
+    if (!dateString) { return '' }; // Guard
+
+    let daysUntil: number;
+    if (eventType === 'birthday') { 
+        daysUntil = getDaysUntilNextBirthday(dateString);
+    } else {
+        daysUntil = getDaysUntilDate(dateString);
+    }
+
+    if (daysUntil === null || daysUntil === undefined) { return '' }; // No class name return.
+    if (daysUntil === 0) { return 'urgent' }; // This means TODAY is the date.  URGENT.
+
+    switch (true) {
+        case (daysUntil <= 7):
+            return 'urgent';
+        case (daysUntil <= 21):
+            return 'warning';
+        default:
+            return 'good';
+    }
 }
