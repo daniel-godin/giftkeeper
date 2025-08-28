@@ -1,7 +1,5 @@
 import { useState } from 'react';
 import { FormInput, FormSelect } from '../../../../components/ui'
-import { useGiftItems } from '../../../../contexts/GiftItemsContext';
-import { usePeople } from '../../../../contexts/PeopleContext';
 import { PeopleSortOptions } from '../../../../hooks/usePeopleFiltered';
 import styles from './PeopleFilterSort.module.css'
 

@@ -195,7 +195,7 @@ describe('isValidEventDate', () => {
     describe('edge cases', () => {
         test('handles leap years correctly', () => {
             // 2024 is a leap year - Feb 29 should be valid if in future/today
-            const feb29_2024 = '2024-02-29';
+            // const feb29_2024 = '2024-02-29';
             // 2025 is not a leap year - Feb 29 should be invalid
             const feb29_2025 = '2025-02-29';
             
