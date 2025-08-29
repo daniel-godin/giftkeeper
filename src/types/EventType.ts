@@ -24,3 +24,12 @@ export interface Event {
 }
 
 export type EventTypes = 'birthday' | '';
+
+// Sorting options for events
+export type EventsSortByOptions = 'title' | 'date' | 'giftCount' | 'totalSpent' | 'recentlyAdded';
+
+export interface EventsSortOptions {
+    sortBy: EventsSortByOptions;
+    sortDirection: 'asc' | 'desc';
+    searchTerm: string; // For "quick" type searching for an event.
+}

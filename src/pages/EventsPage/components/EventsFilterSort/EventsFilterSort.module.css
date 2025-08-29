@@ -1,0 +1,35 @@
+.eventsFilterSort {
+    background-color: white;
+
+    padding: 0.75rem;
+
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.eventsFilterSortHeader {
+    font-weight: 600;
+    font-size: 1.2rem;
+
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: space-between;
+
+    cursor: pointer;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.sortContainer {
+    display: grid;
+    grid-template-columns: 3fr 1fr;
+    gap: 0.5rem;
+}
+
