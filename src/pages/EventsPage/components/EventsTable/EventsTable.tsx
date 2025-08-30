@@ -4,10 +4,11 @@ import { Event } from '../../../../types/EventType';
 import styles from './EventsTable.module.css';
 import { DEFAULT_EVENT } from '../../../../constants/defaultObjects';
 import { Link } from 'react-router';
-import { formatBirthdayShort, getDaysUntilDate, getEventUrgency } from '../../../../utils';
+import { formatDateShort, getDaysUntilDate, getEventUrgency } from '../../../../utils';
 import { formatCurrency } from '../../../../utils/currencyUtils';
 import { EditEventModal } from '../../../../components/modals/EditEventModal/EditEventModal';
 import { Pencil, Trash2 } from 'lucide-react';
+import { useEventsActions } from '../../../../hooks/useEventsActions';
 
 interface EventsTableProps {
     events: Event[];
@@ -16,7 +17,7 @@ interface EventsTableProps {
 
 export function EventsTable({ events, giftStatsByEvent } : EventsTableProps) {
     const { loading: loadingEvents } = useEvents();
-    // const { deletePerson } = usePeopleActions();
+    const { deleteEvent } = useEventsActions();
 
     // Modal State
     const [isEditEventModalOpen, setIsEditEventModalOpen] = useState<boolean>(false);
@@ -28,7 +29,7 @@ export function EventsTable({ events, giftStatsByEvent } : EventsTableProps) {
     }
 
     const handleDelete = async (event: Event) => {
-        // await deletePerson(person);
+        await deleteEvent(event);
     }
 
     return (
@@ -72,7 +73,7 @@ export function EventsTable({ events, giftStatsByEvent } : EventsTableProps) {
                                 <td className={styles.tableCell}>
                                     {event.date && (
                                         <div className={styles.eventDateInfo}>
-                                            <div className={styles.eventDate}>{formatBirthdayShort(event.date)}</div>
+                                            <div className={styles.eventDate}>{formatDateShort(event.date)}</div>
                                             {getDaysUntilDate(event.date) ? (
                                                 <div 
                                                     className={`${styles.eventCountdown} ${styles[getEventUrgency(event.date, '')]}`}
@@ -147,9 +148,9 @@ const SkeletonTable = ({ rows = 5 }) => {
         <table className={styles.eventsTable}>
             <thead className={styles.tableHeader}>
                 <tr>
-                    <th>NAME</th>
+                    <th>TITLE</th>
                     <th>TYPE</th>
-                    <th>BIRTHDAY</th>
+                    <th>DATE</th>
                     <th>GIFTS</th>
                     <th>SPENT</th>
                     <th>ACTIONS</th>

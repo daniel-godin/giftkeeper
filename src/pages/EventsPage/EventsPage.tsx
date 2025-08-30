@@ -29,7 +29,7 @@ export function EventsPage () {
             {deviceType === 'desktop' && ( 
                 <EventsTable
                     events={filteredEvents}
-                    giftStatsByPerson={giftStatsByEvent}
+                    giftStatsByEvent={giftStatsByEvent}
                 /> 
             )}
 
@@ -37,7 +37,7 @@ export function EventsPage () {
             {deviceType === 'mobile' && ( 
                 <EventsList 
                     events={filteredEvents}
-                    giftStatsByPerson={giftStatsByEvent}
+                    giftStatsByEvent={giftStatsByEvent}
                 /> 
             )}
 
