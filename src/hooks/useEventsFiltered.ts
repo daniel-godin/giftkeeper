@@ -2,14 +2,16 @@ import { useMemo, useState } from "react";
 import { useGiftItems } from "../contexts/GiftItemsContext";
 import { getDaysUntilDate } from "../utils";
 import { Timestamp } from "firebase/firestore";
-import { EventsSortOptions } from "../types/EventType";
+import { Event, EventsSortOptions } from "../types/EventType";
 import { useEvents } from "../contexts/EventsContext";
+import { useUpcomingEvents } from "./useUpcomingEvents";
 
 export function useEventsFiltered() {
     const { events } = useEvents();
+    const upcomingEvents = useUpcomingEvents();
     const { giftItems } = useGiftItems();
 
-    const [sortOptions, setSortOptions] = useState<EventsSortOptions>({ sortBy: 'title', sortDirection: 'asc', searchTerm: '' });
+    const [sortOptions, setSortOptions] = useState<EventsSortOptions>({ sortBy: 'date', sortDirection: 'asc', searchTerm: '', showAllEvents: false });
 
     // Saves number of gift items & total spent in a useMemo so it doesn't have to calculate every rerender.
     const giftStatsByEvent = useMemo(() => {
@@ -37,7 +39,11 @@ export function useEventsFiltered() {
     }, [giftItems, events]);
     
     const filteredEvents = useMemo(() => {
-        let result = [...events];
+        // ShowAllEvents(true) === Show ALL events, otherwise use the default of "upcomingEvents".
+        let result: Event[] = [];
+        
+        if (sortOptions.showAllEvents) { result = [...events] }
+        if (!sortOptions.showAllEvents) { result = [...upcomingEvents] }
 
         // Filter First -- Filtered by Title (maybe people in the future)
         if (sortOptions.searchTerm) {
@@ -48,7 +54,7 @@ export function useEventsFiltered() {
             })
         }
 
-        // Sort By Name
+        // Sort By Title
         if (sortOptions.sortBy === 'title') {
             return result.sort((a, b) => {
                 const eventA = a.title.toLowerCase();
@@ -67,12 +73,13 @@ export function useEventsFiltered() {
             })
         }
 
+        // Sort by days until date
         if (sortOptions.sortBy === 'date') {
             return result.sort((a, b) => {
                 const eventA = getDaysUntilDate(a.date || '');
                 const eventB = getDaysUntilDate(b.date || '');
 
-                // Handle missing birthdays -- Put At Bottom of List
+                // Handle missing event dates -- Put At Bottom of List
                 if (!eventA && !eventB) { return 0 };
                 if (!eventA) { return 1 };
                 if (!eventB) { return -1 };

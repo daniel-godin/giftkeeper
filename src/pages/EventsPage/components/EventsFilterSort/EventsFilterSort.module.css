@@ -27,6 +27,16 @@
     gap: 0.5rem;
 }
 
+.searchTermAndShowAllEventsContainer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.5rem;
+}
+
+.checkbox {
+    align-self: center;
+}
+
 .sortContainer {
     display: grid;
     grid-template-columns: 3fr 1fr;

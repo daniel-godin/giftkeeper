@@ -32,4 +32,5 @@ export interface EventsSortOptions {
     sortBy: EventsSortByOptions;
     sortDirection: 'asc' | 'desc';
     searchTerm: string; // For "quick" type searching for an event.
+    showAllEvents: boolean; // Toggle between "upcomingEvents" & "events".
 }

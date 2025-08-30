@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FormInput, FormSelect } from '../../../../components/ui';
+import { FormCheckbox, FormInput, FormSelect } from '../../../../components/ui';
 import styles from './EventsFilterSort.module.css';
 import { EventsSortOptions } from '../../../../types/EventType';
 
@@ -48,15 +48,25 @@ export function EventsFilterSort({ sortOptions, setSortOptions } : EventsFilterS
 
             {showSortOptions && (
                 <form className={styles.form} autoComplete='off'>
+                    <div className={styles.searchTermAndShowAllEventsContainer}>
+                        {/* Text Search Input */}
+                        <FormInput
+                            type='text'
+                            name='searchTerm'
+                            placeholder='search events...'
+                            value={sortOptions.searchTerm}
+                            onChange={handleInputChange}
+                        />
 
-                    {/* Text Search Input */}
-                    <FormInput
-                        type='text'
-                        name='searchTerm'
-                        placeholder='search events...'
-                        value={sortOptions.searchTerm}
-                        onChange={handleInputChange}
-                    />
+                        {/* Use all events, or use just upcomingEvents (default) */}
+                        <FormCheckbox
+                            // label='Show all events (including past)'
+                            name='showAllEvents'
+                            checked={sortOptions.showAllEvents}
+                            onChange={(checked) => setSortOptions(prev => ({ ...prev, showAllEvents: checked }))}
+                            inputClassName={styles.checkbox}
+                        />
+                    </div>
 
                     <div className={styles.sortContainer}>
                         {/* Sort By Options: Title, Upcoming Event, Gift Count, Total Spent, or Recently Added */}
