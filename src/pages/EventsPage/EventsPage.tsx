@@ -3,10 +3,12 @@ import { useViewport } from '../../contexts/ViewportContext';
 import { EventsHeader } from './components/EventsHeader/EventsHeader';
 import { EventsFilterSort } from './components/EventsFilterSort/EventsFilterSort';
 import { useEventsFiltered } from '../../hooks/useEventsFiltered';
+import { EventsTable } from './components/EventsTable/EventsTable';
+import { EventsList } from './components/EventsList/EventsList';
 
 export function EventsPage () {
     // IMPORTANT NOTE:
-    // Currently *ONLY* displaying "upcomingEvents".  Need a way to display *ALL* events later.
+    // Need a way to display *ALL* events, vs. "upcoming" events.
 
     const deviceType = useViewport();
     const { sortOptions, setSortOptions, filteredEvents, giftStatsByEvent } = useEventsFiltered();
@@ -24,11 +26,20 @@ export function EventsPage () {
             />
 
             {/* Load EventsTable if user screen is above 768px */}
-
-
+            {deviceType === 'desktop' && ( 
+                <EventsTable
+                    events={filteredEvents}
+                    giftStatsByPerson={giftStatsByEvent}
+                /> 
+            )}
 
             {/* Load EventsList if user screen is below 768px */}
-
+            {deviceType === 'mobile' && ( 
+                <EventsList 
+                    events={filteredEvents}
+                    giftStatsByPerson={giftStatsByEvent}
+                /> 
+            )}
 
         </section>
     )
