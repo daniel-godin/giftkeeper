@@ -26,7 +26,7 @@ export interface Event {
 export type EventTypes = 'birthday' | '';
 
 // Sorting options for events
-export type EventsSortByOptions = 'title' | 'date' | 'giftCount' | 'totalSpent' | 'recentlyAdded';
+export type EventsSortByOptions = 'title' | 'type' | 'date' | 'giftCount' | 'totalSpent' | 'recentlyAdded';
 
 export interface EventsSortOptions {
     sortBy: EventsSortByOptions;
