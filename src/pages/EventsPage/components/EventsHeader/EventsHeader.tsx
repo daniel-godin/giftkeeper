@@ -19,7 +19,7 @@ export function EventsHeader() {
 
                 <QuickActionButton
                     icon={<CalendarFold />}
-                    text='Create Events'
+                    text='Create Event'
                     onClick={() => setIsAddNewEventModalOpen(true)}
                     variant='primary'
                 />
