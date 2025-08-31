@@ -1,7 +1,7 @@
 import { usePeople } from '../../../../contexts/PeopleContext'
 import { Person } from '../../../../types/PersonType';
 import styles from './PeopleList.module.css'
-import { formatBirthdayShort, getDaysUntilNextBirthday, getEventUrgency } from '../../../../utils';
+import { formatDateShort, getDaysUntilNextBirthday, getEventUrgency } from '../../../../utils';
 import { Link } from 'react-router';
 import { formatCurrency } from '../../../../utils/currencyUtils';
 
@@ -39,7 +39,7 @@ export function PeopleList({ people, giftStatsByPerson } : PeopleListProps) {
                                         {person.relationship && person.birthday && ( <span> • </span> )}
                                         {person.birthday && (
                                             <div className={styles.birthdayInfo}>
-                                                <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
+                                                <div className={styles.birthdayDate}>{formatDateShort(person.birthday)}</div>
                                                 {getDaysUntilNextBirthday(person.birthday) ? (
                                                     <div 
                                                         className={`${styles.birthdayCountdown} ${styles[getEventUrgency(person.birthday, 'birthday')]}`}

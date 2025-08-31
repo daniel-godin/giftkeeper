@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { formatBirthdayShort, getDaysUntilDate, isValidBirthday, isValidDate, isValidDateString, isValidEventDate } from './dateUtils'
+import { formatDateShort, getDaysUntilDate, isValidBirthday, isValidDate, isValidDateString, isValidEventDate } from './dateUtils'
 
 // Tests For getDaysUntilDate
 describe('getDaysUntilDate', () => {
@@ -245,32 +245,32 @@ describe('isValidDateString', () => {
     })
 })
 
-// Tests for formatBirthdayShort Utility Function
+// Tests for formatDateShort Utility Function
 // Proper/Valid Input Date String:  "YYYY-MM-DD".  Returns a shortened month + day "Mar 15".
-describe('formatBirthdayShort', () => {
+describe('formatDateShort', () => {
     test('valid birthday strings', () => {
-        expect(formatBirthdayShort('2000-03-15')).toBe('Mar 15');
-        expect(formatBirthdayShort('1988-12-05')).toBe('Dec 5');
-        expect(formatBirthdayShort('1899-09-22')).toBe('Sep 22');
+        expect(formatDateShort('2000-03-15')).toBe('Mar 15');
+        expect(formatDateShort('1988-12-05')).toBe('Dec 5');
+        expect(formatDateShort('1899-09-22')).toBe('Sep 22');
     })
     
     test('invalid birthday strings', () => {
-        expect(formatBirthdayShort('')).toBe('--');
-        expect(formatBirthdayShort(' ')).toBe('--');
-        expect(formatBirthdayShort('date')).toBe('--');
-        expect(formatBirthdayShort('12-20-2000')).toBe('--');
+        expect(formatDateShort('')).toBe('--');
+        expect(formatDateShort(' ')).toBe('--');
+        expect(formatDateShort('date')).toBe('--');
+        expect(formatDateShort('12-20-2000')).toBe('--');
     })
 
     test('edge case dates', () => {
-        expect(formatBirthdayShort('2000-02-29')).toBe('Feb 29'); // Leap year
-        expect(formatBirthdayShort('2000-01-31')).toBe('Jan 31'); // End of month
-        expect(formatBirthdayShort('2000-04-30')).toBe('Apr 30'); // 30-day month
-        expect(formatBirthdayShort('2000-02-28')).toBe('Feb 28'); // Non-leap year Feb
+        expect(formatDateShort('2000-02-29')).toBe('Feb 29'); // Leap year
+        expect(formatDateShort('2000-01-31')).toBe('Jan 31'); // End of month
+        expect(formatDateShort('2000-04-30')).toBe('Apr 30'); // 30-day month
+        expect(formatDateShort('2000-02-28')).toBe('Feb 28'); // Non-leap year Feb
     })
 
     test('single digit days', () => {
-        expect(formatBirthdayShort('2000-01-01')).toBe('Jan 1');
-        expect(formatBirthdayShort('2000-07-04')).toBe('Jul 4');
+        expect(formatDateShort('2000-01-01')).toBe('Jan 1');
+        expect(formatDateShort('2000-07-04')).toBe('Jul 4');
     })
 })
 

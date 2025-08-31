@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { usePeople } from '../../../../contexts/PeopleContext'
 import styles from './PeopleTable.module.css'
 import { Link } from 'react-router';
-import { formatBirthdayShort, getDaysUntilNextBirthday, getEventUrgency } from '../../../../utils';
+import { formatDateShort, getDaysUntilNextBirthday, getEventUrgency } from '../../../../utils';
 import { Pencil, Trash2 } from 'lucide-react';
 import { Person } from '../../../../types/PersonType';
 import { DEFAULT_PERSON } from '../../../../constants/defaultObjects';
@@ -72,7 +72,7 @@ export function PeopleTable({ people, giftStatsByPerson } : PeopleTableProps) {
                                 <td className={styles.tableCell}>
                                     {person.birthday && (
                                         <div className={styles.birthdayInfo}>
-                                            <div className={styles.birthdayDate}>{formatBirthdayShort(person.birthday)}</div>
+                                            <div className={styles.birthdayDate}>{formatDateShort(person.birthday)}</div>
                                             {getDaysUntilNextBirthday(person.birthday) ? (
                                                 <div 
                                                     className={`${styles.birthdayCountdown} ${styles[getEventUrgency(person.birthday, 'birthday')]}`}
