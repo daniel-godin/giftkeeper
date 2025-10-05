@@ -25,35 +25,25 @@ export const useAuth = () => {
 export function AuthProvider({ children } : { children: React.ReactNode }) {
     const [authState, setAuthState] = useState<AuthState>({
         user: null,
-        loading: true
+        loading: true,
+        error: undefined
     })
 
     useEffect(() => {
-        const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
-            try {
-                if (user) {
-                    setAuthState(prev => ({
-                        ...prev,
-                        user,
-                        loading: false
-                    }))
-                } else {
-                    setAuthState(prev => ({
-                        ...prev,
-                        user: user || null,
-                        loading: false
-                    }))
-                }
-            } catch (error) {
-                devError('Error With Auth State', error)
-
-                setAuthState({
-                    user: null,
-                    loading: false,
-                    error: error instanceof Error ? error.message : "An Unknown Error Occured"
-                })
-            }
-        })
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            setAuthState({
+                user: user,
+                loading: false,
+                error: undefined
+            });
+        }, (error) => {
+            devError('Auth state error: ', error);
+            setAuthState({
+                user: null,
+                loading: false,
+                error: error instanceof Error ? error.message : "An unknown error occured"
+            });
+        });
 
         return () => { unsubscribeAuth() }; // Cleanup Function
     }, [])
@@ -64,7 +54,7 @@ export function AuthProvider({ children } : { children: React.ReactNode }) {
     
     return (
         <AuthContext.Provider value={value}>
-            {!authState.loading && children}
+            {children}
         </AuthContext.Provider>
     )
 }
