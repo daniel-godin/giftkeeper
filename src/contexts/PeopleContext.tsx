@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Person } from "../types/PersonType";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { getPeopleCollRef } from "../firebase/firestore";
@@ -13,12 +13,10 @@ interface PeopleState {
 
 const PeopleContext = createContext<PeopleState | undefined>(undefined);
 
+// Hook for easy access to people data throughout the code, without using useContext everywhere
 export const usePeople = () => {
     const context = useContext(PeopleContext);
-
-    // Guard Clause
-    if (context === undefined) { throw new Error('usePeople must be used within a PeopleProvider'); };
-
+    if (context === undefined) { throw new Error('usePeople must be used within a PeopleProvider'); }; // Guard
     return context;
 }
 
@@ -32,8 +30,7 @@ export function PeopleProvider({ children } : { children: React.ReactNode }) {
     })
 
     useEffect(() => {
-        // Guard Clause
-        if (!authState.user) { 
+        if (!authState.user) { // Guard against no user
             setPeopleState({ people: [], loading: false });
             return; 
         };
@@ -42,11 +39,9 @@ export function PeopleProvider({ children } : { children: React.ReactNode }) {
         const peopleQuery = query(collRef, orderBy('name'));
 
         const unsubscribe = onSnapshot(peopleQuery, (snapshot) => {
-            const data: Person[] = [];
-
-            snapshot.forEach((doc) => {
-                data.push(doc.data() as Person);
-            })
+            const data = snapshot.docs.map((doc => {
+                return doc.data() as Person;
+            }))
 
             setPeopleState({
                 people: data,
@@ -67,10 +62,14 @@ export function PeopleProvider({ children } : { children: React.ReactNode }) {
         })
 
         return () => unsubscribe();
-    }, [authState.user?.uid]);
+    }, [authState.user?.uid]); // Not including addToast, because I don't want to restart the listener for any toast changes.
+
+    const value = useMemo<PeopleState>(() => (
+        peopleState
+    ), [peopleState])
 
     return (
-        <PeopleContext.Provider value={peopleState}>
+        <PeopleContext.Provider value={value}>
             {children}
         </PeopleContext.Provider>
     )
