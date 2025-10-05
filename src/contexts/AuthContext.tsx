@@ -15,12 +15,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Auth Hook to use anywhere inside of the codebase
 export const useAuth = () => {
     const context = useContext(AuthContext);
-
-    // Guard Clause
-    if (context === undefined) { throw new Error('useAuth must be used within an AuthProvider'); };
-
+    if (context === undefined) { throw new Error('useAuth must be used within an AuthProvider') }; // Guard
     return context;
 }
 
