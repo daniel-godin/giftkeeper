@@ -1,5 +1,5 @@
 import { onAuthStateChanged, User } from "firebase/auth";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { auth } from "../firebase/firebase";
 import { devError } from "../utils/logger";
 
@@ -46,11 +46,12 @@ export function AuthProvider({ children } : { children: React.ReactNode }) {
         });
 
         return () => { unsubscribeAuth() }; // Cleanup Function
-    }, [])
+    }, []);
 
-    const value: AuthContextType = {
+    // Memoizing to prevent unnesessary re-renders of auth during a component re-render.
+    const value = useMemo<AuthContextType>(() => ({
         authState
-    }
+    }), [authState])
     
     return (
         <AuthContext.Provider value={value}>
