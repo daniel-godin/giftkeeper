@@ -2,7 +2,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import styles from './PersonPage.module.css'
 import { useMemo, useState } from 'react';
 import { Person } from '../../types/PersonType';
-import { getDaysUntilDate } from '../../utils';
+import { getDaysUntilDate, getDaysUntilNextBirthday } from '../../utils';
 import { useUpcomingEvents } from '../../hooks/useUpcomingEvents';
 import { useEvents } from '../../contexts/EventsContext';
 import { usePeople } from '../../contexts/PeopleContext';
@@ -41,12 +41,6 @@ export function PersonPage() {
     const person = useMemo(() => {
         return people.find(p => p.id === personId) || { ...DEFAULT_PERSON }; // Return empty "person" if .find() can't find the personId.
     }, [personId, people]);
-
-    // Grabs upcoming birthday from the upcoming events hook
-    const upcomingBirthday = useMemo(() => {
-        const upcomingBirthday = upcomingEvents.find(event => event.type === 'birthday');
-        return upcomingBirthday
-    }, [upcomingEvents]);
 
     const handleDelete = async () => {
         const isDeleteSuccessful = await deletePerson(person);
@@ -107,7 +101,7 @@ export function PersonPage() {
                     <div className={styles.statCard}>
                         {person.birthday ? (
                             <>
-                                <div className={styles.statNumber}>{getDaysUntilDate(upcomingBirthday?.date || '')}</div>
+                                <div className={styles.statNumber}>{getDaysUntilNextBirthday(person.birthday)}</div>
                                 <div className={styles.statLabel}>Days to Birthday</div>
                             </>
                         ) : (
