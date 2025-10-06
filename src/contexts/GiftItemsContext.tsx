@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { onSnapshot, orderBy, query } from "firebase/firestore";
 import { getGiftItemsCollRef } from "../firebase/firestore";
 import { useAuth } from "./AuthContext";
@@ -13,12 +13,10 @@ interface GiftItemsState {
 
 const GiftItemsContext = createContext<GiftItemsState | undefined>(undefined);
 
+// Hook for easy access to gift item data throughout the codebase, without using useContext everywhere.
 export const useGiftItems = () => {
     const context = useContext(GiftItemsContext);
-
-    // Guard Clause
     if (context === undefined) { throw new Error('useGiftItems must be used within a GiftItemsProvider'); };
-
     return context;
 }
 
@@ -42,18 +40,18 @@ export function GiftItemsProvider({ children } : { children: React.ReactNode }) 
         const giftItemsQuery = query(collRef, orderBy('createdAt', 'desc'));
 
         const unsubscribe = onSnapshot(giftItemsQuery, (snapshot) => {
-            const data: GiftItem[] = [];
-
-            snapshot.forEach((doc) => {
-                data.push(doc.data() as GiftItem);
-            })
+            const data: GiftItem[] = snapshot.docs.map((doc => {
+                return doc.data() as GiftItem;
+            }))
 
             setGiftItemsState({
                 giftItems: data,
                 loading: false
             })
+
         }, (error) => {
             devError('Error fetching gift items. Error:', error);
+
             addToast({
                 type: 'error',
                 title: 'Error',
@@ -68,10 +66,14 @@ export function GiftItemsProvider({ children } : { children: React.ReactNode }) 
         })
 
         return () => unsubscribe();
-    }, [authState.user?.uid]);
+    }, [authState.user?.uid]);  // Not including addToast, because I don't want to restart the listener for any toast changes.
+
+    const value = useMemo<GiftItemsState>(() => (
+        giftItemsState
+    ), [giftItemsState])
 
     return (
-        <GiftItemsContext.Provider value={giftItemsState}>
+        <GiftItemsContext.Provider value={value}>
             {children}
         </GiftItemsContext.Provider>
     )
