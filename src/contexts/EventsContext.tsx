@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Event } from "../types/EventType";
 import { useAuth } from "./AuthContext";
 import { getEventsCollRef } from "../firebase/firestore";
@@ -13,12 +13,10 @@ interface EventsState {
 
 const EventsContext = createContext<EventsState | undefined>(undefined);
 
+// Hook for easy access to event data throughout codebase, without using useContext everywhere.
 export const useEvents = () => {
     const context = useContext(EventsContext);
-
-    // Guard Clause
-    if (context === undefined) { throw new Error('useEvents must be used within a EventsProvider'); };
-
+    if (context === undefined) { throw new Error('useEvents must be used within a EventsProvider'); }; // Guard
     return context;
 }
 
@@ -42,11 +40,9 @@ export function EventsProvider({ children } : { children: React.ReactNode }) {
         const eventsQuery = query(collRef, orderBy('date'));
 
         const unsubscribe = onSnapshot(eventsQuery, (snapshot) => {
-            const data: Event[] = [];
-
-            snapshot.forEach((doc) => {
-                data.push(doc.data() as Event);
-            })
+            const data: Event[] = snapshot.docs.map((doc => {
+                return doc.data() as Event;
+            }))
 
             setEventsState({
                 events: data,
@@ -70,10 +66,14 @@ export function EventsProvider({ children } : { children: React.ReactNode }) {
         })
 
         return () => unsubscribe();
-    }, [authState.user?.uid]);
+    }, [authState.user?.uid]); // Not including addToast, because I don't want to restart the listener for any toast changes.
+
+    const value = useMemo<EventsState>(() => (
+        eventsState
+    ), [eventsState])
 
     return (
-        <EventsContext.Provider value={eventsState}>
+        <EventsContext.Provider value={value}>
             {children}
         </EventsContext.Provider>
     )
