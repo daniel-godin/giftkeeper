@@ -1,3 +1,7 @@
+// Important Note:
+// This would be better ran as a series of backend CRON jobs or triggered Cloud Functions
+// Using frontend functions with a useEffect trigger for speed of development on a small project
+
 import { useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext"
 import { useEvents } from "../contexts/EventsContext";
@@ -50,7 +54,7 @@ export function DataSync({ children } : { children: React.ReactNode }) {
 
         checkAndSyncBirthdays();
 
-    }, [authState.user?.uid, people, eventsLoading]); 
+    }, [authState.user?.uid]); 
 
     return (
         <>
