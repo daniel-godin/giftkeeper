@@ -22,11 +22,11 @@ const rootElement = document.getElementById('root');
 if (!rootElement) { throw new Error('Root element not found'); };
 createRoot(rootElement).render(
     <StrictMode>
-        <AuthProvider>
-            <ToastProvider>
+        <ToastProvider>
+            <AuthProvider>
                 <App />
-                <ToastContainer />
-            </ToastProvider>
-        </AuthProvider>
+            </AuthProvider>
+            <ToastContainer />
+        </ToastProvider>
     </StrictMode>,
 )

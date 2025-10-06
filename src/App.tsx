@@ -46,7 +46,7 @@ function ProtectedRoute () {
     const { authState } = useAuth();
 
     // Loading & Guard Clauses:
-    if (authState.loading) { return <div>Loading...</div> };
+    if (authState.loading) { return <div>Loading...</div> };  // TODO:  Needs a proper <Loading> UI Component
     if (!authState.user) { return <Navigate to='/auth' replace /> };
 
     return (

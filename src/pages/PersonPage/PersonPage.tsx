@@ -40,7 +40,13 @@ export function PersonPage() {
     // Person Data for PersonId
     const person = useMemo(() => {
         return people.find(p => p.id === personId) || { ...DEFAULT_PERSON }; // Return empty "person" if .find() can't find the personId.
-    }, [personId, people])
+    }, [personId, people]);
+
+    // Grabs upcoming birthday from the upcoming events hook
+    const upcomingBirthday = useMemo(() => {
+        const upcomingBirthday = upcomingEvents.find(event => event.type === 'birthday');
+        return upcomingBirthday
+    }, [upcomingEvents]);
 
     const handleDelete = async () => {
         const isDeleteSuccessful = await deletePerson(person);
@@ -101,7 +107,7 @@ export function PersonPage() {
                     <div className={styles.statCard}>
                         {person.birthday ? (
                             <>
-                                <div className={styles.statNumber}>{getDaysUntilDate(person.birthday)}</div>
+                                <div className={styles.statNumber}>{getDaysUntilDate(upcomingBirthday?.date || '')}</div>
                                 <div className={styles.statLabel}>Days to Birthday</div>
                             </>
                         ) : (
