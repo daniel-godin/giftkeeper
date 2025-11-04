@@ -17,9 +17,6 @@ export function App() {
         <ErrorBoundary>
             <BrowserRouter>
                 <Routes>
-                    {/* Basic Redirect Route */}
-                    <Route path="*" element={<LandingPage />} />
-
                     {/* Public Routes */}
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/auth" element={<AuthPage />} />
@@ -34,6 +31,9 @@ export function App() {
 
                         <Route path="events" element={<EventsPage />} />
                         <Route path="events/:eventId" element={<EventPage />} />
+
+                        {/* Basic Redirect Route */}
+                        <Route path="*" element={<Navigate to='/' replace />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
